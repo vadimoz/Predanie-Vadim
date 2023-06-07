@@ -1,8 +1,11 @@
 package studio.vadim.predanie.data.models
 
-data class PredanieApiRequestListModel (
-    val catalog: String,
-    val type: String,
-    val offset: Int,
-    val limit: Int
+import studio.vadim.predanie.data.models.apiRoutes.PredanieApiRoutes
+import studio.vadim.predanie.data.models.libraryTypes.PredanieLibraryTypes
+
+data class PredanieApiRequestListModel(
+    val route: PredanieApiRoutes,
+    val library: PredanieLibraryTypes,
+    val offset: Int = 20,
+    val limit: Int = 20
 )

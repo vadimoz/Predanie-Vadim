@@ -1,6 +1,4 @@
-package studio.vadim.predanie.data.models
-
-import kotlinx.serialization.Serializable
+package studio.vadim.predanie.domain.models
 
 data class PredanieApiResponseListModel(
     var compositions : ArrayList<Compositions> = arrayListOf(),

@@ -14,16 +14,13 @@ import io.ktor.http.URLProtocol
 import io.ktor.serialization.gson.gson
 import io.ktor.util.InternalAPI
 import studio.vadim.predanie.data.models.PredanieApiRequestListModel
-import studio.vadim.predanie.data.models.PredanieApiResponseListModel
-import studio.vadim.predanie.data.models.PredanieApiRoutes
+import studio.vadim.predanie.domain.models.PredanieApiResponseListModel
 import studio.vadim.predanie.domain.ApiConnection
-import studio.vadim.predanie.domain.models.PredanieListModel
 
 class ApiRepositoryImpl : ApiConnection {
 
     @OptIn(InternalAPI::class)
-    override suspend fun getItemsList(): PredanieApiResponseListModel {
-        val requestParams = PredanieApiRequestListModel(catalog = "popular", limit = 20, offset = 20, type = "audio,music")
+    override suspend fun getItemsList(request: PredanieApiRequestListModel): PredanieApiResponseListModel {
 
         val client = HttpClient(Android) {
             // Logging
@@ -48,15 +45,14 @@ class ApiRepositoryImpl : ApiConnection {
             }
         }.get{
                 url(){
-                        host = PredanieApiRoutes.BASE_URL
+                        host = request.route.getRoute().BASE_URL
                         protocol = URLProtocol.HTTPS
-                        parameters.append("catalog", requestParams.catalog)
-                        parameters.append("limit", requestParams.limit.toString())
-                        parameters.append("offset", requestParams.offset.toString())
-                        parameters.append("type", requestParams.type)
+                        parameters.append("catalog", request.route.getRoute().ROUTE)
+                        parameters.append("limit", request.limit.toString())
+                        parameters.append("offset", request.offset.toString())
+                        parameters.append("type", request.library.getLibraryType().libType)
                 }
             }
-        Log.d("CONTENT", client.body<PredanieApiResponseListModel>().toString())
         return client.body()
     }
 }
