@@ -10,11 +10,12 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.observer.ResponseObserver
 import io.ktor.client.request.get
+import io.ktor.client.statement.request
 import io.ktor.http.URLProtocol
 import io.ktor.serialization.gson.gson
 import io.ktor.util.InternalAPI
-import studio.vadim.predanie.data.models.PredanieApiRequestListModel
-import studio.vadim.predanie.domain.models.PredanieApiResponseListModel
+import studio.vadim.predanie.domain.models.api.lists.PredanieApiRequestListModel
+import studio.vadim.predanie.domain.models.api.lists.PredanieApiResponseListModel
 import studio.vadim.predanie.domain.ApiConnection
 
 class ApiRepositoryImpl : ApiConnection {
@@ -34,7 +35,7 @@ class ApiRepositoryImpl : ApiConnection {
 
             install(ResponseObserver) {
                 onResponse { response ->
-                    Log.d("HTTP status:", "${response.status.value}")
+                    Log.d("HTTP status:", "${response.request.url}")
                 }
             }
             // Timeout
@@ -47,10 +48,9 @@ class ApiRepositoryImpl : ApiConnection {
                 url(){
                         host = request.route.getRoute().BASE_URL
                         protocol = URLProtocol.HTTPS
-                        parameters.append("catalog", request.route.getRoute().ROUTE)
                         parameters.append("limit", request.limit.toString())
                         parameters.append("offset", request.offset.toString())
-                        parameters.append("type", request.library.getLibraryType().libType)
+                        parameters.append("type", request.library)
                 }
             }
         return client.body()

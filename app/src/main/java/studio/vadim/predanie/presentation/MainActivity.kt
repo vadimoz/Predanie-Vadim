@@ -13,28 +13,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import studio.vadim.predanie.data.ApiRepositoryImpl
-import studio.vadim.predanie.data.models.PredanieApiRequestListModel
-import studio.vadim.predanie.data.models.apiRoutes.PredaniePopularListApi
-import studio.vadim.predanie.data.models.apiRoutes.PredanieRouteModel
-import studio.vadim.predanie.data.models.libraryTypes.PredanieAudioLibrary
+import studio.vadim.predanie.domain.models.api.lists.PredanieApiRequestListModel
+import studio.vadim.predanie.domain.models.api.lists.PredaniePopularListImplApi
 import studio.vadim.predanie.domain.usecases.PopularItemsToList
 import studio.vadim.predanie.presentation.theme.PredanieTheme
 
 class MainActivity : ComponentActivity() {
 
+    val mainViewModel: MainViewModel by viewModel()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val api = ApiRepositoryImpl()
-        val params = PredanieApiRequestListModel(PredaniePopularListApi(), PredanieAudioLibrary())
-
-        //Будет в ViewModel
-        val scope = CoroutineScope(Dispatchers.Main)
-
-            scope.launch {
-                PopularItemsToList(api, params).execute()
-            }
+        mainViewModel.start()
 
         setContent {
             PredanieTheme {

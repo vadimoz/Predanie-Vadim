@@ -1,4 +1,4 @@
-package studio.vadim.predanie.domain.models
+package studio.vadim.predanie.domain.models.api.lists
 
 data class PredanieApiResponseListModel(
     var compositions : ArrayList<Compositions> = arrayListOf(),

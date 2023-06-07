@@ -73,5 +73,6 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0"
     implementation("io.ktor:ktor-serialization-gson:2.2.4")
     implementation("io.ktor:ktor-client-content-negotiation:2.2.4")
+    implementation "io.insert-koin:koin-android:3.4.2"
 
 }
