@@ -1,6 +1,6 @@
 package studio.vadim.predanie.domain.models.api.lists
 
-data class PredanieApiResponseListModel(
+data class ResponseItemsListModel(
     var compositions : ArrayList<Compositions> = arrayListOf(),
     var count        : Int?                    = null,
     var status_code   : Int?                    = null,
@@ -25,5 +25,4 @@ data class Banner (
     var h      : Int?    = null,
     var height : Int?    = null,
     var type   : String? = null
-
 )

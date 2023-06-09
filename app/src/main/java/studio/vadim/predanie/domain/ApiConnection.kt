@@ -1,10 +1,20 @@
 package studio.vadim.predanie.domain
 
+import studio.vadim.predanie.domain.models.api.items.RequestAuthorModel
+import studio.vadim.predanie.domain.models.api.items.RequestItemModel
+import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
+import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
 import studio.vadim.predanie.domain.models.api.lists.RequestListModel
-import studio.vadim.predanie.domain.models.api.lists.PredanieApiResponseAuthorsListModel
-import studio.vadim.predanie.domain.models.api.lists.PredanieApiResponseListModel
+import studio.vadim.predanie.domain.models.api.lists.ResponseAuthorsListModel
+import studio.vadim.predanie.domain.models.api.lists.ResponseCatalogModel
+import studio.vadim.predanie.domain.models.api.lists.ResponseGlobalSearchListModel
+import studio.vadim.predanie.domain.models.api.lists.ResponseItemsListModel
 
 interface ApiConnection {
-    suspend fun getItemsList(request: RequestListModel): PredanieApiResponseListModel
-    suspend fun getAuthorsList(request: RequestListModel): PredanieApiResponseAuthorsListModel
+    suspend fun getAuthor(request: RequestAuthorModel): ResponseAuthorModel
+    suspend fun getItem (request: RequestItemModel): ResponseItemModel
+    suspend fun getGlobalSearchList(request: RequestListModel): ResponseGlobalSearchListModel
+    suspend fun getItemsList(request: RequestListModel): ResponseItemsListModel
+    suspend fun getAuthorsList(request: RequestListModel): ResponseAuthorsListModel
+    suspend fun getCatalogList(request: RequestListModel): ResponseCatalogModel
 }

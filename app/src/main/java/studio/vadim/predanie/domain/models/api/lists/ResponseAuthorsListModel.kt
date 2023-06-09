@@ -1,7 +1,7 @@
 package studio.vadim.predanie.domain.models.api.lists
 
-data class PredanieApiResponseAuthorsListModel(
-    var statusCode : Int?            = null,
+data class ResponseAuthorsListModel(
+    var status_code : Int?            = null,
     var count      : Int?            = null,
     var data       : ArrayList<Data> = arrayListOf()
 )
