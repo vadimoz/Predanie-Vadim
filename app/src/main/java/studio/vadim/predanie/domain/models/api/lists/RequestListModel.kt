@@ -1,6 +1,6 @@
 package studio.vadim.predanie.domain.models.api.lists
 
-data class PredanieApiRequestListModel(
+data class RequestListModel(
     val route: String,
     val type: String = "music,audio",
     val offset: Int = 0,
