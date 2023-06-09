@@ -4,16 +4,14 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import studio.vadim.predanie.domain.usecases.NewItemsToList
-import studio.vadim.predanie.domain.usecases.PopularItemsToList
+import studio.vadim.predanie.domain.usecases.showLists.PredefinedItemsToList
 
-class MainViewModel(private val popularList: PopularItemsToList,
-                    private val newList: NewItemsToList) : ViewModel() {
+class MainViewModel(private val predefinedLists: PredefinedItemsToList) : ViewModel() {
 
     fun start(){
         viewModelScope.launch {
-            val i = newList.execute()
-            Log.d("start", i.compositions[3].toString())
+            val i = predefinedLists.getListNew("music")
+            Log.d("start", i.compositions[1].toString())
         }
     }
 }

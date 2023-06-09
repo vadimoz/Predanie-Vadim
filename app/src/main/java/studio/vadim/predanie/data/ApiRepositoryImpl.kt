@@ -44,15 +44,20 @@ class ApiRepositoryImpl : ApiConnection {
                 connectTimeoutMillis = 15000L
                 socketTimeoutMillis = 15000L
             }
-        }.get{
-                url(){
-                        host = request.route.getRoute().BASE_URL
-                        protocol = URLProtocol.HTTPS
-                        parameters.append("limit", request.limit.toString())
-                        parameters.append("offset", request.offset.toString())
-                        parameters.append("type", request.library)
+        }
+        return try {
+            client.get {
+                url() {
+                    host = request.route
+                    protocol = URLProtocol.HTTPS
+                    parameters.append("limit", request.limit.toString())
+                    parameters.append("offset", request.offset.toString())
+                    parameters.append("type", request.type)
                 }
-            }
-        return client.body()
+            }.body<PredanieApiResponseListModel>()
+        } catch (e: Throwable) {
+            Log.d("Connection Error", e.message.toString())
+            PredanieApiResponseListModel()
+        }
     }
 }
