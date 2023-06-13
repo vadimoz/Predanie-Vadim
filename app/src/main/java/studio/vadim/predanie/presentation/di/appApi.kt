@@ -8,7 +8,7 @@ import studio.vadim.predanie.domain.usecases.showItems.GetItems
 import studio.vadim.predanie.domain.usecases.showLists.GetLists
 import studio.vadim.predanie.presentation.MainViewModel
 
-val appModule = module {
+val appApi = module {
     single<ApiConnection> { ApiImpl() }
 
     factory {
@@ -17,7 +17,6 @@ val appModule = module {
     factory {
         GetItems(get())
     }
-
 
     viewModel { MainViewModel(get(), get()) }
 }

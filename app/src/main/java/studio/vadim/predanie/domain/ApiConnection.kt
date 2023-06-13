@@ -13,8 +13,8 @@ import studio.vadim.predanie.domain.models.api.lists.ResponseItemsListModel
 interface ApiConnection {
     suspend fun getAuthor(request: RequestAuthorModel): ResponseAuthorModel
     suspend fun getItem (request: RequestItemModel): ResponseItemModel
-    suspend fun getGlobalSearchList(request: RequestListModel): ResponseGlobalSearchListModel
     suspend fun getItemsList(request: RequestListModel): ResponseItemsListModel
     suspend fun getAuthorsList(request: RequestListModel): ResponseAuthorsListModel
     suspend fun getCatalogList(request: RequestListModel): ResponseCatalogModel
+    suspend fun getGlobalSearchList(request: RequestListModel): ResponseGlobalSearchListModel
 }
