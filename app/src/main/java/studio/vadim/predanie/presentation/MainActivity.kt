@@ -16,8 +16,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainViewModel.init()
-        setContent {
 
+        setContent {
             val navController = rememberNavController()
 
             PredanieTheme {
@@ -26,12 +26,12 @@ class MainActivity : ComponentActivity() {
                     startDestination = "MainScreen"
                 ) {
                     composable("MainScreen") {
-                        MainScreen(name = "MainScreen") {
+                        MainScreen(name = "MainScreen", mainViewModel, onClick = {
                             navController.navigate("ItemScreen")
-                        }
+                        })
                     }
                     composable("ItemScreen") {
-                        ItemScreen(name = "New", mainViewModel, onClick = {
+                        ItemScreen(name = "New", onClick = {
                             navController.navigate("MainScreen")
                         })
                     }

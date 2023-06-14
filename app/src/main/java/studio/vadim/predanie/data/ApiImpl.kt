@@ -72,6 +72,7 @@ class ApiImpl : ApiConnection {
 
                 parameters.append("limit", request.limit.toString())
                 parameters.append("offset", request.offset.toString())
+                parameters.append("type", request.type)
                 parameters.append("id_category", request.id_category.toString())
             }
         }.body()
