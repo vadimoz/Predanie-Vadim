@@ -70,7 +70,7 @@ class MainActivity : ComponentActivity() {
                 CatalogScreen(mainViewModel = mainViewModel)
             }
             composable(NavigationItem.Movies.route) {
-                MoviesScreen()
+                SearchScreen(mainViewModel = mainViewModel)
             }
             composable(NavigationItem.Books.route) {
                 BooksScreen()

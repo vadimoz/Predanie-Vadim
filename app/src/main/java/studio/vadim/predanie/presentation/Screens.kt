@@ -3,6 +3,8 @@ package studio.vadim.predanie.presentation
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -36,6 +40,7 @@ import coil.compose.rememberAsyncImagePainter
 import studio.vadim.predanie.R
 import studio.vadim.predanie.domain.models.api.lists.Categories
 import studio.vadim.predanie.domain.models.api.lists.Compositions
+import studio.vadim.predanie.domain.models.api.lists.Entities
 
 @Composable
 fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
@@ -186,6 +191,34 @@ fun ListRow(model: Compositions) {
     }
 }
 
+
+@Composable
+fun ListRow(model: Entities) {
+    Column(
+        modifier = Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .width(130.dp)
+            .height(250.dp)
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(model.img),
+            contentDescription = null,
+            modifier = Modifier
+                .size(190.dp)
+                .fillMaxWidth()
+                .padding(5.dp),
+            contentScale = ContentScale.Crop,
+
+            )
+        Text(
+            modifier = Modifier.padding(5.dp),
+            text = model.name.toString()
+        )
+    }
+}
+
+
 @Composable
 fun CatalogListRow(model: Categories) {
     Column(
@@ -200,6 +233,7 @@ fun CatalogListRow(model: Categories) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CatalogScreen(mainViewModel: MainViewModel) {
     val uiState by mainViewModel.uiState.collectAsState()
@@ -215,7 +249,8 @@ fun CatalogScreen(mainViewModel: MainViewModel) {
                 if (uiState.catalogList.categories[index].id_parent == 1) { // id_parent == 1 это базовые разделы
                     CatalogListRow(model = uiState.catalogList.categories[index])
 
-                    Column() {
+                    FlowRow(modifier = Modifier
+                        .wrapContentSize(Alignment.Center)) {
                         uiState.catalogList.categories[index].categories.forEach(){
                             Text (it.name.toString())
                         }
@@ -227,21 +262,29 @@ fun CatalogScreen(mainViewModel: MainViewModel) {
 }
 
 @Composable
-fun MoviesScreen() {
+fun SearchScreen(mainViewModel: MainViewModel) {
+    val uiState by mainViewModel.uiState.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(colorResource(id = R.color.white))
             .wrapContentSize(Alignment.Center)
     ) {
-        Text(
-            text = "Movies View",
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            textAlign = TextAlign.Center,
-            fontSize = 25.sp
+        TextField(
+            uiState.searchString,
+            {
+
+                mainViewModel.searchQueryUpdate(it)
+            },
+            textStyle = TextStyle(fontSize =  28.sp),
+            placeholder = { "Найти..." }
         )
+        LazyColumn() {
+            items(uiState.searchList.entities.count()) { index ->
+                    ListRow(model = uiState.searchList.entities[index])
+            }
+        }
     }
 }
 
