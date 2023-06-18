@@ -20,8 +20,8 @@ class MainViewModel(private val apiLists: GetLists,
             _uiState.value = UIState(newList = apiLists.getListNew("audio"),
                 musicPopularList = apiLists.getListPopular("music"),
                 audioPopularList = apiLists.getListPopular("audio"),
-                favoritesList = apiLists.getListFavorites("audio,music"))
-            //_uiState.value = UIState()
+                favoritesList = apiLists.getListFavorites("audio,music"),
+                catalogList = apiLists.getCatalogList())
         }
     }
 }

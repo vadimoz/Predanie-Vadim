@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -29,12 +30,13 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import studio.vadim.predanie.R
+import studio.vadim.predanie.domain.models.api.lists.Categories
 import studio.vadim.predanie.domain.models.api.lists.Compositions
+
 @Composable
 fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
     val uiState by mainViewModel.uiState.collectAsState()
@@ -58,7 +60,8 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
         ) {
             Text(
                 modifier = Modifier.padding(5.dp),
-                text = "Новинки медиатеки")
+                text = "Новинки медиатеки"
+            )
         }
 
         LazyRow() {
@@ -75,7 +78,8 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
         ) {
             Text(
                 modifier = Modifier.padding(5.dp),
-                text = "Популярные материалы")
+                text = "Популярные материалы"
+            )
         }
         LazyRow() {
             items(uiState.newList.compositions.count()) { index ->
@@ -91,7 +95,8 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
         ) {
             Text(
                 modifier = Modifier.padding(5.dp),
-                text = "Популярная музыка")
+                text = "Популярная музыка"
+            )
         }
         LazyRow() {
             items(uiState.newList.compositions.count()) { index ->
@@ -107,7 +112,8 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
         ) {
             Text(
                 modifier = Modifier.padding(5.dp),
-                text = "Рекомендуем")
+                text = "Рекомендуем"
+            )
         }
         LazyRow() {
             items(uiState.newList.compositions.count()) { index ->
@@ -129,7 +135,12 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
             ) {
                 items.forEach { item ->
                     NavigationBarItem(
-                        icon = { Icon(painterResource(id = item.icon), contentDescription = item.title) },
+                        icon = {
+                            Icon(
+                                painterResource(id = item.icon),
+                                contentDescription = item.title
+                            )
+                        },
                         label = { Text(text = item.title) },
                         alwaysShowLabel = false,
                         selected = false,
@@ -161,39 +172,58 @@ fun ListRow(model: Compositions) {
         Image(
             painter = rememberAsyncImagePainter(model.img_s),
             contentDescription = null,
-            modifier = Modifier.size(190.dp).fillMaxWidth().padding(5.dp),
+            modifier = Modifier
+                .size(190.dp)
+                .fillMaxWidth()
+                .padding(5.dp),
             contentScale = ContentScale.Crop,
 
             )
         Text(
             modifier = Modifier.padding(5.dp),
-            text = model.name.toString())
+            text = model.name.toString()
+        )
     }
 }
 
 @Composable
-fun MusicScreen() {
+fun CatalogListRow(model: Categories) {
+    Column(
+        modifier = Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+    ) {
+        Text(
+            modifier = Modifier.padding(5.dp),
+            text = model.name.toString()
+        )
+    }
+}
+
+@Composable
+fun CatalogScreen(mainViewModel: MainViewModel) {
+    val uiState by mainViewModel.uiState.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(colorResource(id = R.color.white))
             .wrapContentSize(Alignment.Center)
     ) {
-        Text(
-            text = "Music View",
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            textAlign = TextAlign.Center,
-            fontSize = 25.sp
-        )
-    }
-}
+        LazyColumn() {
+            items(uiState.catalogList.categories.count()) { index ->
+                if (uiState.catalogList.categories[index].id_parent == 1) { // id_parent == 1 это базовые разделы
+                    CatalogListRow(model = uiState.catalogList.categories[index])
 
-@Preview(showBackground = true)
-@Composable
-fun MusicScreenPreview() {
-    MusicScreen()
+                    Column() {
+                        uiState.catalogList.categories[index].categories.forEach(){
+                            Text (it.name.toString())
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -215,13 +245,6 @@ fun MoviesScreen() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun MoviesScreenPreview() {
-    MoviesScreen()
-}
-
-
 @Composable
 fun BooksScreen() {
     Column(
@@ -241,12 +264,6 @@ fun BooksScreen() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun BooksScreenPreview() {
-    BooksScreen()
-}
-
 @Composable
 fun ProfileScreen() {
     Column(
@@ -264,10 +281,4 @@ fun ProfileScreen() {
             fontSize = 25.sp
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProfileScreenPreview() {
-    ProfileScreen()
 }

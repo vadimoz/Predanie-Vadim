@@ -67,7 +67,7 @@ class MainActivity : ComponentActivity() {
                 HomeScreen(mainViewModel = mainViewModel){}
             }
             composable(NavigationItem.Music.route) {
-                MusicScreen()
+                CatalogScreen(mainViewModel = mainViewModel)
             }
             composable(NavigationItem.Movies.route) {
                 MoviesScreen()
