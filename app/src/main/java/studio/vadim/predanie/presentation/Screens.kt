@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -36,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.rememberAsyncImagePainter
 import studio.vadim.predanie.R
 import studio.vadim.predanie.domain.models.api.lists.Categories
@@ -46,16 +49,9 @@ import studio.vadim.predanie.domain.models.api.lists.Entities
 fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
     val uiState by mainViewModel.uiState.collectAsState()
 
-    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-        /*Text(
-            text = "Hello $name!"
-        )
+    val articles = mainViewModel.compositionsPager.collectAsLazyPagingItems()
 
-        Button(onClick = {
-            onClick()
-        }) {
-            Text(text = "Next Screen")
-        }*/
+    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 
         //Новинки
         Column(
@@ -70,8 +66,9 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
         }
 
         LazyRow() {
-            items(uiState.newList.compositions.count()) { index ->
-                ListRow(model = uiState.newList.compositions[index])
+
+            items(articles.itemCount) { index ->
+                articles[index]?.let { ListRow(model = it) }
             }
         }
 
@@ -167,6 +164,7 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
 
 @Composable
 fun ListRow(model: Compositions) {
+
     Column(
         modifier = Modifier
             .wrapContentHeight()
@@ -202,14 +200,12 @@ fun ListRow(model: Entities) {
             .height(250.dp)
     ) {
         Image(
-            painter = rememberAsyncImagePainter(model.img),
+            painter = rememberAsyncImagePainter(model.img_s),
             contentDescription = null,
             modifier = Modifier
                 .size(190.dp)
                 .fillMaxWidth()
                 .padding(5.dp),
-            contentScale = ContentScale.Crop,
-
             )
         Text(
             modifier = Modifier.padding(5.dp),
@@ -280,7 +276,7 @@ fun SearchScreen(mainViewModel: MainViewModel) {
             textStyle = TextStyle(fontSize =  28.sp),
             placeholder = { "Найти..." }
         )
-        LazyColumn() {
+        LazyVerticalGrid(columns = GridCells.Adaptive(128.dp)) {
             items(uiState.searchList.entities.count()) { index ->
                     ListRow(model = uiState.searchList.entities[index])
             }

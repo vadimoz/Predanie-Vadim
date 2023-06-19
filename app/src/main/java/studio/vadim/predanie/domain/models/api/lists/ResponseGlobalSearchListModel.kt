@@ -13,6 +13,7 @@ data class Entities (
     var id         : Int?    = null,
     var name       : String? = null,
     var entity_type : String? = null,
-    var img        : String? = null
+    var img        : String? = null,
+    var img_s        : String? = null
 
 )
