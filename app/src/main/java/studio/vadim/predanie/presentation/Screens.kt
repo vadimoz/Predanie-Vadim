@@ -49,7 +49,10 @@ import studio.vadim.predanie.domain.models.api.lists.Entities
 fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
     val uiState by mainViewModel.uiState.collectAsState()
 
-    val articles = mainViewModel.compositionsPager.collectAsLazyPagingItems()
+    val newItems = uiState.newList.collectAsLazyPagingItems()
+    val audioPopularList = uiState.audioPopularList.collectAsLazyPagingItems()
+    val musicPopularList = uiState.musicPopularList.collectAsLazyPagingItems()
+    val favoritesList = uiState.favoritesList.collectAsLazyPagingItems()
 
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 
@@ -66,9 +69,8 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
         }
 
         LazyRow() {
-
-            items(articles.itemCount) { index ->
-                articles[index]?.let { ListRow(model = it) }
+            items(newItems.itemCount) { index ->
+                newItems[index]?.let { ListRow(model = it) }
             }
         }
 
@@ -84,8 +86,8 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
             )
         }
         LazyRow() {
-            items(uiState.newList.compositions.count()) { index ->
-                ListRow(model = uiState.audioPopularList.compositions[index])
+            items(audioPopularList.itemCount) { index ->
+                audioPopularList[index]?.let { ListRow(model = it) }
             }
         }
 
@@ -101,8 +103,8 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
             )
         }
         LazyRow() {
-            items(uiState.newList.compositions.count()) { index ->
-                ListRow(model = uiState.musicPopularList.compositions[index])
+            items(musicPopularList.itemCount) { index ->
+                musicPopularList[index]?.let { ListRow(model = it) }
             }
         }
 
@@ -118,8 +120,8 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
             )
         }
         LazyRow() {
-            items(uiState.newList.compositions.count()) { index ->
-                ListRow(model = uiState.favoritesList.compositions[index])
+            items(favoritesList.itemCount) { index ->
+                favoritesList[index]?.let { ListRow(model = it) }
             }
         }
 

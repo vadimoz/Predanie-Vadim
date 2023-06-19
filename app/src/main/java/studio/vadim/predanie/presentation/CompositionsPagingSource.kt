@@ -6,13 +6,21 @@ import studio.vadim.predanie.domain.models.api.lists.Compositions
 import studio.vadim.predanie.domain.usecases.showLists.GetLists
 
 class CompositionsPagingSource(
-    private val api: GetLists
+    private val api: GetLists,
+    val type: String
 ) : PagingSource<Int, Compositions>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Compositions> {
         return try {
             val nextOffset = params.key ?: 0
-            val response = api.getListNew("audio,music", offset = nextOffset, limit = 5)
+
+            val response = when (type) {
+                "new" -> api.getListNew("audio,music", offset = nextOffset, limit = 5)
+                "audioPopular" -> api.getListPopular("audio", offset = nextOffset, limit = 5)
+                "musicPopular" -> api.getListPopular("music", offset = nextOffset, limit = 5)
+                "favorites" -> api.getListFavorites("audio,music", offset = nextOffset, limit = 5)
+                else -> {api.getListNew("audio,music", offset = nextOffset, limit = 5)}
+            }
 
             LoadResult.Page(
                 data = response.compositions,

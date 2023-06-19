@@ -1,14 +1,16 @@
 package studio.vadim.predanie.presentation
 
+import androidx.paging.PagingData
+import kotlinx.coroutines.flow.Flow
+import studio.vadim.predanie.domain.models.api.lists.Compositions
 import studio.vadim.predanie.domain.models.api.lists.ResponseCatalogModel
 import studio.vadim.predanie.domain.models.api.lists.ResponseGlobalSearchListModel
-import studio.vadim.predanie.domain.models.api.lists.ResponseItemsListModel
 
 data class UIState(
-    val newList: ResponseItemsListModel = ResponseItemsListModel(),
-    val musicPopularList: ResponseItemsListModel = ResponseItemsListModel(),
-    val audioPopularList: ResponseItemsListModel = ResponseItemsListModel(),
-    val favoritesList: ResponseItemsListModel = ResponseItemsListModel(),
+    val newList: Flow<PagingData<Compositions>>,
+    val musicPopularList: Flow<PagingData<Compositions>>,
+    val audioPopularList: Flow<PagingData<Compositions>>,
+    val favoritesList: Flow<PagingData<Compositions>>,
     val catalogList: ResponseCatalogModel = ResponseCatalogModel(),
     var searchString: String = "",
     val searchList: ResponseGlobalSearchListModel = ResponseGlobalSearchListModel()

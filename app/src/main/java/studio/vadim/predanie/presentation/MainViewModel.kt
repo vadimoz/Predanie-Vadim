@@ -17,16 +17,35 @@ import studio.vadim.predanie.domain.usecases.showLists.GetLists
 class MainViewModel(private val apiLists: GetLists,
                     private val apiItems: GetItems) : ViewModel() {
 
-    private val PAGE_SIZE = 5
-
-    private val _uiState = MutableStateFlow(UIState())
-    val uiState: StateFlow<UIState> = _uiState.asStateFlow()
-
-    val compositionsPager = Pager(PagingConfig(pageSize = PAGE_SIZE)) {
-        CompositionsPagingSource(apiLists)
+    val newList = Pager(PagingConfig(pageSize = 5)) {
+        CompositionsPagingSource(apiLists, type = "new")
     }.flow.cachedIn(viewModelScope)
 
-    fun init() {
+    val audioPopularList = Pager(PagingConfig(pageSize = 5)) {
+        CompositionsPagingSource(apiLists, "audioPopular")
+    }.flow.cachedIn(viewModelScope)
+
+    val musicPopularList = Pager(PagingConfig(pageSize = 5)) {
+        CompositionsPagingSource(apiLists, "musicPopular")
+    }.flow.cachedIn(viewModelScope)
+
+    val favoritesList = Pager(PagingConfig(pageSize = 5)) {
+        CompositionsPagingSource(apiLists, "favorites")
+    }.flow.cachedIn(viewModelScope)
+
+    private val _uiState = MutableStateFlow(UIState(newList, audioPopularList = audioPopularList,
+    musicPopularList = musicPopularList, favoritesList = favoritesList))
+
+    val uiState: StateFlow<UIState> = _uiState.asStateFlow()
+
+    init{
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    catalogList = apiLists.getCatalogList(),
+                )
+            }
+        }
     }
 
     fun searchQueryUpdate(query: String){
