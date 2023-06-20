@@ -39,30 +39,37 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun MainScreen() {
         val navController = rememberNavController()
         Scaffold(
-            bottomBar = { BottomNavigationBar(navController) },
             content = { padding ->
                 Box(modifier = Modifier.padding(padding)) {
                     Navigation(navController = navController)
                 }
             },
+            bottomBar = {
+                if (currentRoute(navController) != NavigationItem.Splash.route) {
+                    BottomNavigationBar(navController)
+                }
+            },
         )
     }
 
-    @Preview(showBackground = true)
     @Composable
-    fun MainScreenPreview() {
-        MainScreen()
+    public fun currentRoute(navController: NavHostController): String? {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        return navBackStackEntry?.destination?.route
     }
 
     @Composable
     fun Navigation(navController: NavHostController) {
-        NavHost(navController, startDestination = NavigationItem.Home.route) {
+        NavHost(navController, startDestination = NavigationItem.Splash.route) {
+
+            composable(NavigationItem.Splash.route) {
+                SplashScreen(mainViewModel = mainViewModel, navController)
+            }
             composable(NavigationItem.Home.route) {
                 HomeScreen(mainViewModel = mainViewModel){}
             }
@@ -87,12 +94,6 @@ class MainActivity : ComponentActivity() {
         TopAppBar(
             title = { Text(text = stringResource(R.string.app_name), fontSize = 18.sp) },
         )
-    }
-
-    @Preview(showBackground = true)
-    @Composable
-    fun TopBarPreview() {
-        TopBar()
     }
 
     @Composable

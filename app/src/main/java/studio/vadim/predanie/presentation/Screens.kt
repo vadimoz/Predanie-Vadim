@@ -2,6 +2,7 @@ package studio.vadim.predanie.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -38,13 +39,53 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.rememberAsyncImagePainter
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import studio.vadim.predanie.R
 import studio.vadim.predanie.domain.models.api.lists.Categories
 import studio.vadim.predanie.domain.models.api.lists.Compositions
 import studio.vadim.predanie.domain.models.api.lists.Entities
 
+@Composable
+fun SplashScreen(mainViewModel: MainViewModel, navController: NavHostController) {
+    val uiState by mainViewModel.uiState.collectAsState()
+
+    val newItems = uiState.newList.collectAsLazyPagingItems()
+    val audioPopularList = uiState.audioPopularList.collectAsLazyPagingItems()
+    val musicPopularList = uiState.musicPopularList.collectAsLazyPagingItems()
+    val favoritesList = uiState.favoritesList.collectAsLazyPagingItems()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.rain))
+        val logoAnimationState =
+            animateLottieCompositionAsState(composition = composition)
+        LottieAnimation(
+            composition = composition,
+            progress = { logoAnimationState.progress },
+            modifier = Modifier
+                .align(Alignment.Center),
+            contentScale = ContentScale.Crop,
+        )
+
+        Image(painterResource(R.drawable.logo),"Logo",
+            modifier = Modifier
+             .width(150.dp)
+            .align(Alignment.BottomCenter)
+        )
+
+        if (logoAnimationState.isAtEnd && logoAnimationState.isPlaying) {
+            navController.navigate(NavigationItem.Home.route)
+        }
+    }
+}
 @Composable
 fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
     val uiState by mainViewModel.uiState.collectAsState()
