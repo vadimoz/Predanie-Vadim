@@ -1,7 +1,9 @@
 package studio.vadim.predanie.presentation
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -81,13 +83,28 @@ fun SplashScreen(mainViewModel: MainViewModel, navController: NavHostController)
             .align(Alignment.BottomCenter)
         )
 
+        Image(painterResource(R.drawable.vadim),"Logo",
+            modifier = Modifier
+                .width(150.dp)
+                .align(Alignment.TopCenter)
+                .padding(20.dp)
+        )
+
         if (logoAnimationState.isAtEnd && logoAnimationState.isPlaying) {
             navController.navigate(NavigationItem.Home.route)
         }
     }
 }
+
 @Composable
-fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
+fun ItemScreen(mainViewModel: MainViewModel, itemId: String?) {
+    Log.d("ds","fds")
+    if (itemId != null) {
+        Text(text = itemId)
+    }
+}
+@Composable
+fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val uiState by mainViewModel.uiState.collectAsState()
 
     val newItems = uiState.newList.collectAsLazyPagingItems()
@@ -111,7 +128,7 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
 
         LazyRow() {
             items(newItems.itemCount) { index ->
-                newItems[index]?.let { ListRow(model = it) }
+                newItems[index]?.let { ListRow(model = it, navController) }
             }
         }
 
@@ -128,7 +145,7 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
         }
         LazyRow() {
             items(audioPopularList.itemCount) { index ->
-                audioPopularList[index]?.let { ListRow(model = it) }
+                audioPopularList[index]?.let { ListRow(model = it, navController) }
             }
         }
 
@@ -145,7 +162,7 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
         }
         LazyRow() {
             items(musicPopularList.itemCount) { index ->
-                musicPopularList[index]?.let { ListRow(model = it) }
+                musicPopularList[index]?.let { ListRow(model = it,  navController) }
             }
         }
 
@@ -162,7 +179,7 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
         }
         LazyRow() {
             items(favoritesList.itemCount) { index ->
-                favoritesList[index]?.let { ListRow(model = it) }
+                favoritesList[index]?.let { ListRow(model = it,  navController) }
             }
         }
 
@@ -206,14 +223,16 @@ fun HomeScreen(mainViewModel: MainViewModel, onClick: () -> Unit) {
 }
 
 @Composable
-fun ListRow(model: Compositions) {
-
+fun ListRow(model: Compositions, navController: NavHostController) {
     Column(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
             .width(130.dp)
             .height(250.dp)
+            .clickable {
+                navController.navigate("ItemScreen/${model.id}")
+            }
     ) {
         Image(
             painter = rememberAsyncImagePainter(model.img_s),
@@ -223,7 +242,6 @@ fun ListRow(model: Compositions) {
                 .fillMaxWidth()
                 .padding(5.dp),
             contentScale = ContentScale.Crop,
-
             )
         Text(
             modifier = Modifier.padding(5.dp),

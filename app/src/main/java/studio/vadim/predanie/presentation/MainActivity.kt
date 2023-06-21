@@ -28,6 +28,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import studio.vadim.predanie.R
+
 class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModel()
 
@@ -66,12 +67,11 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun Navigation(navController: NavHostController) {
         NavHost(navController, startDestination = NavigationItem.Splash.route) {
-
             composable(NavigationItem.Splash.route) {
                 SplashScreen(mainViewModel = mainViewModel, navController)
             }
             composable(NavigationItem.Home.route) {
-                HomeScreen(mainViewModel = mainViewModel){}
+                HomeScreen(mainViewModel = mainViewModel, navController)
             }
             composable(NavigationItem.Music.route) {
                 CatalogScreen(mainViewModel = mainViewModel)
@@ -84,6 +84,11 @@ class MainActivity : ComponentActivity() {
             }
             composable(NavigationItem.Profile.route) {
                 ProfileScreen()
+            }
+            composable(NavigationItem.Item.route) { navBackStackEntry ->
+                val itemId = navBackStackEntry.arguments?.getString("itemId")
+
+                ItemScreen(mainViewModel = mainViewModel, itemId)
             }
         }
     }
@@ -112,7 +117,12 @@ class MainActivity : ComponentActivity() {
             val currentRoute = navBackStackEntry?.destination?.route
             items.forEach { item ->
                 NavigationBarItem(
-                    icon = { Icon(painterResource(id = item.icon), contentDescription = item.title) },
+                    icon = {
+                        Icon(
+                            painterResource(id = item.icon),
+                            contentDescription = item.title
+                        )
+                    },
                     label = { Text(text = item.title) },
                     alwaysShowLabel = true,
                     selected = currentRoute == item.route,

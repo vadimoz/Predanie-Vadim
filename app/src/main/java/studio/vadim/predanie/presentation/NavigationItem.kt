@@ -9,4 +9,5 @@ sealed class NavigationItem(var route: String, var icon: Int, var title: String)
     object Movies : NavigationItem("movies", R.drawable.ic_action_user, "Поиск")
     object Books : NavigationItem("books", R.drawable.ic_action_records, "Мое")
     object Profile : NavigationItem("profile", R.drawable.ic_action_user, "Фонд")
+    object Item : NavigationItem("ItemScreen/{itemId}", R.drawable.ic_action_blog, "Произведение")
 }
