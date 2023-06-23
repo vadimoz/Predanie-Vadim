@@ -32,6 +32,12 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.slaviboy.composeunits.initSize
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import studio.vadim.predanie.R
+import studio.vadim.predanie.presentation.Screens.BooksScreen
+import studio.vadim.predanie.presentation.Screens.CatalogScreen
+import studio.vadim.predanie.presentation.Screens.HomeScreen
+import studio.vadim.predanie.presentation.Screens.ProfileScreen
+import studio.vadim.predanie.presentation.Screens.SearchScreen
+import studio.vadim.predanie.presentation.Screens.SplashScreen
 
 class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModel()
@@ -108,7 +114,10 @@ class MainActivity : ComponentActivity() {
             composable(NavigationItem.Item.route) { navBackStackEntry ->
                 val itemId = navBackStackEntry.arguments?.getString("itemId")
 
-                ItemScreen(mainViewModel = mainViewModel, itemId)
+                ItemScreen(
+                    mainViewModel = mainViewModel,
+                    itemId
+                )
             }
         }
     }
