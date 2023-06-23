@@ -3,6 +3,9 @@ package studio.vadim.predanie.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,10 +25,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.slaviboy.composeunits.initSize
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import studio.vadim.predanie.R
 
@@ -34,16 +38,17 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initSize()
 
         setContent {
             MainScreen()
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
     @Composable
     fun MainScreen() {
-        val navController = rememberNavController()
+        val navController = rememberAnimatedNavController()
         Scaffold(
             content = { padding ->
                 Box(modifier = Modifier.padding(padding)) {
@@ -64,13 +69,28 @@ class MainActivity : ComponentActivity() {
         return navBackStackEntry?.destination?.route
     }
 
+    @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun Navigation(navController: NavHostController) {
-        NavHost(navController, startDestination = NavigationItem.Splash.route) {
-            composable(NavigationItem.Splash.route) {
+        AnimatedNavHost(navController, startDestination = NavigationItem.Splash.route) {
+            composable(
+                NavigationItem.Splash.route,
+            ) {
                 SplashScreen(mainViewModel = mainViewModel, navController)
             }
-            composable(NavigationItem.Home.route) {
+            composable(NavigationItem.Home.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentScope.SlideDirection.Up,
+                        animationSpec = tween(1000)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentScope.SlideDirection.Down,
+                        animationSpec = tween(1000)
+                    )
+                },) {
                 HomeScreen(mainViewModel = mainViewModel, navController)
             }
             composable(NavigationItem.Music.route) {
