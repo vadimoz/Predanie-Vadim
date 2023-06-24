@@ -45,6 +45,7 @@ import coil.load
 import com.flaviofaria.kenburnsview.KenBurnsView
 import com.flaviofaria.kenburnsview.RandomTransitionGenerator
 import com.slaviboy.composeunits.dh
+import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.screens.accordion.components.AccordionGroup
 import studio.vadim.predanie.presentation.screens.accordion.components.AccordionModel
@@ -55,7 +56,7 @@ fun ItemScreen(
     modifier: Modifier = Modifier,
     textModifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current.copy(
-        color = Color.White,
+        color = Color.Black,
         fontSize = 18.sp,
         fontFamily = FontFamily.Serif
     ),
@@ -92,7 +93,7 @@ fun ItemScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .background(color = Color.Black)
+                    .background(color = Color.White)
             ) {
                 if (!TextUtils.isEmpty(mainImage)) {
 
@@ -121,7 +122,7 @@ fun ItemScreen(
                         .align(Alignment.TopCenter)
                         .background(
                             brush = Brush.linearGradient(
-                                colors = listOf(Color.Transparent, Color.Black),
+                                colors = listOf(Color.Transparent, Color.White),
                                 start = Offset(0f, 0f), // top left corner
                                 end = Offset(1f, boxSize) // bottom right corner
                             )
@@ -135,9 +136,9 @@ fun ItemScreen(
                         uiState.itemInto.data?.name?.let {
                             Text(
                                 text = it,
-                                color = Color.White,
+                                color = Color.Black,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 28.sp,
+                                fontSize = 36.sp,
                                 modifier = Modifier.padding(20.dp)
                             )
                         }
@@ -202,42 +203,26 @@ fun ItemScreen(
                             }
 
                         }
-                        val modelTechStocks = AccordionModel(
-                            header = "Technology Stocks",
-                            rows = mutableListOf(
-                                AccordionModel.Row(security = "AAPL", "$328.00"),
-                                AccordionModel.Row(security = "GOOGL", "$328.00"),
-                                AccordionModel.Row(security = "NFLX", "$198.00"),
-                                AccordionModel.Row(security = "META", "$200.00"),
-                                AccordionModel.Row(security = "TSLA", "$769.16"),
+                        for (part in uiState.itemInto.data?.parts!!) {
+                            val rows = mutableListOf<Tracks>()
+                            val accordionItems =
+                                uiState.itemInto.data!!.tracks.filter { s -> s.parent == part.id.toString() }
+
+                            for (item in accordionItems) {
+                                rows.add(item)
+                            }
+
+                            val parts = AccordionModel(
+                                header = part.name.toString(),
+                                rows
                             )
-                        )
 
-                        val modelEnergyStocks = AccordionModel(
-                            header = "Energy Stocks",
-                            rows = mutableListOf(
-                                AccordionModel.Row(security = "MPC", "$96.56"),
-                                AccordionModel.Row(security = "CVX", "179.71"),
-                                AccordionModel.Row(security = "DVN", "$77.13"),
-                                AccordionModel.Row(security = "XOM", "$98.48"),
-                                AccordionModel.Row(security = "XPRO", "$13.86"),
+                            val group = listOf(parts)
+                            AccordionGroup(
+                                modifier = Modifier.padding(top = 8.dp),
+                                group = group
                             )
-                        )
-
-                        val modelDividendStocks = AccordionModel(
-                            header = "Dividend Stocks",
-                            rows = mutableListOf(
-                                AccordionModel.Row(security = "JNJ", "$178.83"),
-                                AccordionModel.Row(security = "PG", "$148.63"),
-                                AccordionModel.Row(security = "KO", "$64.12"),
-                                AccordionModel.Row(security = "BAC", "$37.42"),
-                                AccordionModel.Row(security = "MA", "$333.33"),
-                            )
-                        )
-
-                        val group = listOf(modelTechStocks, modelEnergyStocks, modelDividendStocks)
-
-                        AccordionGroup(modifier = Modifier.padding(top = 8.dp), group = group)
+                        }
                     }
                 }
             }

@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowDropDown
+import androidx.compose.material.icons.outlined.List
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -22,14 +22,15 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.presentation.screens.accordion.theme.*
 
 data class AccordionModel(
     val header: String,
-    val rows: List<Row>
+    val rows: MutableList<Tracks>
 ) {
     data class Row(
-        val security: String,
+        val name: String,
         val price: String
     )
 }
@@ -96,7 +97,7 @@ private fun AccordionHeader(
             Text(title, Modifier.weight(1f), color = Gray600)
             Surface(shape = CircleShape, color = LightBlue900.copy(alpha = 0.6f)) {
                 Icon(
-                    Icons.Outlined.ArrowDropDown,
+                    Icons.Outlined.List,
                     contentDescription = "arrow-down",
                     modifier = Modifier.rotate(degrees),
                     tint = White
@@ -106,21 +107,20 @@ private fun AccordionHeader(
     }
 }
 
-@Preview
 @Composable
 private fun AccordionRow(
-    model: AccordionModel.Row = AccordionModel.Row("AAPL", "$328.89")
+    model: Tracks
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(8.dp)
     ) {
         //style = tags
-        Text(model.security, Modifier.weight(1f), color = MedGray3)
+        Text(model.name.toString(), Modifier.weight(1f), color = MedGray3)
         Surface(color = Green500, shape = RoundedCornerShape(8.dp), tonalElevation = 2.dp) {
             //style = bodyBold
             Text(
-                text = model.price,
+                text = model.id.toString(),
                 modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
                 color = White
             )
