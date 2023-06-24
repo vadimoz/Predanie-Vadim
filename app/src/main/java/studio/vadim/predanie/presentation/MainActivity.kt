@@ -32,12 +32,13 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.slaviboy.composeunits.initSize
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import studio.vadim.predanie.R
-import studio.vadim.predanie.presentation.Screens.BooksScreen
-import studio.vadim.predanie.presentation.Screens.CatalogScreen
-import studio.vadim.predanie.presentation.Screens.HomeScreen
-import studio.vadim.predanie.presentation.Screens.ProfileScreen
-import studio.vadim.predanie.presentation.Screens.SearchScreen
-import studio.vadim.predanie.presentation.Screens.SplashScreen
+import studio.vadim.predanie.presentation.screens.BooksScreen
+import studio.vadim.predanie.presentation.screens.CatalogScreen
+import studio.vadim.predanie.presentation.screens.HomeScreen
+import studio.vadim.predanie.presentation.screens.ItemScreen
+import studio.vadim.predanie.presentation.screens.ProfileScreen
+import studio.vadim.predanie.presentation.screens.SearchScreen
+import studio.vadim.predanie.presentation.screens.SplashScreen
 
 class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModel()

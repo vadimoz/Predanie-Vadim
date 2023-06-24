@@ -1,4 +1,4 @@
-package studio.vadim.predanie.presentation.Screens
+package studio.vadim.predanie.presentation.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

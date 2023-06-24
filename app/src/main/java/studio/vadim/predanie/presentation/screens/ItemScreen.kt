@@ -1,4 +1,4 @@
-package studio.vadim.predanie.presentation
+package studio.vadim.predanie.presentation.screens
 
 import android.text.Html.fromHtml
 import android.text.TextUtils
@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -44,17 +45,28 @@ import coil.load
 import com.flaviofaria.kenburnsview.KenBurnsView
 import com.flaviofaria.kenburnsview.RandomTransitionGenerator
 import com.slaviboy.composeunits.dh
+import studio.vadim.predanie.presentation.MainViewModel
+import studio.vadim.predanie.presentation.screens.accordion.components.AccordionGroup
+import studio.vadim.predanie.presentation.screens.accordion.components.AccordionModel
 
 @Composable
 fun ItemScreen(
     mainViewModel: MainViewModel, itemId: String?,
     modifier: Modifier = Modifier,
     textModifier: Modifier = Modifier,
-    style: TextStyle = LocalTextStyle.current.copy(color = Color.White, fontSize = 19.sp),
+    style: TextStyle = LocalTextStyle.current.copy(
+        color = Color.White,
+        fontSize = 18.sp,
+        fontFamily = FontFamily.Serif
+    ),
     fontStyle: FontStyle? = null,
     collapsedMaxLine: Int = 4,
     showMoreText: String = " ... Развернуть",
-    showMoreStyle: SpanStyle = SpanStyle(fontWeight = FontWeight.W500, fontSize = 16.sp, color = Color.LightGray),
+    showMoreStyle: SpanStyle = SpanStyle(
+        fontWeight = FontWeight.W500,
+        fontSize = 16.sp,
+        color = Color.LightGray
+    ),
     showLessText: String = " Свернуть",
     showLessStyle: SpanStyle = showMoreStyle,
     textAlign: TextAlign? = null
@@ -137,10 +149,12 @@ fun ItemScreen(
                             var lastCharIndex by remember { mutableStateOf(0) }
                             val text = fromHtml(uiState.itemInto.data!!.desc)
 
-                            Box(modifier = Modifier
-                                .clickable(clickable) {
-                                    isExpanded = !isExpanded
-                                }.then(Modifier.padding(20.dp))
+                            Box(
+                                modifier = Modifier
+                                    .clickable(clickable) {
+                                        isExpanded = !isExpanded
+                                    }
+                                    .then(Modifier.padding(20.dp))
                             ) {
                                 Text(
                                     modifier = Modifier
@@ -188,6 +202,42 @@ fun ItemScreen(
                             }
 
                         }
+                        val modelTechStocks = AccordionModel(
+                            header = "Technology Stocks",
+                            rows = mutableListOf(
+                                AccordionModel.Row(security = "AAPL", "$328.00"),
+                                AccordionModel.Row(security = "GOOGL", "$328.00"),
+                                AccordionModel.Row(security = "NFLX", "$198.00"),
+                                AccordionModel.Row(security = "META", "$200.00"),
+                                AccordionModel.Row(security = "TSLA", "$769.16"),
+                            )
+                        )
+
+                        val modelEnergyStocks = AccordionModel(
+                            header = "Energy Stocks",
+                            rows = mutableListOf(
+                                AccordionModel.Row(security = "MPC", "$96.56"),
+                                AccordionModel.Row(security = "CVX", "179.71"),
+                                AccordionModel.Row(security = "DVN", "$77.13"),
+                                AccordionModel.Row(security = "XOM", "$98.48"),
+                                AccordionModel.Row(security = "XPRO", "$13.86"),
+                            )
+                        )
+
+                        val modelDividendStocks = AccordionModel(
+                            header = "Dividend Stocks",
+                            rows = mutableListOf(
+                                AccordionModel.Row(security = "JNJ", "$178.83"),
+                                AccordionModel.Row(security = "PG", "$148.63"),
+                                AccordionModel.Row(security = "KO", "$64.12"),
+                                AccordionModel.Row(security = "BAC", "$37.42"),
+                                AccordionModel.Row(security = "MA", "$333.33"),
+                            )
+                        )
+
+                        val group = listOf(modelTechStocks, modelEnergyStocks, modelDividendStocks)
+
+                        AccordionGroup(modifier = Modifier.padding(top = 8.dp), group = group)
                     }
                 }
             }
