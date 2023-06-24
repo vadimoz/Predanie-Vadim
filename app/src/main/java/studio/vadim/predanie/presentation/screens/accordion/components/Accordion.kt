@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.presentation.screens.accordion.theme.*
@@ -62,9 +62,12 @@ fun Accordion(modifier: Modifier = Modifier, model: AccordionModel) {
                 modifier = Modifier.padding(top = 8.dp)
             ) {
                 Column {
+
+                    var counter = 1
                     for (row in model.rows) {
-                        AccordionRow(row)
+                        AccordionRow(row, counter)
                         Divider(color = Gray200, thickness = 1.dp)
+                        counter += 1
                     }
                 }
             }
@@ -72,7 +75,6 @@ fun Accordion(modifier: Modifier = Modifier, model: AccordionModel) {
     }
 }
 
-@Preview
 @Composable
 private fun AccordionHeader(
     title: String = "Header",
@@ -108,14 +110,17 @@ private fun AccordionHeader(
 }
 
 @Composable
-private fun AccordionRow(
-    model: Tracks
+fun AccordionRow(
+    model: Tracks,
+    index: Int
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier.padding(24.dp)
     ) {
         //style = tags
+
+        Text("${index.toString()}.", Modifier.wrapContentWidth().padding(end = 5.dp), color = Gray600)
         Text(model.name.toString(), Modifier.weight(1f), color = MedGray3)
         Surface(color = Green500, shape = RoundedCornerShape(8.dp), tonalElevation = 2.dp) {
             //style = bodyBold

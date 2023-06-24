@@ -1,7 +1,6 @@
 package studio.vadim.predanie.presentation.screens
 
 import android.text.Html.fromHtml
-import android.text.TextUtils
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import androidx.compose.animation.animateContentSize
@@ -49,6 +48,7 @@ import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.screens.accordion.components.AccordionGroup
 import studio.vadim.predanie.presentation.screens.accordion.components.AccordionModel
+import studio.vadim.predanie.presentation.screens.accordion.components.AccordionRow
 
 @Composable
 fun ItemScreen(
@@ -73,7 +73,6 @@ fun ItemScreen(
     textAlign: TextAlign? = null
 ) {
     val uiState by mainViewModel.uiState.collectAsState()
-    val mainImage = uiState.itemInto.data?.img_big
 
     DisposableEffect(itemId) {
         onDispose {
@@ -95,15 +94,14 @@ fun ItemScreen(
                     .fillMaxHeight()
                     .background(color = Color.White)
             ) {
-                if (!TextUtils.isEmpty(mainImage)) {
-
+                if (uiState.itemInto.data?.img_big != null) {
                     val interpolator = AccelerateDecelerateInterpolator()
 
                     val generator = RandomTransitionGenerator(12000, interpolator)
 
                     val customView = KenBurnsView(LocalContext.current).also { imageView ->
                         imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-                        imageView.load(mainImage)
+                        imageView.load(uiState.itemInto.data?.img_big)
                     }
 
                     customView.setTransitionGenerator(generator)
@@ -223,6 +221,14 @@ fun ItemScreen(
                                 group = group
                             )
                         }
+
+                        val separateFiles = uiState.itemInto.data!!.tracks.filter { s -> s.parent == null }
+
+                        var counter = 1
+                            for (item in separateFiles) {
+                                AccordionRow(model = Tracks(id = item.id, name = item.name), index = counter)
+                                counter += 1
+                            }
                     }
                 }
             }
