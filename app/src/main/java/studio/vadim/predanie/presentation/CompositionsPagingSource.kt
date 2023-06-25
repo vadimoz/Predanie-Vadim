@@ -7,7 +7,8 @@ import studio.vadim.predanie.domain.usecases.showLists.GetLists
 
 class CompositionsPagingSource(
     private val api: GetLists,
-    val type: String
+    val type: String,
+    val catalogId: Int
 ) : PagingSource<Int, Compositions>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Compositions> {
@@ -15,17 +16,18 @@ class CompositionsPagingSource(
             val nextOffset = params.key ?: 0
 
             val response = when (type) {
-                "new" -> api.getListNew("audio,music", offset = nextOffset, limit = 5)
-                "audioPopular" -> api.getListPopular("audio", offset = nextOffset, limit = 5)
-                "musicPopular" -> api.getListPopular("music", offset = nextOffset, limit = 5)
-                "favorites" -> api.getListFavorites("audio,music", offset = nextOffset, limit = 5)
-                else -> {api.getListNew("audio,music", offset = nextOffset, limit = 5)}
+                "new" -> api.getListNew("audio,music", offset = nextOffset, limit = 15)
+                "audioPopular" -> api.getListPopular("audio", offset = nextOffset, limit = 15)
+                "musicPopular" -> api.getListPopular("music", offset = nextOffset, limit = 15)
+                "catalogItems" -> api.getCategoryItemsList(categoryId = catalogId, offset = nextOffset, limit = 15)
+                "favorites" -> api.getListFavorites("audio,music", offset = nextOffset, limit = 15)
+                else -> {api.getListNew("audio,music", offset = nextOffset, limit = 15)}
             }
 
             LoadResult.Page(
                 data = response.compositions,
-                prevKey = if (nextOffset == 0) null else nextOffset.minus(5),
-                nextKey = if (response.compositions.isEmpty()) null else nextOffset.plus(5),
+                prevKey = if (nextOffset == 0) null else nextOffset.minus(15),
+                nextKey = if (response.compositions.isEmpty()) null else nextOffset.plus(15),
             )
         } catch (e: Exception) {
             LoadResult.Error(e)
@@ -34,8 +36,8 @@ class CompositionsPagingSource(
 
     override fun getRefreshKey(state: PagingState<Int, Compositions>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
-            state.closestPageToPosition(anchorPosition)?.prevKey?.plus(5)
-                ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(5)
+            state.closestPageToPosition(anchorPosition)?.prevKey?.plus(15)
+                ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(15)
         }
     }
 }

@@ -1,6 +1,7 @@
 package studio.vadim.predanie.presentation.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -14,12 +15,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.navigation.NavHostController
 import studio.vadim.predanie.R
 import studio.vadim.predanie.presentation.MainViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun CatalogScreen(mainViewModel: MainViewModel) {
+fun CatalogScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val uiState by mainViewModel.uiState.collectAsState()
 
     Column(
@@ -38,7 +40,9 @@ fun CatalogScreen(mainViewModel: MainViewModel) {
                             .wrapContentSize(Alignment.Center)
                     ) {
                         uiState.catalogList.categories[index].categories.forEach() {
-                            Text(it.name.toString())
+                            Text(it.name.toString(), modifier = Modifier.clickable {
+                                navController.navigate("CatalogItemsScreen/${it.id_category}")
+                            })
                         }
                     }
                 }

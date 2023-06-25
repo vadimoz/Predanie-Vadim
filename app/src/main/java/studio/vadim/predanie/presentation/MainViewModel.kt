@@ -19,20 +19,20 @@ import studio.vadim.predanie.domain.usecases.showLists.GetLists
 class MainViewModel(private val apiLists: GetLists,
                     private val apiItems: GetItems) : ViewModel() {
 
-    val newList = Pager(PagingConfig(pageSize = 5)) {
-        CompositionsPagingSource(apiLists, type = "new")
+    val newList = Pager(PagingConfig(pageSize = 15)) {
+        CompositionsPagingSource(apiLists, type = "new", 0)
     }.flow.cachedIn(viewModelScope)
 
-    val audioPopularList = Pager(PagingConfig(pageSize = 5)) {
-        CompositionsPagingSource(apiLists, "audioPopular")
+    val audioPopularList = Pager(PagingConfig(pageSize = 15)) {
+        CompositionsPagingSource(apiLists, "audioPopular", 0)
     }.flow.cachedIn(viewModelScope)
 
-    val musicPopularList = Pager(PagingConfig(pageSize = 5)) {
-        CompositionsPagingSource(apiLists, "musicPopular")
+    val musicPopularList = Pager(PagingConfig(pageSize = 15)) {
+        CompositionsPagingSource(apiLists, "musicPopular", 0)
     }.flow.cachedIn(viewModelScope)
 
-    val favoritesList = Pager(PagingConfig(pageSize = 5)) {
-        CompositionsPagingSource(apiLists, "favorites")
+    val favoritesList = Pager(PagingConfig(pageSize = 15)) {
+        CompositionsPagingSource(apiLists, "favorites", 0)
     }.flow.cachedIn(viewModelScope)
 
 
@@ -87,7 +87,6 @@ class MainViewModel(private val apiLists: GetLists,
             }
         }
     }
-
     fun searchQueryUpdate(query: String){
         viewModelScope.launch {
             _uiState.update { currentState ->
@@ -100,6 +99,21 @@ class MainViewModel(private val apiLists: GetLists,
                 currentState.copy(
                     searchList = apiLists.getGlobalSearchList(_uiState.value.searchString)
                 )
+            }
+        }
+    }
+    fun getCatalogItemsList(catalogId: String?) {
+        if (catalogId != null) {
+            viewModelScope.launch {
+                val list = Pager(PagingConfig(pageSize = 15)) {
+                            CompositionsPagingSource(
+                                apiLists,
+                                "catalogItems",
+                                catalogId = catalogId.toInt()
+                            )
+                        }.flow.cachedIn(viewModelScope)
+
+                _uiState.value.catalogItemsList = list
             }
         }
     }

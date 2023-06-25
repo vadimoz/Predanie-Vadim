@@ -108,9 +108,9 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
         fun BottomNavigationBar() {
             val items = listOf(
                 NavigationItem.Home,
-                NavigationItem.Music,
+                NavigationItem.Catalog,
                 NavigationItem.Movies,
-                NavigationItem.Books,
+                NavigationItem.CatalogItems,
                 NavigationItem.Profile
             )
             NavigationBar(

@@ -103,14 +103,20 @@ class MainActivity : ComponentActivity() {
             ) {
                 HomeScreen(mainViewModel = mainViewModel, navController)
             }
-            composable(NavigationItem.Music.route) {
-                CatalogScreen(mainViewModel = mainViewModel)
+            composable(NavigationItem.Catalog.route) {
+                CatalogScreen(mainViewModel = mainViewModel,
+                    navController = navController)
             }
             composable(NavigationItem.Movies.route) {
                 SearchScreen(mainViewModel = mainViewModel)
             }
-            composable(NavigationItem.Books.route) {
-                CatalogItemsScreen()
+            composable(NavigationItem.CatalogItems.route) { navBackStackEntry ->
+                val catalogId = navBackStackEntry.arguments?.getString("catalogId")
+                CatalogItemsScreen(
+                    mainViewModel = mainViewModel,
+                    navController = navController,
+                    catalogId
+                )
             }
             composable(NavigationItem.Author.route) { navBackStackEntry ->
                 val authorId = navBackStackEntry.arguments?.getString("authorId")
@@ -143,9 +149,9 @@ class MainActivity : ComponentActivity() {
     fun BottomNavigationBar(navController: NavController) {
         val items = listOf(
             NavigationItem.Home,
-            NavigationItem.Music,
+            NavigationItem.Catalog,
             NavigationItem.Movies,
-            NavigationItem.Books,
+            NavigationItem.Movies,
             NavigationItem.Profile
         )
         NavigationBar(
@@ -178,7 +184,7 @@ class MainActivity : ComponentActivity() {
                             // reselecting the same item
                             launchSingleTop = true
                             // Restore state when reselecting a previously selected item
-                            restoreState = true
+                            restoreState = false
                         }
                     }
                 )
