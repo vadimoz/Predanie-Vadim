@@ -2,6 +2,7 @@ package studio.vadim.predanie.presentation
 
 import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
+import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
 import studio.vadim.predanie.domain.models.api.lists.Compositions
 import studio.vadim.predanie.domain.models.api.lists.ResponseCatalogModel
@@ -15,5 +16,6 @@ data class UIState(
     val catalogList: ResponseCatalogModel = ResponseCatalogModel(),
     var searchString: String = "",
     val searchList: ResponseGlobalSearchListModel = ResponseGlobalSearchListModel(),
-    val itemInto: ResponseItemModel = ResponseItemModel()
+    val itemInto: ResponseItemModel = ResponseItemModel(),
+    val authorInto: ResponseAuthorModel = ResponseAuthorModel()
 )

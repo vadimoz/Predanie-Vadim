@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
 import studio.vadim.predanie.domain.usecases.showItems.GetItems
 import studio.vadim.predanie.domain.usecases.showLists.GetLists
@@ -59,7 +60,24 @@ class MainViewModel(private val apiLists: GetLists,
             }
         }
     }
-
+    fun getAuthorInfo(id: Int) {
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    authorInto = apiItems.getAuthor(id),
+                )
+            }
+        }
+    }
+    fun cleanAuthorState() {
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    authorInto = ResponseAuthorModel(),
+                )
+            }
+        }
+    }
     fun cleanItemState() {
         viewModelScope.launch {
             _uiState.update { currentState ->

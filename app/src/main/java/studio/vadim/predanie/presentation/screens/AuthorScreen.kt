@@ -1,17 +1,18 @@
 package studio.vadim.predanie.presentation.screens
 
-import android.text.Html.fromHtml
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.widget.ImageView
+import android.text.Html
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
@@ -24,10 +25,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -39,20 +39,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import coil.load
-import com.flaviofaria.kenburnsview.KenBurnsView
-import com.flaviofaria.kenburnsview.RandomTransitionGenerator
+import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.slaviboy.composeunits.dh
-import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.presentation.MainViewModel
-import studio.vadim.predanie.presentation.screens.accordion.AccordionGroup
-import studio.vadim.predanie.presentation.screens.accordion.AccordionModel
-import studio.vadim.predanie.presentation.screens.accordion.AccordionRow
+
 @Composable
-fun ItemScreen(
-    mainViewModel: MainViewModel, itemId: String?,
+fun AuthorScreen(
+    mainViewModel: MainViewModel, authorId: String?,
     modifier: Modifier = Modifier,
+    navController: NavHostController,
     textModifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current.copy(
         color = Color.Black,
@@ -73,14 +69,15 @@ fun ItemScreen(
 ) {
     val uiState by mainViewModel.uiState.collectAsState()
 
-    DisposableEffect(itemId) {
+    DisposableEffect(authorId) {
         onDispose {
-            mainViewModel.cleanItemState()
+            mainViewModel.cleanAuthorState()
         }
     }
 
-    if (itemId != null) {
-        mainViewModel.getItemInfo(itemId.toInt())
+    if (authorId != null) {
+        mainViewModel.getAuthorInfo(authorId.toInt())
+
         Column(
             Modifier
                 .verticalScroll(rememberScrollState())
@@ -92,60 +89,43 @@ fun ItemScreen(
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .background(color = Color.White)
+                    .padding(20.dp)
             ) {
-                if (uiState.itemInto.data?.img_big != null) {
-                    val interpolator = AccelerateDecelerateInterpolator()
-
-                    val generator = RandomTransitionGenerator(12000, interpolator)
-
-                    val customView = KenBurnsView(LocalContext.current).also { imageView ->
-                        imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-                        imageView.load(uiState.itemInto.data?.img_big)
-                    }
-
-                    customView.setTransitionGenerator(generator)
-
-                    AndroidView(
-                        factory = { customView },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                    )
-                }
+                AsyncImage(
+                    model = uiState.authorInto.data?.img,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,            // crop the image if it's not a square
+                    modifier = Modifier
+                        .size(0.3.dh)
+                        .clip(CircleShape)                       // clip to the circle shape
+                        .border(2.dp, Color.LightGray, CircleShape)
+                        .align(Alignment.TopCenter)
+                )
 
                 val boxSize = with(LocalDensity.current) { 0.5.dh.toPx() }
                 Column(
                     Modifier
                         .align(Alignment.TopCenter)
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(Color.Transparent, Color.White),
-                                start = Offset(0f, 0f), // top left corner
-                                end = Offset(1f, boxSize) // bottom right corner
-                            )
-                        )
                 ) {
 
                     Column(
                         Modifier
                             .padding(top = 0.3.dh)
                     ) {
-                        uiState.itemInto.data?.name?.let {
-                            Text(
-                                text = it,
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 36.sp,
-                                modifier = Modifier.padding(20.dp)
-                            )
-                        }
+                        Text(
+                            text = uiState.authorInto.data?.name.toString(),
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 36.sp,
+                            modifier = Modifier.padding(20.dp)
+                        )
 
-                        uiState.itemInto.data?.desc?.let {
+                        uiState.authorInto.data?.desc?.let {
 
                             var isExpanded by remember { mutableStateOf(false) }
                             var clickable by remember { mutableStateOf(false) }
                             var lastCharIndex by remember { mutableStateOf(0) }
-                            val text = fromHtml(uiState.itemInto.data!!.desc)
+                            val text = Html.fromHtml(uiState.authorInto.data?.desc.toString())
 
                             Box(
                                 modifier = Modifier
@@ -200,34 +180,20 @@ fun ItemScreen(
                             }
 
                         }
-                        for (part in uiState.itemInto.data?.parts!!) {
-                            val rows = mutableListOf<Tracks>()
-                            val accordionItems =
-                                uiState.itemInto.data!!.tracks.filter { s -> s.parent == part.id.toString() }
 
-                            for (item in accordionItems) {
-                                rows.add(item)
+                        if (uiState.authorInto.data?.compositions != null) {
+                            NonlazyGrid(
+                                columns = 3,
+                                itemCount = uiState.authorInto.data?.compositions!!.count(),
+                                modifier = Modifier
+                                    .padding(start = 7.5.dp, end = 7.5.dp)
+                            ) {
+                                ListRow(
+                                    model = uiState.authorInto.data?.compositions!![it],
+                                    navController
+                                )
                             }
-
-                            val parts = AccordionModel(
-                                header = part.name.toString(),
-                                rows
-                            )
-
-                            val group = listOf(parts)
-                            AccordionGroup(
-                                modifier = Modifier.padding(top = 8.dp),
-                                group = group
-                            )
                         }
-
-                        val separateFiles = uiState.itemInto.data!!.tracks.filter { s -> s.parent == null }
-
-                        var counter = 1
-                            for (item in separateFiles) {
-                                AccordionRow(model = Tracks(id = item.id, name = item.name), index = counter)
-                                counter += 1
-                            }
                     }
                 }
             }

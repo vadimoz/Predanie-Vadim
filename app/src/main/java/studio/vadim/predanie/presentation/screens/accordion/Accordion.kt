@@ -1,4 +1,4 @@
-package studio.vadim.predanie.presentation.screens.accordion.components
+package studio.vadim.predanie.presentation.screens.accordion
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.unit.dp
 import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.presentation.screens.accordion.theme.*
-
 data class AccordionModel(
     val header: String,
     val rows: MutableList<Tracks>
@@ -34,7 +33,6 @@ data class AccordionModel(
         val price: String
     )
 }
-
 @Composable
 fun AccordionGroup(modifier: Modifier = Modifier, group: List<AccordionModel>) {
     Column(modifier = modifier) {
@@ -43,7 +41,6 @@ fun AccordionGroup(modifier: Modifier = Modifier, group: List<AccordionModel>) {
         }
     }
 }
-
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Accordion(modifier: Modifier = Modifier, model: AccordionModel) {

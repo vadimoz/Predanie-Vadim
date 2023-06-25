@@ -32,11 +32,12 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.slaviboy.composeunits.initSize
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import studio.vadim.predanie.R
-import studio.vadim.predanie.presentation.screens.BooksScreen
+import studio.vadim.predanie.presentation.navigation.NavigationItem
+import studio.vadim.predanie.presentation.screens.AuthorScreen
+import studio.vadim.predanie.presentation.screens.CatalogItemsScreen
 import studio.vadim.predanie.presentation.screens.CatalogScreen
 import studio.vadim.predanie.presentation.screens.HomeScreen
 import studio.vadim.predanie.presentation.screens.ItemScreen
-import studio.vadim.predanie.presentation.screens.ProfileScreen
 import studio.vadim.predanie.presentation.screens.SearchScreen
 import studio.vadim.predanie.presentation.screens.SplashScreen
 
@@ -85,7 +86,8 @@ class MainActivity : ComponentActivity() {
             ) {
                 SplashScreen(mainViewModel = mainViewModel, navController)
             }
-            composable(NavigationItem.Home.route,
+            composable(
+                NavigationItem.Home.route,
                 enterTransition = {
                     slideIntoContainer(
                         AnimatedContentScope.SlideDirection.Up,
@@ -97,7 +99,8 @@ class MainActivity : ComponentActivity() {
                         AnimatedContentScope.SlideDirection.Down,
                         animationSpec = tween(1000)
                     )
-                },) {
+                },
+            ) {
                 HomeScreen(mainViewModel = mainViewModel, navController)
             }
             composable(NavigationItem.Music.route) {
@@ -107,10 +110,15 @@ class MainActivity : ComponentActivity() {
                 SearchScreen(mainViewModel = mainViewModel)
             }
             composable(NavigationItem.Books.route) {
-                BooksScreen()
+                CatalogItemsScreen()
             }
-            composable(NavigationItem.Profile.route) {
-                ProfileScreen()
+            composable(NavigationItem.Author.route) { navBackStackEntry ->
+                val authorId = navBackStackEntry.arguments?.getString("authorId")
+                AuthorScreen(
+                    mainViewModel = mainViewModel,
+                    authorId,
+                    navController = navController
+                )
             }
             composable(NavigationItem.Item.route) { navBackStackEntry ->
                 val itemId = navBackStackEntry.arguments?.getString("itemId")
