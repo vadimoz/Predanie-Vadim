@@ -94,10 +94,10 @@ fun AuthorScreen(
                 AsyncImage(
                     model = uiState.authorInto.data?.img,
                     contentDescription = null,
-                    contentScale = ContentScale.Crop,            // crop the image if it's not a square
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(0.3.dh)
-                        .clip(CircleShape)                       // clip to the circle shape
+                        .clip(CircleShape)
                         .border(2.dp, Color.LightGray, CircleShape)
                         .align(Alignment.TopCenter)
                 )
@@ -119,7 +119,6 @@ fun AuthorScreen(
                             fontSize = 36.sp,
                             modifier = Modifier.padding(20.dp)
                         )
-
                         uiState.authorInto.data?.desc?.let {
 
                             var isExpanded by remember { mutableStateOf(false) }

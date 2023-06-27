@@ -80,7 +80,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun Navigation(navController: NavHostController) {
-        AnimatedNavHost(navController, startDestination = NavigationItem.Splash.route) {
+        AnimatedNavHost(navController, startDestination = NavigationItem.Home.route) {
             composable(
                 NavigationItem.Splash.route,
             ) {

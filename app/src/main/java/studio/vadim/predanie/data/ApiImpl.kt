@@ -1,5 +1,6 @@
 package studio.vadim.predanie.data
 
+import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.android.Android
@@ -13,6 +14,7 @@ import io.ktor.client.request.get
 import io.ktor.http.URLProtocol
 import io.ktor.serialization.gson.gson
 import io.ktor.util.InternalAPI
+import kotlinx.coroutines.delay
 import studio.vadim.predanie.domain.ApiConnection
 import studio.vadim.predanie.domain.models.api.items.RequestAuthorModel
 import studio.vadim.predanie.domain.models.api.items.RequestItemModel
@@ -26,86 +28,134 @@ import studio.vadim.predanie.domain.models.api.lists.ResponseItemsListModel
 
 class ApiImpl : ApiConnection {
 
+    //TODO: обернуть все запросы в ошибку и повторять
+
     override suspend fun getAuthor(request: RequestAuthorModel): ResponseAuthorModel {
         val client = createHttpClient()
-        return client.get {
-            url() {
-                host = request.route
-                protocol = URLProtocol.HTTPS
-                //TODO: Промапить RequestListModel
 
-                parameters.append("author_id", request.authorId.toString())
+        while (true) {
+            try {
+                return client.get {
+                    url() {
+                        host = request.route
+                        protocol = URLProtocol.HTTPS
+
+                        parameters.append("author_id", request.authorId.toString())
+                    }
+                }.body()
+            } catch (e: Throwable) {
+                Log.d("getAuthor", e.message.toString())
+                delay(10000L)
             }
-        }.body()
+        }
     }
+
     override suspend fun getItem(request: RequestItemModel): ResponseItemModel {
         val client = createHttpClient()
-        return client.get {
-            url() {
-                host = request.route
-                protocol = URLProtocol.HTTPS
-                //TODO: Промапить RequestListModel
 
-                parameters.append("composition_id", request.compositionId.toString())
+        while (true) {
+            try {
+                return client.get {
+                    url() {
+                        host = request.route
+                        protocol = URLProtocol.HTTPS
+                        //TODO: Промапить RequestListModel
+
+                        parameters.append("composition_id", request.compositionId.toString())
+                    }
+                }.body()
+            } catch (e: Throwable) {
+                Log.d("getItem", e.message.toString())
+                delay(10000L)
             }
-        }.body()
+        }
     }
+
     override suspend fun getCatalogList(request: RequestListModel): ResponseCatalogModel {
         val client = createHttpClient()
-        return client.get {
-            url() {
-                host = request.route
-                protocol = URLProtocol.HTTPS
-                //TODO: Промапить RequestListModel
+        while (true) {
+            try {
+                return client.get {
+                    url() {
+                        host = request.route
+                        protocol = URLProtocol.HTTPS
+                        //TODO: Промапить RequestListModel
+                    }
+                }.body()
+            } catch (e: Throwable) {
+                Log.d("getCatalogList", e.message.toString())
+                delay(10000L)
             }
-        }.body()
+        }
     }
+
     @OptIn(InternalAPI::class)
     override suspend fun getItemsList(request: RequestListModel): ResponseItemsListModel {
         val client = createHttpClient()
-        return client.get {
-            url() {
-                host = request.route
-                protocol = URLProtocol.HTTPS
-                //TODO: Промапить RequestListModel
+        while (true) {
+            try {
+                return client.get {
+                    url() {
+                        host = request.route
+                        protocol = URLProtocol.HTTPS
+                        //TODO: Промапить RequestListModel
 
-                parameters.append("limit", request.limit.toString())
-                parameters.append("offset", request.offset.toString())
-                parameters.append("type", request.type)
-                parameters.append("id_category", request.id_category.toString())
+                        parameters.append("limit", request.limit.toString())
+                        parameters.append("offset", request.offset.toString())
+                        parameters.append("type", request.type)
+                        parameters.append("id_category", request.id_category.toString())
+                    }
+                }.body()
+            } catch (e: Throwable) {
+                Log.d("getItemsList", e.message.toString())
+                delay(10000L)
             }
-        }.body()
+        }
     }
 
     override suspend fun getGlobalSearchList(request: RequestListModel): ResponseGlobalSearchListModel {
         val client = createHttpClient()
-        return client.get {
-            url() {
-                host = request.route
-                protocol = URLProtocol.HTTPS
-                //TODO: Промапить RequestListModel
+        while (true) {
+            try {
+                return client.get {
+                    url() {
+                        host = request.route
+                        protocol = URLProtocol.HTTPS
+                        //TODO: Промапить RequestListModel
 
-                parameters.append("limit", request.limit.toString())
-                parameters.append("offset", request.offset.toString())
-                parameters.append("q", request.q)
+                        parameters.append("limit", request.limit.toString())
+                        parameters.append("offset", request.offset.toString())
+                        parameters.append("q", request.q)
+                    }
+                }.body()
+            } catch (e: Throwable) {
+                Log.d("getGlobalSearchList", e.message.toString())
+                delay(10000L)
             }
-        }.body()
+        }
     }
+
     override suspend fun getAuthorsList(request: RequestListModel): ResponseAuthorsListModel {
         val client = createHttpClient()
-        return client.get {
-            url() {
-                host = request.route
-                protocol = URLProtocol.HTTPS
-                //TODO: Промапить RequestListModel
+        while (true) {
+            try {
+                return client.get {
+                    url() {
+                        host = request.route
+                        protocol = URLProtocol.HTTPS
 
-                parameters.append("limit", request.limit.toString())
-                parameters.append("offset", request.offset.toString())
-                parameters.append("type", request.type)
-                parameters.append("search", request.search)
-                parameters.append("letter", request.letter)
+                        parameters.append("limit", request.limit.toString())
+                        parameters.append("offset", request.offset.toString())
+                        parameters.append("type", request.type)
+                        parameters.append("search", request.search)
+                        parameters.append("letter", request.letter)
+                    }
+                }.body()
+            } catch (e: Throwable) {
+                Log.d("getAuthorsList", e.message.toString())
+                delay(10000L)
             }
-        }.body()
+        }
     }
 
     private fun createHttpClient(): HttpClient {

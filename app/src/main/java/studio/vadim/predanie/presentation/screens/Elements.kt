@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import studio.vadim.predanie.domain.models.api.items.AuthorCompositions
 import studio.vadim.predanie.domain.models.api.lists.Categories
@@ -34,8 +35,8 @@ fun ListRow(model: Compositions, navController: NavHostController) {
             .width(130.dp)
             .height(250.dp)
     ) {
-        Image(
-            painter = rememberAsyncImagePainter(model.img_s),
+        AsyncImage(
+            model = model.img_s,
             contentDescription = null,
             modifier = Modifier
                 .clickable {
