@@ -16,7 +16,7 @@ data class UIState(
     val catalogList: ResponseCatalogModel = ResponseCatalogModel(),
     var searchString: String = "",
     val searchList: ResponseGlobalSearchListModel = ResponseGlobalSearchListModel(),
-    val itemInto: ResponseItemModel = ResponseItemModel(),
+    val itemInto: ResponseItemModel? = ResponseItemModel(),
     val authorInto: ResponseAuthorModel = ResponseAuthorModel(),
     var catalogItemsList: Flow<PagingData<Compositions>>? = null,
 )

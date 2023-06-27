@@ -3,10 +3,11 @@ package studio.vadim.predanie.presentation.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -24,6 +25,7 @@ import studio.vadim.predanie.presentation.MainViewModel
 @Composable
 fun SearchScreen(mainViewModel: MainViewModel,
                  navController: NavHostController) {
+
     val uiState by mainViewModel.uiState.collectAsState()
 
     Column(
@@ -31,6 +33,7 @@ fun SearchScreen(mainViewModel: MainViewModel,
             .fillMaxSize()
             .background(colorResource(id = R.color.white))
             .wrapContentSize(Alignment.Center)
+            .verticalScroll(rememberScrollState())
     ) {
         TextField(
             uiState.searchString,
@@ -53,10 +56,16 @@ fun SearchScreen(mainViewModel: MainViewModel,
             }
         }
 
-        LazyVerticalGrid(columns = GridCells.Adaptive(128.dp)) {
-            items(compositionsItems.count()) { index ->
-                ListRow(model = compositionsItems[index], navController)
-            }
+        NonlazyGrid(
+            columns = 3,
+            itemCount = compositionsItems.count(),
+            modifier = Modifier
+                .padding(start = 7.5.dp, end = 7.5.dp)
+        ) {
+            ListRow(
+                model = compositionsItems[it],
+                navController
+            )
         }
     }
 }

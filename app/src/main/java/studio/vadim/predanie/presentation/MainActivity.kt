@@ -108,7 +108,7 @@ class MainActivity : ComponentActivity() {
                     navController = navController)
             }
             composable(NavigationItem.Movies.route) {
-                SearchScreen(mainViewModel = mainViewModel)
+                SearchScreen(mainViewModel = mainViewModel, navController)
             }
             composable(NavigationItem.CatalogItems.route) { navBackStackEntry ->
                 val catalogId = navBackStackEntry.arguments?.getString("catalogId")

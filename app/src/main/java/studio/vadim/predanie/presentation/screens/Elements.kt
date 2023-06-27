@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -72,18 +73,20 @@ fun ListAuthorsRow(model: Entities, navController: NavHostController) {
             .wrapContentHeight()
             .fillMaxWidth()
             .width(130.dp)
-            .height(100.dp)
+            .height(250.dp)
+            .padding(top = 20.dp)
             .clickable {
                 navController.navigate("AuthorScreen/${model.id}")
             }
     ) {
         Image(
-            painter = rememberAsyncImagePainter(model.img_s),
+            painter = rememberAsyncImagePainter(model.img),
             contentDescription = null,
             modifier = Modifier
                 .size(100.dp)
                 .fillMaxWidth()
-                .padding(5.dp),
+                .padding(5.dp)
+                .clip(CircleShape)
         )
         Text(
             modifier = Modifier.padding(5.dp),
@@ -91,6 +94,7 @@ fun ListAuthorsRow(model: Entities, navController: NavHostController) {
         )
     }
 }
+
 @Composable
 fun ListRow(model: Entities, navController: NavHostController) {
     Column(
@@ -117,6 +121,7 @@ fun ListRow(model: Entities, navController: NavHostController) {
         )
     }
 }
+
 @Composable
 fun NonlazyGrid(
     columns: Int,
@@ -150,6 +155,7 @@ fun NonlazyGrid(
         }
     }
 }
+
 @Composable
 fun ListRow(model: AuthorCompositions, navController: NavHostController) {
     Column(
