@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.TextField
@@ -16,11 +17,13 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import studio.vadim.predanie.R
 import studio.vadim.predanie.presentation.MainViewModel
 
 @Composable
-fun SearchScreen(mainViewModel: MainViewModel) {
+fun SearchScreen(mainViewModel: MainViewModel,
+                 navController: NavHostController) {
     val uiState by mainViewModel.uiState.collectAsState()
 
     Column(
@@ -32,15 +35,27 @@ fun SearchScreen(mainViewModel: MainViewModel) {
         TextField(
             uiState.searchString,
             {
-
                 mainViewModel.searchQueryUpdate(it)
             },
             textStyle = TextStyle(fontSize = 28.sp),
             placeholder = { "Найти..." }
         )
+
+        val authorsItems =
+            uiState.searchList.entities.filter { s -> s.entity_type == "author" }
+
+        val compositionsItems =
+            uiState.searchList.entities.filter { s -> s.entity_type == "composition" }
+
+        LazyRow() {
+            items(authorsItems.count()) { index ->
+                ListAuthorsRow(model = authorsItems[index], navController)
+            }
+        }
+
         LazyVerticalGrid(columns = GridCells.Adaptive(128.dp)) {
-            items(uiState.searchList.entities.count()) { index ->
-                ListRow(model = uiState.searchList.entities[index])
+            items(compositionsItems.count()) { index ->
+                ListRow(model = compositionsItems[index], navController)
             }
         }
     }

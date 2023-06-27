@@ -59,9 +59,6 @@ fun ListRow(model: Compositions, navController: NavHostController) {
 
         Text(
             modifier = Modifier
-                .clickable {
-                    navController.navigate("AuthorScreen/67398")
-                }
                 .padding(5.dp),
             text = model.author_name.toString()
         )
@@ -69,13 +66,42 @@ fun ListRow(model: Compositions, navController: NavHostController) {
 }
 
 @Composable
-fun ListRow(model: Entities) {
+fun ListAuthorsRow(model: Entities, navController: NavHostController) {
+    Column(
+        modifier = Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .width(130.dp)
+            .height(100.dp)
+            .clickable {
+                navController.navigate("AuthorScreen/${model.id}")
+            }
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(model.img_s),
+            contentDescription = null,
+            modifier = Modifier
+                .size(100.dp)
+                .fillMaxWidth()
+                .padding(5.dp),
+        )
+        Text(
+            modifier = Modifier.padding(5.dp),
+            text = model.name.toString()
+        )
+    }
+}
+@Composable
+fun ListRow(model: Entities, navController: NavHostController) {
     Column(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
             .width(130.dp)
             .height(250.dp)
+            .clickable {
+                navController.navigate("ItemScreen/${model.id}")
+            }
     ) {
         Image(
             painter = rememberAsyncImagePainter(model.img_s),
