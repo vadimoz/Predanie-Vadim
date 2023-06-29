@@ -1,6 +1,9 @@
 package studio.vadim.predanie.presentation.screens
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -14,10 +17,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import studio.vadim.predanie.presentation.MainViewModel
@@ -33,111 +38,173 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val musicPopularList = uiState.musicPopularList.collectAsLazyPagingItems()
     val favoritesList = uiState.favoritesList.collectAsLazyPagingItems()
 
-    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
 
-        //Новинки
+        /*Image(
+            painter = painterResource(id = R.drawable.bg_gradient),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.matchParentSize()
+        )*/
+
         Column(
             modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
         ) {
-            Text(
-                modifier = Modifier.padding(5.dp),
-                text = "Новинки медиатеки"
-            )
-        }
 
-        LazyRow() {
-            items(newItems.itemCount) { index ->
-                newItems[index]?.let { ListRow(model = it, navController) }
-            }
-        }
-
-        //Популярное аудио
-        Column(
-            modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
-        ) {
-            Text(
-                modifier = Modifier.padding(5.dp),
-                text = "Популярные материалы"
-            )
-        }
-        LazyRow() {
-            items(audioPopularList.itemCount) { index ->
-                audioPopularList[index]?.let { ListRow(model = it, navController) }
-            }
-        }
-
-        //Популярная музыка
-        Column(
-            modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
-        ) {
-            Text(
-                modifier = Modifier.padding(5.dp),
-                text = "Популярная музыка"
-            )
-        }
-        LazyRow() {
-            items(musicPopularList.itemCount) { index ->
-                musicPopularList[index]?.let { ListRow(model = it, navController) }
-            }
-        }
-
-        //Рекомендуем
-        Column(
-            modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
-        ) {
-            Text(
-                modifier = Modifier.padding(5.dp),
-                text = "Рекомендуем"
-            )
-        }
-        LazyRow() {
-            items(favoritesList.itemCount) { index ->
-                favoritesList[index]?.let { ListRow(model = it, navController) }
-            }
-        }
-
-        @Composable
-        fun BottomNavigationBar() {
-            val items = listOf(
-                NavigationItem.Home,
-                NavigationItem.Catalog,
-                NavigationItem.Movies,
-                NavigationItem.CatalogItems,
-                NavigationItem.Profile
-            )
-            NavigationBar(
-                contentColor = Color.White
+            //Новинки
+            Column(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
             ) {
-                items.forEach { item ->
-                    NavigationBarItem(
-                        icon = {
-                            Icon(
-                                painterResource(id = item.icon),
-                                contentDescription = item.title
-                            )
-                        },
-                        label = { Text(text = item.title) },
-                        alwaysShowLabel = false,
-                        selected = false,
-                        onClick = {
-                            /* Add code later */
-                        }
+                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                    Text(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = "§",
+                        fontSize = 25.sp,
+                        color = Color(android.graphics.Color.parseColor("#FFD600"))
                     )
+                    Text(
+                        modifier = Modifier.padding(start = 5.dp),
+                        text = "Новинки медиатеки",
+                        fontSize = 35.sp,
+                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                    )
+
                 }
             }
-        }
 
-        @Composable
-        fun BottomNavigationBarPreview() {
-            BottomNavigationBar()
+            LazyRow() {
+                items(newItems.itemCount) { index ->
+                    newItems[index]?.let { ListRow(model = it, navController) }
+                }
+            }
+
+            //Рекомендуем
+            Column(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+            ) {
+                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                    Text(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = "§",
+                        fontSize = 25.sp,
+                        color = Color(android.graphics.Color.parseColor("#FFD600"))
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 5.dp),
+                        text = "Рекомендуем",
+                        fontSize = 35.sp,
+                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                    )
+
+                }
+            }
+            LazyRow() {
+                items(favoritesList.itemCount) { index ->
+                    favoritesList[index]?.let { ListRow(model = it, navController) }
+                }
+            }
+
+            //Популярное аудио
+            Column(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+            ) {
+                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                    Text(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = "§",
+                        fontSize = 25.sp,
+                        color = Color(android.graphics.Color.parseColor("#FFD600"))
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 5.dp),
+                        text = "Популярные аудио",
+                        fontSize = 35.sp,
+                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                    )
+
+                }
+            }
+            LazyRow() {
+                items(audioPopularList.itemCount) { index ->
+                    audioPopularList[index]?.let { ListRow(model = it, navController) }
+                }
+            }
+
+            //Популярная музыка
+            Column(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)
+                ) {
+                    Text(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = "§",
+                        fontSize = 25.sp,
+                        color = Color(android.graphics.Color.parseColor("#FFD600"))
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 5.dp),
+                        text = "Популярная музыка",
+                        fontSize = 35.sp,
+                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                    )
+
+                }
+            }
+            LazyRow() {
+                items(musicPopularList.itemCount) { index ->
+                    musicPopularList[index]?.let { ListRow(model = it, navController) }
+                }
+            }
+
+            @Composable
+            fun BottomNavigationBar() {
+                val items = listOf(
+                    NavigationItem.Home,
+                    NavigationItem.Catalog,
+                    NavigationItem.Search,
+                    NavigationItem.CatalogItems,
+                    NavigationItem.Profile
+                )
+                NavigationBar(
+                    contentColor = Color.White
+                ) {
+                    items.forEach { item ->
+                        NavigationBarItem(
+                            icon = {
+                                Icon(
+                                    painterResource(id = item.icon),
+                                    contentDescription = item.title
+                                )
+                            },
+                            label = { Text(text = item.title) },
+                            alwaysShowLabel = false,
+                            selected = false,
+                            onClick = {
+                                /* Add code later */
+                            }
+                        )
+                    }
+                }
+            }
+
+            @Composable
+            fun BottomNavigationBarPreview() {
+                BottomNavigationBar()
+            }
         }
     }
 }

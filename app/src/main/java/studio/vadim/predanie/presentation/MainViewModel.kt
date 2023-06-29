@@ -117,4 +117,19 @@ class MainViewModel(private val apiLists: GetLists,
             }
         }
     }
+
+    fun setSearchQuery(query: String?) {
+
+        if (query != null) {
+            searchQueryUpdate(query = query)
+        }
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    searchString = query.toString()
+                )
+
+            }
+        }
+    }
 }

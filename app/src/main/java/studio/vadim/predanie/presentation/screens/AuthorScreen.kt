@@ -182,7 +182,7 @@ fun AuthorScreen(
 
                         if (uiState.authorInto.data?.compositions != null) {
                             NonlazyGrid(
-                                columns = 3,
+                                columns = 2,
                                 itemCount = uiState.authorInto.data?.compositions!!.count(),
                                 modifier = Modifier
                                     .padding(start = 7.5.dp, end = 7.5.dp)

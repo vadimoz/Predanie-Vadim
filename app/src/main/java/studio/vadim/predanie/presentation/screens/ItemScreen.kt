@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -32,7 +31,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -54,7 +52,6 @@ fun ItemScreen(
     style: TextStyle = LocalTextStyle.current.copy(
         color = Color.White,
         fontSize = 18.sp,
-        fontFamily = FontFamily.Serif
     ),
     fontStyle: FontStyle? = null,
     collapsedMaxLine: Int = 4,
@@ -112,7 +109,7 @@ fun ItemScreen(
                 AsyncImage(
                     model = uiState.itemInto!!.data?.img_big,
                     contentDescription = null,
-                    contentScale = ContentScale.Crop,
+                    contentScale = ContentScale.FillWidth,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .fillMaxSize()
@@ -134,7 +131,6 @@ fun ItemScreen(
                     Column(
                         Modifier
                             .padding(top = 0.3.dh)
-                            .height(1.dh)
                     ) {
                         uiState.itemInto?.data?.name?.let {
                             Text(

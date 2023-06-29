@@ -20,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.unit.dp
 import studio.vadim.predanie.domain.models.api.items.Tracks
@@ -117,8 +118,8 @@ fun AccordionRow(
     ) {
         //style = tags
 
-        Text("${index.toString()}.", Modifier.wrapContentWidth().padding(end = 5.dp), color = Gray600)
-        Text(model.name.toString(), Modifier.weight(1f), color = MedGray3)
+        Text("${index.toString()}.", Modifier.wrapContentWidth().padding(end = 5.dp), color = Color.White)
+        Text(model.name.toString(), Modifier.weight(1f), color = Color.White)
         Surface(color = Green500, shape = RoundedCornerShape(8.dp), tonalElevation = 2.dp) {
             //style = bodyBold
             Text(

@@ -1,6 +1,7 @@
 package studio.vadim.predanie.presentation.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,8 +18,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
@@ -34,8 +38,32 @@ fun ListRow(model: Compositions, navController: NavHostController) {
             .wrapContentHeight()
             .fillMaxWidth()
             .width(130.dp)
-            .height(250.dp)
+            .height(300.dp)
     ) {
+        if (model.author_name.toString() != "Без автора") {
+            Text(
+                modifier = Modifier
+                    .height(32.dp)
+                    .padding(end = 10.dp)
+                    .clickable {
+                        navController.navigate("SearchScreen/${model.author_name}")
+                    },
+                fontSize = 10.sp,
+                textAlign = TextAlign.End,
+                lineHeight = 10.sp,
+                text = model.author_name.toString()
+            )
+        } else {
+            Text(
+                modifier = Modifier
+                    .height(30.dp)
+                    .padding(end = 10.dp),
+                fontSize = 10.sp,
+                textAlign = TextAlign.End,
+                lineHeight = 10.sp,
+                text = ""
+            )
+        }
         AsyncImage(
             model = model.img_s,
             contentDescription = null,
@@ -55,13 +83,9 @@ fun ListRow(model: Compositions, navController: NavHostController) {
                     navController.navigate("ItemScreen/${model.id}")
                 }
                 .padding(5.dp),
-            text = model.name.toString()
-        )
 
-        Text(
-            modifier = Modifier
-                .padding(5.dp),
-            text = model.author_name.toString()
+            lineHeight = 22.sp,
+            text = model.name.toString()
         )
     }
 }
@@ -82,11 +106,12 @@ fun ListAuthorsRow(model: Entities, navController: NavHostController) {
         Image(
             painter = rememberAsyncImagePainter(model.img),
             contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(100.dp)
-                .fillMaxWidth()
                 .padding(5.dp)
                 .clip(CircleShape)
+                .border(2.dp, Color(0xFFFFD600), CircleShape)
         )
         Text(
             modifier = Modifier.padding(5.dp),

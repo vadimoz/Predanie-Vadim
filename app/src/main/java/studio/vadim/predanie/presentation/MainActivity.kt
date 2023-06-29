@@ -3,11 +3,10 @@ package studio.vadim.predanie.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -19,9 +18,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -40,6 +41,8 @@ import studio.vadim.predanie.presentation.screens.HomeScreen
 import studio.vadim.predanie.presentation.screens.ItemScreen
 import studio.vadim.predanie.presentation.screens.SearchScreen
 import studio.vadim.predanie.presentation.screens.SplashScreen
+import studio.vadim.predanie.presentation.theme.PredanieTheme
+
 
 class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModel()
@@ -47,15 +50,17 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initSize()
-
         setContent {
-            MainScreen()
+            PredanieTheme() {
+                MainScreen()
+            }
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
     @Composable
     fun MainScreen() {
+
         val navController = rememberAnimatedNavController()
         Scaffold(
             content = { padding ->
@@ -80,7 +85,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun Navigation(navController: NavHostController) {
-        AnimatedNavHost(navController, startDestination = NavigationItem.Home.route) {
+        AnimatedNavHost(navController, startDestination = NavigationItem.Splash.route) {
             composable(
                 NavigationItem.Splash.route,
             ) {
@@ -88,7 +93,7 @@ class MainActivity : ComponentActivity() {
             }
             composable(
                 NavigationItem.Home.route,
-                enterTransition = {
+                /*enterTransition = {
                     slideIntoContainer(
                         AnimatedContentScope.SlideDirection.Up,
                         animationSpec = tween(1000)
@@ -99,16 +104,22 @@ class MainActivity : ComponentActivity() {
                         AnimatedContentScope.SlideDirection.Down,
                         animationSpec = tween(1000)
                     )
-                },
+                },*/
             ) {
                 HomeScreen(mainViewModel = mainViewModel, navController)
             }
             composable(NavigationItem.Catalog.route) {
-                CatalogScreen(mainViewModel = mainViewModel,
-                    navController = navController)
+                CatalogScreen(
+                    mainViewModel = mainViewModel,
+                    navController = navController
+                )
             }
-            composable(NavigationItem.Movies.route) {
-                SearchScreen(mainViewModel = mainViewModel, navController)
+            composable(NavigationItem.Search.route) {navBackStackEntry ->
+                val query = navBackStackEntry.arguments?.getString("query")
+                SearchScreen(
+                    mainViewModel = mainViewModel,
+                    navController,
+                    query)
             }
             composable(NavigationItem.CatalogItems.route) { navBackStackEntry ->
                 val catalogId = navBackStackEntry.arguments?.getString("catalogId")
@@ -150,12 +161,12 @@ class MainActivity : ComponentActivity() {
         val items = listOf(
             NavigationItem.Home,
             NavigationItem.Catalog,
-            NavigationItem.Movies,
-            NavigationItem.Movies,
-            NavigationItem.Profile
+            NavigationItem.Search,
+            NavigationItem.Profile,
+            NavigationItem.Fund
         )
         NavigationBar(
-            contentColor = Color.White
+            contentColor = Color.White, containerColor = Color.White
         ) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
@@ -164,7 +175,8 @@ class MainActivity : ComponentActivity() {
                     icon = {
                         Icon(
                             painterResource(id = item.icon),
-                            contentDescription = item.title
+                            contentDescription = item.title,
+                            modifier = Modifier.size(20.dp)
                         )
                     },
                     label = { Text(text = item.title) },
@@ -186,7 +198,13 @@ class MainActivity : ComponentActivity() {
                             // Restore state when reselecting a previously selected item
                             restoreState = false
                         }
-                    }
+                    },
+                    colors = androidx.compose.material3.NavigationBarItemDefaults
+                        .colors(
+                            unselectedIconColor = Color.LightGray,
+                            selectedIconColor = Black,
+                            indicatorColor = Color.White,
+                        )
                 )
             }
         }

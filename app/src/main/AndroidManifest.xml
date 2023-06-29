@@ -12,6 +12,7 @@
         android:usesCleartextTraffic="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:fitsSystemWindows="true"
         android:theme="@style/Theme.Predanie"
         tools:targetApi="33">
         <activity
