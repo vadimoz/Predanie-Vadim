@@ -18,8 +18,15 @@ data class SubCategories (
 
     var id_category : Int?    = null,
     var id_parent   : Int?    = null,
-    var name       : String? = null
+    var name       : String? = null,
+    var categories : ArrayList<InnerCategories>? = arrayListOf()
+)
 
+data class InnerCategories (
+
+    var id_category : Int?    = null,
+    var id_parent   : Int?    = null,
+    var name       : String? = null,
 )
 
 data class BannerCatalog (

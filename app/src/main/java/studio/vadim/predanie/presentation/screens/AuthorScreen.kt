@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -89,7 +90,6 @@ fun AuthorScreen(
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .background(color = Color.White)
-                    .padding(20.dp)
             ) {
                 AsyncImage(
                     model = uiState.authorInto.data?.img,
@@ -98,7 +98,7 @@ fun AuthorScreen(
                     modifier = Modifier
                         .size(0.3.dh)
                         .clip(CircleShape)
-                        .border(2.dp, Color.LightGray, CircleShape)
+                        .border(5.dp, Color(0xFFFFD600), CircleShape)
                         .align(Alignment.TopCenter)
                 )
 
@@ -112,13 +112,17 @@ fun AuthorScreen(
                         Modifier
                             .padding(top = 0.3.dh)
                     ) {
-                        Text(
-                            text = uiState.authorInto.data?.name.toString(),
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 36.sp,
-                            modifier = Modifier.padding(20.dp)
-                        )
+                        Row(modifier = Modifier) {
+                            Text(
+                                text = uiState.authorInto.data?.name.toString(),
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 36.sp,
+                                textAlign = TextAlign.Center,
+                                lineHeight = 40.sp,
+                                modifier = Modifier.padding(20.dp)
+                            )
+                        }
                         uiState.authorInto.data?.desc?.let {
 
                             var isExpanded by remember { mutableStateOf(false) }

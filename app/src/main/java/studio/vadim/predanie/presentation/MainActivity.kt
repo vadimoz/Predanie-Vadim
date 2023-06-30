@@ -123,10 +123,12 @@ class MainActivity : ComponentActivity() {
             }
             composable(NavigationItem.CatalogItems.route) { navBackStackEntry ->
                 val catalogId = navBackStackEntry.arguments?.getString("catalogId")
+                val catalogName = navBackStackEntry.arguments?.getString("catalogName")
                 CatalogItemsScreen(
                     mainViewModel = mainViewModel,
                     navController = navController,
-                    catalogId
+                    catalogId,
+                    catalogName
                 )
             }
             composable(NavigationItem.Author.route) { navBackStackEntry ->

@@ -1,5 +1,6 @@
 package studio.vadim.predanie.presentation
 
+import android.text.TextUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -120,15 +121,13 @@ class MainViewModel(private val apiLists: GetLists,
 
     fun setSearchQuery(query: String?) {
 
-        if (query != null) {
-            searchQueryUpdate(query = query)
-        }
-        viewModelScope.launch {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    searchString = query.toString()
-                )
-
+        if (!TextUtils.isEmpty(query)) {
+            viewModelScope.launch {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        searchList = apiLists.getGlobalSearchList(query.toString())
+                    )
+                }
             }
         }
     }

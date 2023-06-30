@@ -219,10 +219,21 @@ fun CatalogListRow(model: Categories) {
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
+            .padding(20.dp)
     ) {
-        Text(
-            modifier = Modifier.padding(5.dp),
-            text = model.name.toString()
-        )
+        Row() {
+            Text(
+                modifier = Modifier.padding(top = 8.dp),
+                text = "§",
+                fontSize = 25.sp,
+                color = Color(android.graphics.Color.parseColor("#FFD600"))
+            )
+
+            Text(
+                modifier = Modifier.padding(5.dp),
+                text = model.name.toString(),
+                fontSize = 30.sp,
+            )
+        }
     }
 }
