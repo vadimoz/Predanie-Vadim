@@ -4,6 +4,7 @@ import android.text.Html.fromHtml
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,9 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -43,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.slaviboy.composeunits.dh
 import studio.vadim.predanie.R
@@ -51,9 +55,11 @@ import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.screens.accordion.AccordionGroup
 import studio.vadim.predanie.presentation.screens.accordion.AccordionModel
 import studio.vadim.predanie.presentation.screens.accordion.AccordionRow
+
 @Composable
 fun ItemScreen(
     mainViewModel: MainViewModel, itemId: String?,
+    navController: NavHostController,
     modifier: Modifier = Modifier,
     textModifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current.copy(
@@ -125,31 +131,93 @@ fun ItemScreen(
                     ) {
 
                         uiState.itemInto?.data?.author_name?.let { it1 ->
-                            Text(
-                                text = it1,
-                                color = Color.Black,
-                                fontSize = 18.sp,
-                                style = TextStyle (fontFamily = ptsans),
-                                modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 0.dp)
-                            )
+
+                            if (it1 != "Без автора") {
+                                Surface(
+                                    modifier = Modifier.padding(
+                                        start = 20.dp,
+                                        end = 20.dp,
+                                        bottom = 10.dp
+                                    ),
+                                    color = Color.White,
+                                    shape = RoundedCornerShape(8.dp),
+                                    tonalElevation = 2.dp
+                                ) {
+                                    Text(
+                                        text = it1,
+                                        color = Color.Black,
+                                        fontSize = 12.sp,
+                                        style = TextStyle(fontFamily = ptsans),
+                                        modifier = Modifier.padding(
+                                            start = 5.dp,
+                                            end = 5.dp,
+                                            bottom = 0.dp
+                                        )
+                                            .clickable {
+                                            navController.navigate("AuthorScreen/${uiState.itemInto?.data?.author_id}")
+                                        }
+                                    )
+                                }
+                            }
                         }
 
                         uiState.itemInto?.data?.name?.let {
+                            Surface(
+                                modifier = Modifier.padding(
+                                    start = 20.dp,
+                                    end = 20.dp,
+                                    bottom = 0.dp
+                                ),
+                                color = Color.White,
+                                shape = RoundedCornerShape(8.dp),
+                                tonalElevation = 2.dp
+                            ) {
+                                Text(
+                                    text = it,
+                                    color = Color.DarkGray,
+                                    fontSize = 36.sp,
+                                    style = TextStyle(fontFamily = ptsans),
+                                    modifier = Modifier.padding(
+                                        start = 20.dp,
+                                        end = 20.dp,
+                                        top = 0.dp
+                                    )
+                                )
+                            }
 
-                            Text(
-                                text = it,
-                                color = Color.Black,
-                                fontSize = 36.sp,
-                                style = TextStyle (fontFamily = ptsans),
-                                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 0.dp)
-                            )
-
-                            Row(){
+                            Row(modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalArrangement = Arrangement.Center) {
                                 Icon(
-                                    painter = painterResource(R.drawable.double_arrow),
-                                    contentDescription = "arrow-down",
-                                    tint = Color.Black,
-                                    modifier = Modifier.size(128.dp)
+                                    painter = painterResource(R.drawable.playall),
+                                    contentDescription = "Play",
+                                    modifier = Modifier.size(128.dp),
+                                    tint = Color.Black.copy(alpha = 0.5f),
+                                )
+                            }
+
+                            Row(modifier = Modifier.fillMaxWidth().padding(10.dp), horizontalArrangement = Arrangement.SpaceAround) {
+                                Icon(
+                                    painter = painterResource(R.drawable.share),
+                                    contentDescription = "Play",
+                                    modifier = Modifier.size(20.dp),
+                                    tint = Color.Black.copy(alpha = 0.5f),
+                                )
+                                Icon(
+                                    painter = painterResource(R.drawable.playlist_add),
+                                    contentDescription = "Play",
+                                    modifier = Modifier.size(20.dp),
+                                    tint = Color.Black.copy(alpha = 0.5f),
+                                )
+                                Icon(
+                                    painter = painterResource(R.drawable.bookmark),
+                                    contentDescription = "Play",
+                                    modifier = Modifier.size(20.dp),
+                                    tint = Color.Black.copy(alpha = 0.5f),
+                                )
+                                Icon(
+                                    painter = painterResource(R.drawable.dots),
+                                    contentDescription = "Play",
+                                    modifier = Modifier.size(20.dp),
+                                    tint = Color.Black.copy(alpha = 0.5f),
                                 )
                             }
                         }
@@ -235,13 +303,20 @@ fun ItemScreen(
                             )
                         }
 
-                        val separateFiles = uiState.itemInto!!.data!!.tracks.filter { s -> s.parent == null }
+                        val separateFiles =
+                            uiState.itemInto!!.data!!.tracks.filter { s -> s.parent == null }
 
                         var counter = 1
-                            for (item in separateFiles) {
-                                AccordionRow(model = Tracks(id = item.id, name = item.name, time = item.time), index = counter)
-                                counter += 1
-                            }
+                        for (item in separateFiles) {
+                            AccordionRow(
+                                model = Tracks(
+                                    id = item.id,
+                                    name = item.name,
+                                    time = item.time
+                                ), index = counter
+                            )
+                            counter += 1
+                        }
                     }
                 }
             }

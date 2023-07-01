@@ -2,6 +2,7 @@ package studio.vadim.predanie.presentation.screens
 
 import android.text.Html
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,8 +15,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -33,7 +36,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -53,8 +55,7 @@ fun AuthorScreen(
     textModifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current.copy(
         color = Color.Black,
-        fontSize = 18.sp,
-        fontFamily = FontFamily.Serif
+        fontSize = 18.sp
     ),
     fontStyle: FontStyle? = null,
     collapsedMaxLine: Int = 4,
@@ -96,9 +97,9 @@ fun AuthorScreen(
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(0.3.dh)
+                        .size(0.2.dh)
                         .clip(CircleShape)
-                        .border(5.dp, Color(0xFFFFD600), CircleShape)
+                        .border(2.dp, Color(0xFFFFD600), CircleShape)
                         .align(Alignment.TopCenter)
                 )
 
@@ -110,19 +111,32 @@ fun AuthorScreen(
 
                     Column(
                         Modifier
-                            .padding(top = 0.3.dh)
+                            .padding(top = 0.2.dh)
                     ) {
                         Row(modifier = Modifier) {
-                            if(uiState.authorInto.data?.name.toString() != "null") {
-                                Text(
-                                    text = uiState.authorInto.data?.name.toString(),
-                                    color = Color.Black,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 36.sp,
-                                    textAlign = TextAlign.Center,
-                                    lineHeight = 40.sp,
-                                    modifier = Modifier.padding(20.dp)
-                                )
+                            if (uiState.authorInto.data?.name.toString() != "null") {
+                                Surface(
+                                    modifier = Modifier.padding(
+                                        start = 20.dp,
+                                        end = 20.dp,
+                                        bottom = 0.dp,
+                                        top = 10.dp
+                                    ),
+                                    color = Color.White,
+                                    border = BorderStroke(8.dp,Color(android.graphics.Color.parseColor("#FFD600"))),
+                                    shape = RoundedCornerShape(6.dp),
+                                    tonalElevation = 2.dp
+                                ) {
+                                    Text(
+                                        text = uiState.authorInto.data?.name.toString(),
+                                        color = Color.DarkGray,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 36.sp,
+                                        textAlign = TextAlign.Center,
+                                        lineHeight = 40.sp,
+                                        modifier = Modifier.padding(20.dp)
+                                    )
+                                }
                             }
                         }
                         uiState.authorInto.data?.desc?.let {

@@ -100,7 +100,7 @@ class MainActivity : ComponentActivity() {
             composable(
                 NavigationItem.Profile.route,
             ) {
-                ProfileScreen()
+                ProfileScreen(mainViewModel = mainViewModel, navController)
             }
             composable(
                 NavigationItem.Home.route,
@@ -155,7 +155,8 @@ class MainActivity : ComponentActivity() {
 
                 ItemScreen(
                     mainViewModel = mainViewModel,
-                    itemId
+                    itemId,
+                    navController = navController
                 )
             }
         }
