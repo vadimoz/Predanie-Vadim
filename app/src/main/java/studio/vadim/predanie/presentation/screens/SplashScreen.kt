@@ -63,7 +63,11 @@ fun SplashScreen(mainViewModel: MainViewModel, navController: NavHostController)
         )*/
 
         if (logoAnimationState.isAtEnd && logoAnimationState.isPlaying) {
-            navController.navigate(NavigationItem.Home.route)
+            navController.navigate(NavigationItem.Home.route) {
+                popUpTo(NavigationItem.Splash.route){
+                    inclusive = true
+                }
+            }
         }
     }
 }

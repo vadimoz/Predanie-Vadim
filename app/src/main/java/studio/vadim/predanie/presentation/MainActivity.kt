@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +36,7 @@ import studio.vadim.predanie.presentation.navigation.NavigationItem
 import studio.vadim.predanie.presentation.screens.AuthorScreen
 import studio.vadim.predanie.presentation.screens.CatalogItemsScreen
 import studio.vadim.predanie.presentation.screens.CatalogScreen
+import studio.vadim.predanie.presentation.screens.FundScreen
 import studio.vadim.predanie.presentation.screens.HomeScreen
 import studio.vadim.predanie.presentation.screens.ItemScreen
 import studio.vadim.predanie.presentation.screens.SearchScreen
@@ -90,6 +90,11 @@ class MainActivity : ComponentActivity() {
                 NavigationItem.Splash.route,
             ) {
                 SplashScreen(mainViewModel = mainViewModel, navController)
+            }
+            composable(
+                NavigationItem.Fund.route,
+            ) {
+                FundScreen()
             }
             composable(
                 NavigationItem.Home.route,
@@ -163,8 +168,8 @@ class MainActivity : ComponentActivity() {
         val items = listOf(
             NavigationItem.Home,
             NavigationItem.Catalog,
-            NavigationItem.Search,
             NavigationItem.Profile,
+            NavigationItem.Search,
             NavigationItem.Fund
         )
         NavigationBar(
@@ -178,7 +183,7 @@ class MainActivity : ComponentActivity() {
                         Icon(
                             painterResource(id = item.icon),
                             contentDescription = item.title,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(25.dp)
                         )
                     },
                     label = { Text(text = item.title) },
@@ -203,8 +208,8 @@ class MainActivity : ComponentActivity() {
                     },
                     colors = androidx.compose.material3.NavigationBarItemDefaults
                         .colors(
-                            unselectedIconColor = Color.LightGray,
-                            selectedIconColor = Black,
+                            unselectedIconColor = Color.DarkGray,
+                            selectedIconColor = Color(android.graphics.Color.parseColor("#FFD600")),
                             indicatorColor = Color.White,
                         )
                 )
