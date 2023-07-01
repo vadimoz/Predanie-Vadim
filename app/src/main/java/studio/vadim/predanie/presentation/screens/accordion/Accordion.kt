@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.List
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -22,9 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import studio.vadim.predanie.R
 import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.presentation.screens.accordion.theme.*
+
 data class AccordionModel(
     val header: String,
     val rows: MutableList<Tracks>
@@ -34,6 +35,7 @@ data class AccordionModel(
         val price: String
     )
 }
+
 @Composable
 fun AccordionGroup(modifier: Modifier = Modifier, group: List<AccordionModel>) {
     Column(modifier = modifier) {
@@ -42,6 +44,7 @@ fun AccordionGroup(modifier: Modifier = Modifier, group: List<AccordionModel>) {
         }
     }
 }
+
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Accordion(modifier: Modifier = Modifier, model: AccordionModel) {
@@ -95,9 +98,9 @@ private fun AccordionHeader(
         ) {
             // style = accordionHeaderStyle,
             Text(title, Modifier.weight(1f), color = Gray600)
-            Surface(shape = CircleShape, color = LightBlue900.copy(alpha = 0.6f)) {
+            Surface(shape = CircleShape, color = Color.DarkGray) {
                 Icon(
-                    Icons.Outlined.List,
+                    painter = painterResource(R.drawable.double_arrow),
                     contentDescription = "arrow-down",
                     modifier = Modifier.rotate(degrees),
                     tint = White
@@ -114,19 +117,42 @@ fun AccordionRow(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(24.dp)
+        modifier = Modifier.padding(15.dp)
     ) {
         //style = tags
 
-        Text("${index.toString()}.", Modifier.wrapContentWidth().padding(end = 5.dp), color = Color.White)
-        Text(model.name.toString(), Modifier.weight(1f), color = Color.White)
-        Surface(color = Green500, shape = RoundedCornerShape(8.dp), tonalElevation = 2.dp) {
-            //style = bodyBold
-            Text(
-                text = model.id.toString(),
-                modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
-                color = White
-            )
+        Text(
+            "${index.toString()}.",
+            Modifier
+                .wrapContentWidth()
+                .padding(end = 5.dp), color = Gray600
+        )
+        Text(model.name.toString(), Modifier.weight(1f), color = Gray600)
+
+        Column() {
+                //style = bodyBold
+
+                if(model.time != null) {
+                    val seconds: Int = model.time as Int
+                    val S = seconds % 60
+                    var H = seconds / 60
+                    val M = H % 60
+                    H = H / 60
+
+                    Text(
+                        text = "$H:$M:$S",
+                        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
+                        color = Color.Black
+                    )
+                }
+
+            Surface(color = Green500, shape = RoundedCornerShape(8.dp), tonalElevation = 2.dp) {
+                Text(
+                    text = "Запустить",
+                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
+                    color = White
+                )
+            }
         }
     }
 }

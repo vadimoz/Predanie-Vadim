@@ -39,6 +39,7 @@ import studio.vadim.predanie.presentation.screens.CatalogScreen
 import studio.vadim.predanie.presentation.screens.FundScreen
 import studio.vadim.predanie.presentation.screens.HomeScreen
 import studio.vadim.predanie.presentation.screens.ItemScreen
+import studio.vadim.predanie.presentation.screens.ProfileScreen
 import studio.vadim.predanie.presentation.screens.SearchScreen
 import studio.vadim.predanie.presentation.screens.SplashScreen
 import studio.vadim.predanie.presentation.theme.PredanieTheme
@@ -95,6 +96,11 @@ class MainActivity : ComponentActivity() {
                 NavigationItem.Fund.route,
             ) {
                 FundScreen()
+            }
+            composable(
+                NavigationItem.Profile.route,
+            ) {
+                ProfileScreen()
             }
             composable(
                 NavigationItem.Home.route,

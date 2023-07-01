@@ -188,15 +188,12 @@ fun ListRow(model: AuthorCompositions, navController: NavHostController) {
             .wrapContentHeight()
             .fillMaxWidth()
             .width(130.dp)
-            .height(250.dp)
+            .height(300.dp)
     ) {
-        Image(
-            painter = rememberAsyncImagePainter(model.img_s),
+        AsyncImage(
+            model = model.img_s,
             contentDescription = null,
             modifier = Modifier
-                .size(190.dp)
-                .fillMaxWidth()
-                .padding(5.dp)
                 .clickable {
                     navController.navigate("ItemScreen/${model.id}")
                 }
@@ -207,7 +204,13 @@ fun ListRow(model: AuthorCompositions, navController: NavHostController) {
             contentScale = ContentScale.Crop
         )
         Text(
-            modifier = Modifier.padding(5.dp),
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("ItemScreen/${model.id}")
+                }
+                .padding(5.dp),
+
+            lineHeight = 22.sp,
             text = model.name.toString()
         )
     }

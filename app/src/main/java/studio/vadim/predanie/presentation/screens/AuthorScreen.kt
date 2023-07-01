@@ -113,15 +113,17 @@ fun AuthorScreen(
                             .padding(top = 0.3.dh)
                     ) {
                         Row(modifier = Modifier) {
-                            Text(
-                                text = uiState.authorInto.data?.name.toString(),
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 36.sp,
-                                textAlign = TextAlign.Center,
-                                lineHeight = 40.sp,
-                                modifier = Modifier.padding(20.dp)
-                            )
+                            if(uiState.authorInto.data?.name.toString() != "null") {
+                                Text(
+                                    text = uiState.authorInto.data?.name.toString(),
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 36.sp,
+                                    textAlign = TextAlign.Center,
+                                    lineHeight = 40.sp,
+                                    modifier = Modifier.padding(20.dp)
+                                )
+                            }
                         }
                         uiState.authorInto.data?.desc?.let {
 
@@ -186,7 +188,7 @@ fun AuthorScreen(
 
                         if (uiState.authorInto.data?.compositions != null) {
                             NonlazyGrid(
-                                columns = 2,
+                                columns = 3,
                                 itemCount = uiState.authorInto.data?.compositions!!.count(),
                                 modifier = Modifier
                                     .padding(start = 7.5.dp, end = 7.5.dp)

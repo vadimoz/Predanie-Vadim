@@ -1,6 +1,5 @@
 package studio.vadim.predanie.presentation.screens
 
-import android.text.TextUtils
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -55,9 +54,10 @@ fun SearchScreen(
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
 
-            if (!TextUtils.isEmpty(query)) {
+            if (query != "{query}") {
                 mainViewModel.setSearchQuery(query)
             }
+
         }
 
         TextField(
@@ -82,7 +82,7 @@ fun SearchScreen(
         val compositionsItems =
             uiState.searchList.entities.filter { s -> s.entity_type == "composition" }
 
-        Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+        Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 5.dp)) {
             Text(
                 modifier = Modifier.padding(top = 8.dp),
                 text = "§",
@@ -104,7 +104,7 @@ fun SearchScreen(
             }
         }
 
-        Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+        Row(modifier = Modifier.padding(top = 5.dp, start = 20.dp, bottom = 20.dp)) {
             Text(
                 modifier = Modifier.padding(top = 8.dp),
                 text = "§",

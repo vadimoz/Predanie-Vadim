@@ -6,12 +6,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,9 +31,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -39,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.slaviboy.composeunits.dh
+import studio.vadim.predanie.R
 import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.screens.accordion.AccordionGroup
@@ -50,7 +57,7 @@ fun ItemScreen(
     modifier: Modifier = Modifier,
     textModifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current.copy(
-        color = Color.White,
+        color = Color.Black,
         fontSize = 18.sp,
     ),
     fontStyle: FontStyle? = null,
@@ -59,13 +66,17 @@ fun ItemScreen(
     showMoreStyle: SpanStyle = SpanStyle(
         fontWeight = FontWeight.W500,
         fontSize = 16.sp,
-        color = Color.White
+        color = Color.Black
     ),
     showLessText: String = " Свернуть",
     showLessStyle: SpanStyle = showMoreStyle,
     textAlign: TextAlign? = null
 ) {
     val uiState by mainViewModel.uiState.collectAsState()
+
+    val ptsans = FontFamily(
+        Font(R.raw.ptsans),
+    )
 
     DisposableEffect(itemId) {
         onDispose {
@@ -86,26 +97,6 @@ fun ItemScreen(
                     .fillMaxWidth()
                     .fillMaxHeight()
             ) {
-                /*if (!TextUtils.isEmpty(uiState.itemInto?.data?.img_big)) {
-                    val interpolator = AccelerateDecelerateInterpolator()
-
-                    val generator = RandomTransitionGenerator(12000, interpolator)
-
-                    val customView = KenBurnsView(LocalContext.current).also { imageView ->
-                        imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-                        imageView.load(uiState.itemInto!!.data?.img_big)
-                    }
-
-                    customView.setTransitionGenerator(generator)
-
-                    AndroidView(
-                        factory = { customView },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                    )
-                }*/
-
                 AsyncImage(
                     model = uiState.itemInto!!.data?.img_big,
                     contentDescription = null,
@@ -121,7 +112,7 @@ fun ItemScreen(
                         .align(Alignment.TopCenter)
                         .background(
                             brush = Brush.linearGradient(
-                                colors = listOf(Color.Transparent, Color.Black),
+                                colors = listOf(Color.Transparent, Color.White),
                                 start = Offset(0f, 0f), // top left corner
                                 end = Offset(1f, boxSize) // bottom right corner
                             )
@@ -132,14 +123,35 @@ fun ItemScreen(
                         Modifier
                             .padding(top = 0.3.dh)
                     ) {
+
+                        uiState.itemInto?.data?.author_name?.let { it1 ->
+                            Text(
+                                text = it1,
+                                color = Color.Black,
+                                fontSize = 18.sp,
+                                style = TextStyle (fontFamily = ptsans),
+                                modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 0.dp)
+                            )
+                        }
+
                         uiState.itemInto?.data?.name?.let {
+
                             Text(
                                 text = it,
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
+                                color = Color.Black,
                                 fontSize = 36.sp,
-                                modifier = Modifier.padding(20.dp)
+                                style = TextStyle (fontFamily = ptsans),
+                                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 0.dp)
                             )
+
+                            Row(){
+                                Icon(
+                                    painter = painterResource(R.drawable.double_arrow),
+                                    contentDescription = "arrow-down",
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(128.dp)
+                                )
+                            }
                         }
 
                         uiState.itemInto?.data?.desc?.let {
@@ -227,7 +239,7 @@ fun ItemScreen(
 
                         var counter = 1
                             for (item in separateFiles) {
-                                AccordionRow(model = Tracks(id = item.id, name = item.name), index = counter)
+                                AccordionRow(model = Tracks(id = item.id, name = item.name, time = item.time), index = counter)
                                 counter += 1
                             }
                     }
