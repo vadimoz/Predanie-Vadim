@@ -11,4 +11,5 @@ sealed class NavigationItem(var route: String, var icon: Int, var title: String)
     object Author : NavigationItem("AuthorScreen/{authorId}", R.drawable.ic_action_user, "Автор")
     object Item : NavigationItem("ItemScreen/{itemId}", R.drawable.ic_action_blog, "Произведение")
     object Fund : NavigationItem("FundScreen", R.drawable.predanie, "Фонд")
+    object Player : NavigationItem("PlayerScreen", R.drawable.predanie, "Плеер")
 }

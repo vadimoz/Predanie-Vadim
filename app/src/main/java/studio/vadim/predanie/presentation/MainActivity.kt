@@ -1,6 +1,9 @@
 package studio.vadim.predanie.presentation
 
+
+import android.content.ComponentName
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -23,12 +26,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.Player.COMMAND_PLAY_PAUSE
+import androidx.media3.common.Player.COMMAND_PREPARE
+import androidx.media3.common.Player.COMMAND_SET_MEDIA_ITEM
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.MoreExecutors
 import com.slaviboy.composeunits.initSize
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import studio.vadim.predanie.R
@@ -39,6 +52,7 @@ import studio.vadim.predanie.presentation.screens.CatalogScreen
 import studio.vadim.predanie.presentation.screens.FundScreen
 import studio.vadim.predanie.presentation.screens.HomeScreen
 import studio.vadim.predanie.presentation.screens.ItemScreen
+import studio.vadim.predanie.presentation.screens.PlayerScreen
 import studio.vadim.predanie.presentation.screens.ProfileScreen
 import studio.vadim.predanie.presentation.screens.SearchScreen
 import studio.vadim.predanie.presentation.screens.SplashScreen
@@ -48,8 +62,63 @@ import studio.vadim.predanie.presentation.theme.PredanieTheme
 class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModel()
 
+    private lateinit var controllerFuture: ListenableFuture<MediaController>
+    private lateinit var controller: MediaController
+
+    override fun onStart() {
+        super.onStart()
+        val sessionToken = SessionToken(this, ComponentName(this, PlayerService::class.java))
+        controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
+
+        controllerFuture.addListener(
+            {
+                controller = controllerFuture.get()
+                initController()
+            },
+            MoreExecutors.directExecutor()
+        )
+    }
+
+    private fun initController() {
+        controller.playWhenReady = true
+        controller.prepare()
+        controller.play()
+
+        controller.addListener(object : Player.Listener {
+
+            override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+                super.onMediaMetadataChanged(mediaMetadata)
+                Log.d("onMediaMetadataChanged","onMediaMetadataChanged=$mediaMetadata")
+            }
+
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                super.onIsPlayingChanged(isPlaying)
+                Log.d("onIsPlayingChanged","onIsPlayingChanged=$isPlaying")
+            }
+
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                super.onPlaybackStateChanged(playbackState)
+            }
+
+            override fun onPlayerError(error: PlaybackException) {
+                super.onPlayerError(error)
+                Log.d("onPlayerError","onPlayerError=${error.stackTraceToString()}")
+            }
+
+            override fun onPlayerErrorChanged(error: PlaybackException?) {
+                super.onPlayerErrorChanged(error)
+                Log.d("onPlayerErrorChanged","onPlayerErrorChanged=${error?.stackTraceToString()}")
+            }
+        })
+
+        Log.d("others","COMMAND_PREPARE=${controller.isCommandAvailable(COMMAND_PREPARE)}")
+        Log.d("others","COMMAND_SET_MEDIA_ITEM=${controller.isCommandAvailable(COMMAND_SET_MEDIA_ITEM)}")
+        Log.d("others","COMMAND_PLAY_PAUSE=${controller.isCommandAvailable(COMMAND_PLAY_PAUSE)}")
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         initSize()
         setContent {
             PredanieTheme() {
@@ -86,7 +155,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun Navigation(navController: NavHostController) {
-        AnimatedNavHost(navController, startDestination = NavigationItem.Splash.route) {
+        AnimatedNavHost(navController, startDestination = NavigationItem.Player.route) {
             composable(
                 NavigationItem.Splash.route,
             ) {
@@ -96,6 +165,11 @@ class MainActivity : ComponentActivity() {
                 NavigationItem.Fund.route,
             ) {
                 FundScreen()
+            }
+            composable(
+                NavigationItem.Player.route,
+            ) {
+                PlayerScreen()
             }
             composable(
                 NavigationItem.Profile.route,

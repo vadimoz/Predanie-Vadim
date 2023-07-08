@@ -27,9 +27,6 @@ import studio.vadim.predanie.domain.models.api.lists.ResponseGlobalSearchListMod
 import studio.vadim.predanie.domain.models.api.lists.ResponseItemsListModel
 
 class ApiImpl : ApiConnection {
-
-    //TODO: обернуть все запросы в ошибку и повторять
-
     override suspend fun getAuthor(request: RequestAuthorModel): ResponseAuthorModel {
         val client = createHttpClient()
 

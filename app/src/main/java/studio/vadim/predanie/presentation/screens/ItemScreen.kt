@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -103,10 +104,14 @@ fun ItemScreen(
                     .fillMaxWidth()
                     .fillMaxHeight()
             ) {
+                val matrix = ColorMatrix()
+                matrix.setToSaturation(0F)
+
                 AsyncImage(
                     model = uiState.itemInto!!.data?.img_big,
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
+                    //colorFilter = ColorFilter.colorMatrix(matrix),
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .fillMaxSize()

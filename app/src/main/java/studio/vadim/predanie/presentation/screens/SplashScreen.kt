@@ -3,7 +3,7 @@ package studio.vadim.predanie.presentation.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -50,8 +50,8 @@ fun SplashScreen(mainViewModel: MainViewModel, navController: NavHostController)
         Image(
             painterResource(R.drawable.logo), "Logo",
             modifier = Modifier
-                .width(150.dp)
                 .align(Alignment.BottomCenter)
+                .size(500.dp)
         )
 
         /*Image(
