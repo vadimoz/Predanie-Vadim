@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModel()
 
     private lateinit var controllerFuture: ListenableFuture<MediaController>
-    private lateinit var controller: MediaController
+    private lateinit var playerController: MediaController
 
     override fun onStart() {
         super.onStart()
@@ -72,19 +72,27 @@ class MainActivity : ComponentActivity() {
 
         controllerFuture.addListener(
             {
-                controller = controllerFuture.get()
+                playerController = controllerFuture.get()
+                mainViewModel.setPlayerInstance(playerController)
                 initController()
             },
             MoreExecutors.directExecutor()
         )
     }
 
-    private fun initController() {
-        controller.playWhenReady = true
-        controller.prepare()
-        controller.play()
+    override fun onStop() {
+        super.onStop()
 
-        controller.addListener(object : Player.Listener {
+        MediaController.releaseFuture(controllerFuture)
+    }
+
+    private fun initController() {
+        playerController.playWhenReady = true
+        playerController.prepare()
+        playerController.play()
+
+
+        playerController.addListener(object : Player.Listener {
 
             override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
                 super.onMediaMetadataChanged(mediaMetadata)
@@ -111,9 +119,9 @@ class MainActivity : ComponentActivity() {
             }
         })
 
-        Log.d("others","COMMAND_PREPARE=${controller.isCommandAvailable(COMMAND_PREPARE)}")
-        Log.d("others","COMMAND_SET_MEDIA_ITEM=${controller.isCommandAvailable(COMMAND_SET_MEDIA_ITEM)}")
-        Log.d("others","COMMAND_PLAY_PAUSE=${controller.isCommandAvailable(COMMAND_PLAY_PAUSE)}")
+        Log.d("others","COMMAND_PREPARE=${playerController.isCommandAvailable(COMMAND_PREPARE)}")
+        Log.d("others","COMMAND_SET_MEDIA_ITEM=${playerController.isCommandAvailable(COMMAND_SET_MEDIA_ITEM)}")
+        Log.d("others","COMMAND_PLAY_PAUSE=${playerController.isCommandAvailable(COMMAND_PLAY_PAUSE)}")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -169,7 +177,7 @@ class MainActivity : ComponentActivity() {
             composable(
                 NavigationItem.Player.route,
             ) {
-                PlayerScreen()
+                PlayerScreen(mainViewModel = mainViewModel)
             }
             composable(
                 NavigationItem.Profile.route,

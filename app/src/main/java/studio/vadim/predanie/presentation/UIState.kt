@@ -1,5 +1,6 @@
 package studio.vadim.predanie.presentation
 
+import androidx.media3.session.MediaController
 import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
@@ -19,4 +20,5 @@ data class UIState(
     val itemInto: ResponseItemModel? = ResponseItemModel(),
     val authorInto: ResponseAuthorModel = ResponseAuthorModel(),
     var catalogItemsList: Flow<PagingData<Compositions>>? = null,
+    var playerController: MediaController? = null
 )

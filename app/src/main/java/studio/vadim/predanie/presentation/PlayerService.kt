@@ -5,10 +5,9 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 
-
 class PlayerService : MediaSessionService(), MediaSession.Callback {
-    private var mediaSession: MediaSession? = null
 
+    private var mediaSession: MediaSession? = null
     private lateinit var exoPlayer: ExoPlayer
 
     override fun onCreate() {
@@ -18,7 +17,6 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
                 val mediaItem =
                     MediaItem.fromUri("https://storage.googleapis.com/exoplayer-test-media-0/play.mp3")
                 exoPlayer.setMediaItem(mediaItem)
-                exoPlayer.play()
             }
 
         mediaSession = MediaSession.Builder(this, exoPlayer).build()
@@ -33,8 +31,10 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
         super.onDestroy()
     }
 
-    // Return a MediaSession to link with the MediaController that is making
-    // this request.
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession?
             = mediaSession
+
+    fun getPlayer(): ExoPlayer {
+        return exoPlayer
+    }
 }

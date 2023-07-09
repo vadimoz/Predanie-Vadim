@@ -3,6 +3,7 @@ package studio.vadim.predanie.presentation
 import android.text.TextUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.session.MediaController
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
@@ -128,6 +129,16 @@ class MainViewModel(private val apiLists: GetLists,
                         searchList = apiLists.getGlobalSearchList(query.toString())
                     )
                 }
+            }
+        }
+    }
+
+    fun setPlayerInstance(playerService: MediaController) {
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    playerController = playerService
+                )
             }
         }
     }

@@ -2,7 +2,6 @@ package studio.vadim.predanie.presentation.screens
 
 import android.text.Html
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -123,7 +122,6 @@ fun AuthorScreen(
                                         top = 10.dp
                                     ),
                                     color = Color.White,
-                                    border = BorderStroke(8.dp,Color(android.graphics.Color.parseColor("#FFD600"))),
                                     shape = RoundedCornerShape(6.dp),
                                     tonalElevation = 2.dp
                                 ) {
