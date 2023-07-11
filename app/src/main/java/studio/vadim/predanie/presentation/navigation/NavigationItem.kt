@@ -3,6 +3,7 @@ package studio.vadim.predanie.presentation.navigation
 import studio.vadim.predanie.R
 sealed class NavigationItem(var route: String, var icon: Int, var title: String) {
     object Splash : NavigationItem("SplashScreen", R.drawable.ic_action_blog, "СплэшСкрин")
+    object QuickSplash : NavigationItem("QuickScreen", R.drawable.ic_action_blog, "СплэшСкрин")
     object Home : NavigationItem("MainScreen", R.drawable.ic_home, "Ленты")
     object Catalog : NavigationItem("CatalogScreen", R.drawable.ic_catalog, "Каталог")
     object Search : NavigationItem("SearchScreen/{query}", R.drawable.ic_search, "Поиск")

@@ -57,6 +57,7 @@ import studio.vadim.predanie.presentation.screens.HomeScreen
 import studio.vadim.predanie.presentation.screens.ItemScreen
 import studio.vadim.predanie.presentation.screens.PlayerScreen
 import studio.vadim.predanie.presentation.screens.ProfileScreen
+import studio.vadim.predanie.presentation.screens.QuickScreen
 import studio.vadim.predanie.presentation.screens.SearchScreen
 import studio.vadim.predanie.presentation.screens.SplashScreen
 import studio.vadim.predanie.presentation.theme.PredanieTheme
@@ -137,7 +138,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //Log.d("INTENT", getIntent().getStringExtra("player").toString())
         initSize()
         setContent {
             PredanieTheme() {
@@ -186,7 +186,7 @@ class MainActivity : ComponentActivity() {
         var startDestination: String = ""
 
         if (getIntent().getStringExtra("player") == "true") {
-            startDestination = NavigationItem.Player.route
+            startDestination = NavigationItem.QuickSplash.route
         } else {
             startDestination = NavigationItem.Splash.route
         }
@@ -233,6 +233,12 @@ class MainActivity : ComponentActivity() {
                 }
                 composable(NavigationItem.Catalog.route) {
                     CatalogScreen(
+                        mainViewModel = mainViewModel,
+                        navController = navController
+                    )
+                }
+                composable(NavigationItem.QuickSplash.route) {
+                    QuickScreen(
                         mainViewModel = mainViewModel,
                         navController = navController
                     )
@@ -314,16 +320,18 @@ class MainActivity : ComponentActivity() {
                             // Pop up to the start destination of the graph to
                             // avoid building up a large stack of destinations
                             // on the back stack as users select items
+
                             navController.graph.startDestinationRoute?.let { route ->
                                 popUpTo(route) {
                                     saveState = true
                                 }
                             }
+
                             // Avoid multiple copies of the same destination when
                             // reselecting the same item
                             launchSingleTop = true
                             // Restore state when reselecting a previously selected item
-                            restoreState = true
+                            restoreState = false
                         }
                     },
                     colors = androidx.compose.material3.NavigationBarItemDefaults
