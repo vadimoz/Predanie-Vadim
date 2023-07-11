@@ -10,28 +10,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.ui.PlayerView
+import androidx.navigation.NavHostController
 import studio.vadim.predanie.presentation.MainViewModel
+import studio.vadim.predanie.presentation.navigation.NavigationItem
 
 @Composable
-fun PlayerScreen(mainViewModel: MainViewModel) {
+@androidx.media3.common.util.UnstableApi
+fun PlayerScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val uiState by mainViewModel.uiState.collectAsState()
+    navController.popBackStack(NavigationItem.Catalog.route, inclusive = true, saveState = true)
 
     Column(
         Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Implementing ExoPlayer
         AndroidView(
             factory = { context ->
                 PlayerView(context).apply {
                     player = uiState.playerController
+                    controllerHideOnTouch = false
+                    controllerAutoShow = false
+                    controllerShowTimeoutMs = 0
+                    showController()
                 }
             },
             update = {
                 it.player = uiState.playerController
             }
-
-            )
+        )
     }
 }

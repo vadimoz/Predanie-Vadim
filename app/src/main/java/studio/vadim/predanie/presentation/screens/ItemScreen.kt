@@ -56,7 +56,6 @@ import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.screens.accordion.AccordionGroup
 import studio.vadim.predanie.presentation.screens.accordion.AccordionModel
 import studio.vadim.predanie.presentation.screens.accordion.AccordionRow
-
 @Composable
 fun ItemScreen(
     mainViewModel: MainViewModel, itemId: String?,
@@ -153,14 +152,15 @@ fun ItemScreen(
                                         color = Color.Black,
                                         fontSize = 12.sp,
                                         style = TextStyle(fontFamily = ptsans),
-                                        modifier = Modifier.padding(
-                                            start = 5.dp,
-                                            end = 5.dp,
-                                            bottom = 0.dp
-                                        )
+                                        modifier = Modifier
+                                            .padding(
+                                                start = 5.dp,
+                                                end = 5.dp,
+                                                bottom = 0.dp
+                                            )
                                             .clickable {
-                                            navController.navigate("AuthorScreen/${uiState.itemInto?.data?.author_id}")
-                                        }
+                                                navController.navigate("AuthorScreen/${uiState.itemInto?.data?.author_id}")
+                                            }
                                     )
                                 }
                             }
@@ -190,16 +190,34 @@ fun ItemScreen(
                                 )
                             }
 
-                            Row(modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalArrangement = Arrangement.Center) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(20.dp),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+
                                 Icon(
                                     painter = painterResource(R.drawable.playall),
                                     contentDescription = "Play",
-                                    modifier = Modifier.size(128.dp),
+                                    modifier = Modifier
+                                        .size(128.dp)
+                                        .clickable {
+                                            val playerList = mainViewModel.prepareCompositionForPlayer(uiState.itemInto?.data!!)
+                                            uiState.playerController?.setMediaItems(playerList)
+                                            uiState.playerController?.play()
+                                            navController.navigate("PlayerScreen")
+                                        },
                                     tint = Color.Black.copy(alpha = 0.5f),
                                 )
                             }
 
-                            Row(modifier = Modifier.fillMaxWidth().padding(10.dp), horizontalArrangement = Arrangement.SpaceAround) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(10.dp),
+                                horizontalArrangement = Arrangement.SpaceAround
+                            ) {
                                 Icon(
                                     painter = painterResource(R.drawable.share),
                                     contentDescription = "Play",

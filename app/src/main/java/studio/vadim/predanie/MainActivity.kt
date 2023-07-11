@@ -1,4 +1,4 @@
-package studio.vadim.predanie.presentation
+package studio.vadim.predanie
 
 
 import android.content.ComponentName
@@ -37,6 +37,7 @@ import androidx.media3.session.SessionToken
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -44,7 +45,8 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import com.slaviboy.composeunits.initSize
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import studio.vadim.predanie.R
+import studio.vadim.predanie.presentation.MainViewModel
+import studio.vadim.predanie.presentation.PlayerService
 import studio.vadim.predanie.presentation.navigation.NavigationItem
 import studio.vadim.predanie.presentation.screens.AuthorScreen
 import studio.vadim.predanie.presentation.screens.CatalogItemsScreen
@@ -93,7 +95,6 @@ class MainActivity : ComponentActivity() {
 
 
         playerController.addListener(object : Player.Listener {
-
             override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
                 super.onMediaMetadataChanged(mediaMetadata)
                 Log.d("onMediaMetadataChanged","onMediaMetadataChanged=$mediaMetadata")
@@ -163,7 +164,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun Navigation(navController: NavHostController) {
-        AnimatedNavHost(navController, startDestination = NavigationItem.Player.route) {
+        AnimatedNavHost(navController, startDestination = NavigationItem.Splash.route) {
             composable(
                 NavigationItem.Splash.route,
             ) {
@@ -176,8 +177,11 @@ class MainActivity : ComponentActivity() {
             }
             composable(
                 NavigationItem.Player.route,
+                deepLinks = listOf(navDeepLink {
+                    uriPattern = "https://predanie.ru/player"
+                }),
             ) {
-                PlayerScreen(mainViewModel = mainViewModel)
+                PlayerScreen(mainViewModel = mainViewModel, navController)
             }
             composable(
                 NavigationItem.Profile.route,
