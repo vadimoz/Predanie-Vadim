@@ -1,26 +1,29 @@
 package studio.vadim.predanie.presentation
 
+import android.R.attr.name
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.core.app.NotificationCompat
-import androidx.core.app.TaskStackBuilder
-import androidx.core.net.toUri
+import androidx.media3.common.MediaItem
+import androidx.media3.common.util.Log
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaNotification
 import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaSession.MediaItemsWithStartPosition
 import androidx.media3.session.MediaSessionService
 import androidx.media3.session.MediaStyleNotificationHelper
 import com.google.common.collect.ImmutableList
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
 import studio.vadim.predanie.MainActivity
 import studio.vadim.predanie.R
+
 
 class PlayerService : MediaSessionService(), MediaSession.Callback {
 
@@ -35,8 +38,8 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
             .also { exoPlayer ->
                 //exoPlayer
             }
-
-        mediaSession = MediaSession.Builder(this, exoPlayer).build()
+        val customCallback = CustomMediaSessionCallback()
+        mediaSession = MediaSession.Builder(this, exoPlayer).setCallback(customCallback).build()
 
         this.setMediaNotificationProvider(object : MediaNotification.Provider{
             override fun createNotification(
@@ -108,5 +111,29 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
         val nextIntent = Intent(applicationContext, MainActivity::class.java)
 
         return PendingIntent.getActivities(applicationContext, 0, arrayOf(startActivityIntent), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT )
+    }
+
+    @UnstableApi
+    private inner class CustomMediaSessionCallback: MediaSession.Callback {
+        override fun onPlaybackResumption(
+            session: MediaSession,
+            controller: MediaSession.ControllerInfo
+        ): ListenableFuture<MediaItemsWithStartPosition> {
+            return getLastPlaylist()
+        }
+    }
+
+    fun getLastPlaylist(): ListenableFuture<MediaItemsWithStartPosition> {
+        Log.d("getLastPlaylst", "fires")
+        try {
+            val mediaItem: MediaItem = MediaItem.Builder()
+                .setUri("https://predanie.clients-cdnnow.ru//uploads//ftp//makdonald-dzhordzh-g//dary-mladenca-hrista//03-glava-2.mp3")
+                .setMediaId("100")
+                .build()
+
+            return Futures.immediateFuture(MediaItemsWithStartPosition(listOf(mediaItem), 0, 0))
+        } catch (e: Exception) {
+            return Futures.immediateFailedFuture(e)
+        }
     }
 }
