@@ -12,14 +12,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavHostController
 import studio.vadim.predanie.presentation.MainViewModel
-import studio.vadim.predanie.presentation.navigation.NavigationItem
 
 @Composable
 @androidx.media3.common.util.UnstableApi
 fun PlayerScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val uiState by mainViewModel.uiState.collectAsState()
-    navController.popBackStack(NavigationItem.Catalog.route, inclusive = true, saveState = true)
-
     Column(
         Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,

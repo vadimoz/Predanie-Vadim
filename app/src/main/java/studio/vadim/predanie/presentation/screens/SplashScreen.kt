@@ -1,5 +1,9 @@
 package studio.vadim.predanie.presentation.screens
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -61,7 +65,7 @@ fun SplashScreen(mainViewModel: MainViewModel, navController: NavHostController)
                 .align(Alignment.TopCenter)
                 .padding(20.dp)
         )*/
-
+        Log.d("NAVV",navController.backQueue.first().destination.route.toString())
         if (logoAnimationState.isAtEnd && logoAnimationState.isPlaying) {
             navController.navigate(NavigationItem.Home.route) {
                 popUpTo(NavigationItem.Splash.route){
@@ -70,4 +74,10 @@ fun SplashScreen(mainViewModel: MainViewModel, navController: NavHostController)
             }
         }
     }
+}
+
+fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }

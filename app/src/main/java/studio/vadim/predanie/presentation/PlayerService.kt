@@ -5,9 +5,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Bundle
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
@@ -90,12 +91,22 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
             = mediaSession
 
     private fun createPendingIntent(deepLink: String): PendingIntent {
-        val startActivityIntent = Intent(Intent.ACTION_VIEW, deepLink.toUri(),
-            this, MainActivity::class.java)
+        val startActivityIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
 
-        startActivityIntent.flags = FLAG_ACTIVITY_CLEAR_TASK
+        startActivityIntent.putExtra("player", "true")
+/*
+        val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(this).run {
+            addNextIntentWithParentStack(startActivityIntent)
+            getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
+        }
 
-        val pendingIntent = PendingIntent.getActivity(this, 0, startActivityIntent, PendingIntent.FLAG_IMMUTABLE)
-        return pendingIntent!!
+        return resultPendingIntent!!*/
+
+        val rootIntent  = applicationContext.packageManager.getLaunchIntentForPackage(applicationContext.packageName)
+        val nextIntent = Intent(applicationContext, MainActivity::class.java)
+
+        return PendingIntent.getActivities(applicationContext, 0, arrayOf(startActivityIntent), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT )
     }
 }

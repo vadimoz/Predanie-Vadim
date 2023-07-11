@@ -1,6 +1,7 @@
 package studio.vadim.predanie.presentation.screens
 
 import android.text.Html
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -70,6 +71,7 @@ fun AuthorScreen(
 ) {
     val uiState by mainViewModel.uiState.collectAsState()
 
+    Log.d("NAVV",navController.backQueue.first().destination.route.toString())
     DisposableEffect(authorId) {
         onDispose {
             mainViewModel.cleanAuthorState()
