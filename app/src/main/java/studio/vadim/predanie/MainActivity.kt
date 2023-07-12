@@ -1,6 +1,7 @@
 package studio.vadim.predanie
 
 
+import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
@@ -34,11 +35,13 @@ import androidx.media3.common.Player.COMMAND_PLAY_PAUSE
 import androidx.media3.common.Player.COMMAND_PREPARE
 import androidx.media3.common.Player.COMMAND_SET_MEDIA_ITEM
 import androidx.media3.session.MediaController
+import androidx.media3.session.MediaNotification
 import androidx.media3.session.SessionToken
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navDeepLink
+import androidx.room.Room
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -46,6 +49,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import com.slaviboy.composeunits.initSize
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import studio.vadim.predanie.data.AppDatabase
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.PlayerService
 import studio.vadim.predanie.presentation.navigation.NavigationItem
@@ -85,7 +89,6 @@ class MainActivity : ComponentActivity() {
             MoreExecutors.directExecutor()
         )
     }
-
     override fun onStop() {
         super.onStop()
 
@@ -137,6 +140,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mainViewModel.initAppDb(applicationContext)
 
         initSize()
         setContent {

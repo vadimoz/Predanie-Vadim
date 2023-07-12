@@ -1,6 +1,5 @@
 package studio.vadim.predanie.presentation
 
-import android.R.attr.name
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -30,6 +29,7 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     private var mediaSession: MediaSession? = null
     private lateinit var exoPlayer: ExoPlayer
     private lateinit var nBuilder: NotificationCompat.Builder
+    private lateinit var notificationManager: NotificationManager
 
     override fun onCreate() {
         super.onCreate()
@@ -64,7 +64,7 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     }
 
     fun  createNotification(session: MediaSession) {
-        val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(NotificationChannel("1","Плеер", NotificationManager.IMPORTANCE_LOW))
 
         // NotificationCompat.Builder here.
@@ -82,12 +82,14 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     }
 
     override fun onDestroy() {
-        mediaSession?.run {
-            player.release()
-            release()
-            mediaSession = null
-        }
         super.onDestroy()
+        Log.d("ONDESTROY MSERVICE", "FIRE")
+
+        mediaSession?.player?.release()
+        mediaSession?.release()
+        mediaSession = null
+
+        notificationManager.cancelAll()
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession?

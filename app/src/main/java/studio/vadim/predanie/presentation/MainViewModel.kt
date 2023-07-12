@@ -1,5 +1,6 @@
 package studio.vadim.predanie.presentation
 
+import android.content.Context
 import android.net.Uri
 import android.text.TextUtils
 import android.util.Log
@@ -11,11 +12,15 @@ import androidx.media3.session.MediaController
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import androidx.room.Room
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import studio.vadim.predanie.data.AppDatabase
 import studio.vadim.predanie.domain.models.api.items.DataItem
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
@@ -208,5 +213,20 @@ class MainViewModel(
 
         //TODO: Сделать на каждый трек запрос в Room
         return mediaItems
+    }
+
+    fun initAppDb(context: Context) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val queryResult = initDb(context)
+        }
+    }
+
+    suspend private fun initDb(context: Context) {
+        val db = Room.databaseBuilder(
+            context,
+            AppDatabase::class.java, "PredanieDB"
+        ).build()
+
+        Log.d("DBDAO", db.userDao().getAll().toString())
     }
 }
