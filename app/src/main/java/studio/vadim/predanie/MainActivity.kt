@@ -48,6 +48,10 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import com.slaviboy.composeunits.initSize
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import studio.vadim.predanie.data.AppDatabase
 import studio.vadim.predanie.presentation.MainViewModel
@@ -65,6 +69,7 @@ import studio.vadim.predanie.presentation.screens.QuickScreen
 import studio.vadim.predanie.presentation.screens.SearchScreen
 import studio.vadim.predanie.presentation.screens.SplashScreen
 import studio.vadim.predanie.presentation.theme.PredanieTheme
+import java.util.Timer
 
 
 class MainActivity : ComponentActivity() {
@@ -74,6 +79,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var playerController: MediaController
 
     private lateinit var navController: NavHostController
+
 
     override fun onStart() {
         super.onStart()
@@ -89,6 +95,7 @@ class MainActivity : ComponentActivity() {
             MoreExecutors.directExecutor()
         )
     }
+
     override fun onStop() {
         super.onStop()
 
@@ -99,43 +106,6 @@ class MainActivity : ComponentActivity() {
         playerController.playWhenReady = true
         playerController.prepare()
         playerController.play()
-
-
-        playerController.addListener(object : Player.Listener {
-            override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
-                super.onMediaMetadataChanged(mediaMetadata)
-                Log.d("onMediaMetadataChanged", "onMediaMetadataChanged=$mediaMetadata")
-            }
-
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                super.onIsPlayingChanged(isPlaying)
-                Log.d("onIsPlayingChanged", "onIsPlayingChanged=$isPlaying")
-            }
-
-            override fun onPlaybackStateChanged(playbackState: Int) {
-                super.onPlaybackStateChanged(playbackState)
-            }
-
-            override fun onPlayerError(error: PlaybackException) {
-                super.onPlayerError(error)
-                Log.d("onPlayerError", "onPlayerError=${error.stackTraceToString()}")
-            }
-
-            override fun onPlayerErrorChanged(error: PlaybackException?) {
-                super.onPlayerErrorChanged(error)
-                Log.d("onPlayerErrorChanged", "onPlayerErrorChanged=${error?.stackTraceToString()}")
-            }
-        })
-
-        Log.d("others", "COMMAND_PREPARE=${playerController.isCommandAvailable(COMMAND_PREPARE)}")
-        Log.d(
-            "others",
-            "COMMAND_SET_MEDIA_ITEM=${playerController.isCommandAvailable(COMMAND_SET_MEDIA_ITEM)}"
-        )
-        Log.d(
-            "others",
-            "COMMAND_PLAY_PAUSE=${playerController.isCommandAvailable(COMMAND_PLAY_PAUSE)}"
-        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -194,95 +164,95 @@ class MainActivity : ComponentActivity() {
         } else {
             startDestination = NavigationItem.Splash.route
         }
-            AnimatedNavHost(navController, startDestination = startDestination) {
-                composable(
-                    NavigationItem.Splash.route,
-                ) {
-                    SplashScreen(mainViewModel = mainViewModel, navController)
-                }
-                composable(
-                    NavigationItem.Fund.route,
-                ) {
-                    FundScreen()
-                }
-                composable(
-                    NavigationItem.Player.route,
-                    deepLinks = listOf(navDeepLink {
-                        uriPattern = "https://predanie.ru/player"
-                    }),
-                ) {
-                    PlayerScreen(mainViewModel = mainViewModel, navController)
-                }
-                composable(
-                    NavigationItem.Profile.route,
-                ) {
-                    ProfileScreen(mainViewModel = mainViewModel, navController)
-                }
-                composable(
-                    NavigationItem.Home.route,
-                    /*enterTransition = {
-                        slideIntoContainer(
-                            AnimatedContentScope.SlideDirection.Up,
-                            animationSpec = tween(1000)
-                        )
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(
-                            AnimatedContentScope.SlideDirection.Down,
-                            animationSpec = tween(1000)
-                        )
-                    },*/
-                ) {
-                    HomeScreen(mainViewModel = mainViewModel, navController)
-                }
-                composable(NavigationItem.Catalog.route) {
-                    CatalogScreen(
-                        mainViewModel = mainViewModel,
-                        navController = navController
-                    )
-                }
-                composable(NavigationItem.QuickSplash.route) {
-                    QuickScreen(
-                        mainViewModel = mainViewModel,
-                        navController = navController
-                    )
-                }
-                composable(NavigationItem.Search.route) { navBackStackEntry ->
-                    val query = navBackStackEntry.arguments?.getString("query")
-                    SearchScreen(
-                        mainViewModel = mainViewModel,
-                        navController,
-                        query
-                    )
-                }
-                composable(NavigationItem.CatalogItems.route) { navBackStackEntry ->
-                    val catalogId = navBackStackEntry.arguments?.getString("catalogId")
-                    val catalogName = navBackStackEntry.arguments?.getString("catalogName")
-                    CatalogItemsScreen(
-                        mainViewModel = mainViewModel,
-                        navController = navController,
-                        catalogId,
-                        catalogName
-                    )
-                }
-                composable(NavigationItem.Author.route) { navBackStackEntry ->
-                    val authorId = navBackStackEntry.arguments?.getString("authorId")
-                    AuthorScreen(
-                        mainViewModel = mainViewModel,
-                        authorId,
-                        navController = navController
-                    )
-                }
-                composable(NavigationItem.Item.route) { navBackStackEntry ->
-                    val itemId = navBackStackEntry.arguments?.getString("itemId")
-
-                    ItemScreen(
-                        mainViewModel = mainViewModel,
-                        itemId,
-                        navController = navController
-                    )
-                }
+        AnimatedNavHost(navController, startDestination = startDestination) {
+            composable(
+                NavigationItem.Splash.route,
+            ) {
+                SplashScreen(mainViewModel = mainViewModel, navController)
             }
+            composable(
+                NavigationItem.Fund.route,
+            ) {
+                FundScreen()
+            }
+            composable(
+                NavigationItem.Player.route,
+                deepLinks = listOf(navDeepLink {
+                    uriPattern = "https://predanie.ru/player"
+                }),
+            ) {
+                PlayerScreen(mainViewModel = mainViewModel, navController)
+            }
+            composable(
+                NavigationItem.Profile.route,
+            ) {
+                ProfileScreen(mainViewModel = mainViewModel, navController)
+            }
+            composable(
+                NavigationItem.Home.route,
+                /*enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentScope.SlideDirection.Up,
+                        animationSpec = tween(1000)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentScope.SlideDirection.Down,
+                        animationSpec = tween(1000)
+                    )
+                },*/
+            ) {
+                HomeScreen(mainViewModel = mainViewModel, navController)
+            }
+            composable(NavigationItem.Catalog.route) {
+                CatalogScreen(
+                    mainViewModel = mainViewModel,
+                    navController = navController
+                )
+            }
+            composable(NavigationItem.QuickSplash.route) {
+                QuickScreen(
+                    mainViewModel = mainViewModel,
+                    navController = navController
+                )
+            }
+            composable(NavigationItem.Search.route) { navBackStackEntry ->
+                val query = navBackStackEntry.arguments?.getString("query")
+                SearchScreen(
+                    mainViewModel = mainViewModel,
+                    navController,
+                    query
+                )
+            }
+            composable(NavigationItem.CatalogItems.route) { navBackStackEntry ->
+                val catalogId = navBackStackEntry.arguments?.getString("catalogId")
+                val catalogName = navBackStackEntry.arguments?.getString("catalogName")
+                CatalogItemsScreen(
+                    mainViewModel = mainViewModel,
+                    navController = navController,
+                    catalogId,
+                    catalogName
+                )
+            }
+            composable(NavigationItem.Author.route) { navBackStackEntry ->
+                val authorId = navBackStackEntry.arguments?.getString("authorId")
+                AuthorScreen(
+                    mainViewModel = mainViewModel,
+                    authorId,
+                    navController = navController
+                )
+            }
+            composable(NavigationItem.Item.route) { navBackStackEntry ->
+                val itemId = navBackStackEntry.arguments?.getString("itemId")
+
+                ItemScreen(
+                    mainViewModel = mainViewModel,
+                    itemId,
+                    navController = navController
+                )
+            }
+        }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

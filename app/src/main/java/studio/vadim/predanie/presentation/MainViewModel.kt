@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import studio.vadim.predanie.data.AppDatabase
+import studio.vadim.predanie.data.app.MainPlaylist
 import studio.vadim.predanie.domain.models.api.items.DataItem
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
@@ -32,6 +33,8 @@ class MainViewModel(
     private val apiLists: GetLists,
     private val apiItems: GetItems
 ) : ViewModel() {
+
+    private lateinit var dbInstance: AppDatabase
 
     val newList = Pager(PagingConfig(pageSize = 15)) {
         CompositionsPagingSource(apiLists, type = "new", 0)
@@ -217,16 +220,16 @@ class MainViewModel(
 
     fun initAppDb(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
-            val queryResult = initDb(context)
+            dbInstance = initDb(context)
         }
     }
 
-    suspend private fun initDb(context: Context) {
-        val db = Room.databaseBuilder(
+    private fun initDb(context: Context): AppDatabase {
+        return Room.databaseBuilder(
             context,
             AppDatabase::class.java, "PredanieDB"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
 
-        Log.d("DBDAO", db.userDao().getAll().toString())
+        //db.mainPlaylistDao().insertAll(MainPlaylist(0, "Main", "100", ))
     }
 }
