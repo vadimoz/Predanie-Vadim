@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.MediaItem
@@ -46,7 +47,20 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     var savePlayerPositionJob: Job? = null
     private var playlistPosition: Long = 0
 
-    override fun onCreate() {
+    override fun onUpdateNotification(
+        session: MediaSession,
+        startInForegroundRequired: Boolean
+    ) {
+        //super.onUpdateNotification(session, startInForegroundRequired)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotification(session)
+        } else {
+            createNotificationOldAndroid(session)
+        }
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    override fun  onCreate() {
         super.onCreate()
 
         dbInstance = AppDatabase.getInstance(this)
@@ -55,29 +69,9 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
             .also { player ->
                 //exoPlayer
             }
+
         val customCallback = CustomMediaSessionCallback()
         mediaSession = MediaSession.Builder(this, player).setCallback(customCallback).build()
-
-        this.setMediaNotificationProvider(object : MediaNotification.Provider {
-            override fun createNotification(
-                mediaSession: MediaSession,// this is the session we pass to style
-                customLayout: ImmutableList<CommandButton>,
-                actionFactory: MediaNotification.ActionFactory,
-                onNotificationChangedCallback: MediaNotification.Provider.Callback
-            ): MediaNotification {
-                createNotification(mediaSession)
-                // notification should be created before you return here
-                return MediaNotification(1, nBuilder.build())
-            }
-
-            override fun handleCustomCommand(
-                session: MediaSession,
-                action: String,
-                extras: Bundle
-            ): Boolean {
-                TODO("Not yet implemented")
-            }
-        })
 
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -112,7 +106,6 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
         }
     }
 
-
     private fun getPlaylistPosition(): Long {
         CoroutineScope(Dispatchers.Main).launch {
             playlistPosition = player.currentPosition
@@ -120,28 +113,33 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
         return playlistPosition
     }
 
-    fun createNotification(session: MediaSession) {
-        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(
-            NotificationChannel(
-                "1",
-                "Плеер",
-                NotificationManager.IMPORTANCE_LOW
-            )
-        )
+    fun  createNotificationOldAndroid(session: MediaSession) {
+        val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        // NotificationCompat.Builder here.
-        nBuilder = NotificationCompat.Builder(this, "1")
-            // Text can be set here
-            // but I believe setting MediaMetaData to MediaSession would be enough.
-            // I havent tested it deeply yet but did display artist from session
+        val notificationCompat = NotificationCompat.Builder(this)
             .setSmallIcon(R.drawable.predanie)
-            .setContentTitle("your Content title")
-            .setContentText("your content text")
+            .setContentTitle(session.player.mediaMetadata.title)
             .setContentIntent(createPendingIntent("https://predanie.ru/player"))
+            .setContentText(session.player.mediaMetadata.writer)
             // set session here
             .setStyle(MediaStyleNotificationHelper.MediaStyle(session))
-        // we don build.
+            .build()
+        notificationManager.notify(1,notificationCompat)
+    }
+
+    fun  createNotification(session: MediaSession) {
+        val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(NotificationChannel("1","Плеер Предание.ру", NotificationManager.IMPORTANCE_HIGH))
+
+        val notificationCompat = NotificationCompat.Builder(this,"1")
+            .setSmallIcon(R.drawable.predanie)
+            .setContentTitle(session.player.mediaMetadata.title)
+            .setContentIntent(createPendingIntent("https://predanie.ru/player"))
+            .setContentText(session.player.mediaMetadata.writer)
+            // set session here
+            .setStyle(MediaStyleNotificationHelper.MediaStyle(session))
+            .build()
+        notificationManager.notify(1,notificationCompat)
     }
 
     override fun onDestroy() {
