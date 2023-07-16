@@ -14,7 +14,6 @@ class Converters {
     fun MediaListToJson(source: ArrayList<MediaItem>): String {
         val mediaItemsForStore = mutableListOf<MediaItemToData>()
         for (it in source) {
-            Log.d("mediaItemsForStore",source.toString())
             mediaItemsForStore.add(MediaItemToData(id = it.mediaId,
                 uri = it.playbackProperties?.uri.toString(),
                 author = it.mediaMetadata.artist.toString(),
