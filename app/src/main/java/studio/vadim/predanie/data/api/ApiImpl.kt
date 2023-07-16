@@ -1,4 +1,4 @@
-package studio.vadim.predanie.data
+package studio.vadim.predanie.data.api
 
 import android.util.Log
 import io.ktor.client.HttpClient

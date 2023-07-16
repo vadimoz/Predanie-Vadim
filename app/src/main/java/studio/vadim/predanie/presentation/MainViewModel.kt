@@ -20,8 +20,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import studio.vadim.predanie.data.AppDatabase
-import studio.vadim.predanie.data.app.MainPlaylist
+import studio.vadim.predanie.data.room.AppDatabase
+import studio.vadim.predanie.data.room.MainPlaylist
 import studio.vadim.predanie.domain.models.api.items.DataItem
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
@@ -201,7 +201,6 @@ class MainViewModel(
                 MediaItem.Builder()
                     .setUri(it.url)
                     .setMediaId(it.id.toString())
-                    .setTag(it.name)
                     .setMediaMetadata(
                         MediaMetadata.Builder()
                             .setDisplayTitle(it.name)
@@ -221,6 +220,19 @@ class MainViewModel(
     fun initAppDb(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             dbInstance = initDb(context)
+            try {
+                dbInstance.mainPlaylistDao()
+                    .insertAll(
+                        MainPlaylist(
+                            playlistName = "Main",
+                            playlistTime = 0,
+                            playlistJson = arrayListOf(MediaItem.fromUri("")),
+                            playlistFile = 0,
+                        )
+                    )
+            } catch (e: Throwable){
+                Log.d("DBERROR", e.message.toString())
+            }
         }
     }
 

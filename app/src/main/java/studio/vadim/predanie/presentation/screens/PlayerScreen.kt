@@ -34,6 +34,7 @@ fun PlayerScreen(mainViewModel: MainViewModel, navController: NavHostController)
             },
             update = {
                 it.player = uiState.playerController
+                it.player?.play()
             }
         )
     }

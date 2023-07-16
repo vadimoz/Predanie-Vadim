@@ -1,11 +1,9 @@
 package studio.vadim.predanie
 
 
-import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -28,32 +26,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.media3.common.MediaMetadata
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.Player
-import androidx.media3.common.Player.COMMAND_PLAY_PAUSE
-import androidx.media3.common.Player.COMMAND_PREPARE
-import androidx.media3.common.Player.COMMAND_SET_MEDIA_ITEM
 import androidx.media3.session.MediaController
-import androidx.media3.session.MediaNotification
 import androidx.media3.session.SessionToken
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navDeepLink
-import androidx.room.Room
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import com.slaviboy.composeunits.initSize
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import studio.vadim.predanie.data.AppDatabase
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.PlayerService
 import studio.vadim.predanie.presentation.navigation.NavigationItem
@@ -69,7 +54,6 @@ import studio.vadim.predanie.presentation.screens.QuickScreen
 import studio.vadim.predanie.presentation.screens.SearchScreen
 import studio.vadim.predanie.presentation.screens.SplashScreen
 import studio.vadim.predanie.presentation.theme.PredanieTheme
-import java.util.Timer
 
 
 class MainActivity : ComponentActivity() {
