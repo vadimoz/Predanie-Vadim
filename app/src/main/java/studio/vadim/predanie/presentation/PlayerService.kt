@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.MediaItem
@@ -13,10 +14,13 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.session.CommandButton
+import androidx.media3.session.MediaNotification
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSession.MediaItemsWithStartPosition
 import androidx.media3.session.MediaSessionService
 import androidx.media3.session.MediaStyleNotificationHelper
+import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
@@ -46,21 +50,30 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     private var playlistPosition: Long = 0
     private var playlistIndex: Int = 0
 
-    override fun onUpdateNotification(
-        session: MediaSession,
-        startInForegroundRequired: Boolean
-    ) {
-        //super.onUpdateNotification(session, startInForegroundRequired)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotification(session)
-        } else {
-            createNotificationOldAndroid(session)
-        }
-    }
-
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-    override fun  onCreate() {
+    override fun onCreate() {
         super.onCreate()
+
+        this.setMediaNotificationProvider(object : MediaNotification.Provider{
+            override fun createNotification(
+                mediaSession: MediaSession,// this is the session we pass to style
+                customLayout: ImmutableList<CommandButton>,
+                actionFactory: MediaNotification.ActionFactory,
+                onNotificationChangedCallback: MediaNotification.Provider.Callback
+            ): MediaNotification {
+                createNotification(mediaSession)
+                // notification should be created before you return here
+                return MediaNotification(1, nBuilder.build())
+            }
+
+            override fun handleCustomCommand(
+                session: MediaSession,
+                action: String,
+                extras: Bundle
+            ): Boolean {
+                TODO("Not yet implemented")
+            }
+        })
 
         dbInstance = AppDatabase.getInstance(this)
 
@@ -118,6 +131,26 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
         })
     }
 
+    fun createNotification(session: MediaSession) {
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(
+            NotificationChannel(
+                "1",
+                "Плеер",
+                NotificationManager.IMPORTANCE_LOW
+            )
+        )
+
+        nBuilder = NotificationCompat.Builder(this, "1")
+            .setSmallIcon(R.drawable.predanie)
+            .setContentTitle("your Content title")
+            .setContentText("your content text")
+            .setContentIntent(createPendingIntent("https://predanie.ru/player"))
+            // set session here
+            .setStyle(MediaStyleNotificationHelper.MediaStyle(session))
+        // we don build.
+    }
+
     fun saveCurrentPositionToDB() {
         CoroutineScope(Dispatchers.IO).launch {
             dbInstance.mainPlaylistDao()
@@ -133,12 +166,13 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-    fun  getCurrentPlaylistFromDB(): MainPlaylist {
+    fun getCurrentPlaylistFromDB(): MainPlaylist {
         CoroutineScope(Dispatchers.IO).launch {
             currentPlaylistFromDB = dbInstance.mainPlaylistDao().findByName("Main")
         }
         return currentPlaylistFromDB
     }
+
 
     private fun getPlaylistPosition(): Long {
         CoroutineScope(Dispatchers.Main).launch {
@@ -168,6 +202,32 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? =
         mediaSession
 
+    private fun createPendingIntent(deepLink: String): PendingIntent {
+        val startActivityIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+
+        startActivityIntent.putExtra("player", "true")
+        /*
+                val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(this).run {
+                    addNextIntentWithParentStack(startActivityIntent)
+                    getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
+                }
+
+                return resultPendingIntent!!*/
+
+        val rootIntent =
+            applicationContext.packageManager.getLaunchIntentForPackage(applicationContext.packageName)
+        val nextIntent = Intent(applicationContext, MainActivity::class.java)
+
+        return PendingIntent.getActivities(
+            applicationContext,
+            0,
+            arrayOf(startActivityIntent),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+    }
+
     @UnstableApi
     private inner class CustomMediaSessionCallback : MediaSession.Callback {
         override fun onPlaybackResumption(
@@ -180,19 +240,25 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-    fun  getLastPlaylist(): ListenableFuture<MediaItemsWithStartPosition> {
+    fun getLastPlaylist(): ListenableFuture<MediaItemsWithStartPosition> {
         return try {
             //получаем из базы текущий плейлист и данные
             val mediaItems = getCurrentPlaylistFromDB()
 
-            Futures.immediateFuture(MediaItemsWithStartPosition(mediaItems.playlistJson, mediaItems.playlistFile, mediaItems.playlistTime))
+            Futures.immediateFuture(
+                MediaItemsWithStartPosition(
+                    mediaItems.playlistJson,
+                    mediaItems.playlistFile,
+                    mediaItems.playlistTime
+                )
+            )
         } catch (e: Exception) {
             return Futures.immediateFailedFuture(e)
         }
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-    fun  createNotificationOldAndroid(session: MediaSession) {
+    fun createNotificationOldAndroid(session: MediaSession) {
         val notificationCompat = NotificationCompat.Builder(this)
             .setSmallIcon(R.drawable.predanie)
             .setContentTitle(session.player.mediaMetadata.title)
@@ -201,24 +267,11 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
             // set session here
             .setStyle(MediaStyleNotificationHelper.MediaStyle(session))
             .build()
-        notificationManager.notify(1,notificationCompat)
+        notificationManager.notify(1, notificationCompat)
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     @RequiresApi(Build.VERSION_CODES.O)
-    fun  createNotification(session: MediaSession) {
-        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(NotificationChannel("1","Плеер Предание.ру", NotificationManager.IMPORTANCE_HIGH))
-
-        val notificationCompat = NotificationCompat.Builder(this,"1")
-            .setSmallIcon(R.drawable.predanie)
-            .setContentTitle(session.player.mediaMetadata.title)
-            .setContentIntent(createClickPendingIntent("https://predanie.ru/player", this))
-            .setContentText(session.player.mediaMetadata.writer)
-            .setStyle(MediaStyleNotificationHelper.MediaStyle(session))
-            .build()
-        notificationManager.notify(1,notificationCompat)
-    }
 
     private fun createClickPendingIntent(deepLink: String, context: Context): PendingIntent {
         val startActivityIntent = Intent(context, MainActivity::class.java).apply {
