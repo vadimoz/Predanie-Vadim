@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 import studio.vadim.predanie.MainActivity
 import studio.vadim.predanie.R
 import studio.vadim.predanie.data.room.AppDatabase
+import studio.vadim.predanie.data.room.FilePosition
 import studio.vadim.predanie.data.room.MainPlaylist
 
 
@@ -45,24 +46,27 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     private lateinit var dbInstance: AppDatabase
     private lateinit var currentPlaylistFromDB: MainPlaylist
 
+    private var mediaInfo: MediaInfo = MediaInfo("","",0)
+
     var savePlayerPositionJob: Job? = null
     var savePlayerPlaylistJob: Job? = null
     private var playlistPosition: Long = 0
     private var playlistIndex: Int = 0
+    private var currentMediaItemPredanieId: String = ""
+    private var currentMediaItemCompositionId: String = ""
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     override fun onCreate() {
         super.onCreate()
 
-        this.setMediaNotificationProvider(object : MediaNotification.Provider{
+        this.setMediaNotificationProvider(object : MediaNotification.Provider {
             override fun createNotification(
-                mediaSession: MediaSession,// this is the session we pass to style
+                mediaSession: MediaSession,
                 customLayout: ImmutableList<CommandButton>,
                 actionFactory: MediaNotification.ActionFactory,
                 onNotificationChangedCallback: MediaNotification.Provider.Callback
             ): MediaNotification {
                 createNotification(mediaSession)
-                // notification should be created before you return here
                 return MediaNotification(1, nBuilder.build())
             }
 
@@ -82,10 +86,18 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
                 //exoPlayer settings
             }
 
+
         val customCallback = CustomMediaSessionCallback()
         mediaSession = MediaSession.Builder(this, player).setCallback(customCallback).build()
 
         player.addListener(object : Player.Listener {
+            //Срабатывает при открытии нового файла
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                Log.d("onMediaItemTransition", "onMediaItemTransition fired")
+                super.onMediaItemTransition(mediaItem, reason)
+            }
+
+            //Сохраняем текущий плейлист
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 super.onIsPlayingChanged(isPlaying)
                 val scope = MainScope()
@@ -102,9 +114,6 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
                 }
                 saveCurrentPlaylistToDB(playlistArray)
 
-
-                val mediaItems = dbInstance.mainPlaylistDao().findByName("Main")
-
                 if (isPlaying) {
                     savePlayerPlaylistJob = scopePlaylist.launch {
                         while (true) {
@@ -115,7 +124,8 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
 
                     savePlayerPositionJob = scope.launch {
                         while (true) {
-                            saveCurrentPositionToDB() //store main playlist
+                            saveCurrentPositionToPlaylistDB(1) //store main playlist
+                            saveCurrentPositionOfMediaFileToDB()
                             delay(1000)
                         }
                     }
@@ -146,15 +156,29 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
             .setContentTitle("your Content title")
             .setContentText("your content text")
             .setContentIntent(createPendingIntent("https://predanie.ru/player"))
-            // set session here
             .setStyle(MediaStyleNotificationHelper.MediaStyle(session))
-        // we don build.
     }
 
-    fun saveCurrentPositionToDB() {
+    fun saveCurrentPositionToPlaylistDB(playlistId: Int) {
         CoroutineScope(Dispatchers.IO).launch {
             dbInstance.mainPlaylistDao()
-                .updateCurrentTimers(getPlaylistPosition(), getPlaylistItemIndex(), 1)
+                .updateCurrentTimers(getPlaylistPosition(), getPlaylistItemIndex(), playlistId)
+        }
+    }
+
+    fun saveCurrentPositionOfMediaFileToDB() {
+        //Использую fileid, значение в ms и completed как знак завершенности
+        CoroutineScope(Dispatchers.IO).launch {
+            val mInfo = getMediaInfo()
+            dbInstance.filePositionDao()
+                .insertOrUpdate(
+                    FilePosition(
+                        fileid = mInfo.currentMediaItemPredanieId,
+                        position = mInfo.currentPlaylistPosition,
+                        compositionid = mInfo.currentMediaItemCompositionId
+                    )
+                )
+
         }
     }
 
@@ -173,6 +197,16 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
         return currentPlaylistFromDB
     }
 
+    private fun getMediaInfo(): MediaInfo {
+        CoroutineScope(Dispatchers.Main).launch {
+            mediaInfo = MediaInfo(
+                currentPlaylistPosition = player.currentPosition,
+                currentMediaItemPredanieId = player.mediaMetadata.trackNumber.toString(),
+                currentMediaItemCompositionId = player.mediaMetadata.compilation.toString(),
+            )
+        }
+        return mediaInfo
+    }
 
     private fun getPlaylistPosition(): Long {
         CoroutineScope(Dispatchers.Main).launch {
@@ -186,6 +220,14 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
             playlistIndex = player.currentMediaItemIndex
         }
         return playlistIndex
+    }
+
+    private fun getCurrentMediaItemCompositionId(): String {
+        CoroutineScope(Dispatchers.Main).launch {
+            currentMediaItemCompositionId =
+                player.mediaMetadata.compilation.toString() //в это поле записываем id трека из Предания
+        }
+        return currentMediaItemCompositionId
     }
 
     override fun onDestroy() {
@@ -230,12 +272,32 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
 
     @UnstableApi
     private inner class CustomMediaSessionCallback : MediaSession.Callback {
+        //Событие на восстановление плейлиста (клик по нотификейшену)
+        /*Returns the last recent playlist of the player with which the player should be prepared when
+        playback resumption from a media button receiver or the System UI notification is requested.*/
         override fun onPlaybackResumption(
             session: MediaSession,
             controller: MediaSession.ControllerInfo
         ): ListenableFuture<MediaItemsWithStartPosition> {
+            Log.d("onPlaybackResumption", "fired event")
             player.play()
             return getLastPlaylist()
+        }
+
+        override fun onConnect(
+            session: MediaSession,
+            controller: MediaSession.ControllerInfo
+        ): MediaSession.ConnectionResult {
+            Log.d("onConnect", "onConnect fired")
+            return super.onConnect(session, controller)
+        }
+
+        override fun onDisconnected(
+            session: MediaSession,
+            controller: MediaSession.ControllerInfo
+        ) {
+            Log.d("onDisconnected", "onDisconnected fired")
+            super.onDisconnected(session, controller)
         }
     }
 

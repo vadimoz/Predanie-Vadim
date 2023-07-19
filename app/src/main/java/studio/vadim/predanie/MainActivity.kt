@@ -107,6 +107,7 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
 
+        //Интент на открытие плеера из нотификации
         if (getIntent().getStringExtra("player") == "true") {
             navController.navigate(NavigationItem.Player.route)
         }

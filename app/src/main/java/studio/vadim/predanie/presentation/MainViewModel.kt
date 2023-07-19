@@ -176,7 +176,6 @@ class MainViewModel(
 
             for (it in accordionItems) {
 
-                Log.d("MEDIAID", it.id.toString())
                 mediaItems.add(
                     MediaItem.Builder()
                         .setUri(it.url)
@@ -185,6 +184,8 @@ class MainViewModel(
                         .setMediaMetadata(
                             MediaMetadata.Builder()
                                 .setDisplayTitle(it.name)
+                                .setTrackNumber(it.id?.toInt()) //file id
+                                .setCompilation(data.id.toString())
                                 .build()
                         )
                         .build()
@@ -205,6 +206,8 @@ class MainViewModel(
                         MediaMetadata.Builder()
                             .setDisplayTitle(it.name)
                             .setArtworkUri(Uri.parse(data.img_big.toString()))
+                            .setCompilation(data.id.toString())
+                            .setTrackNumber(it.id?.toInt())
                             .setArtist(data.author_name.toString())
                             .setTitle(it.name)
                             .build()
