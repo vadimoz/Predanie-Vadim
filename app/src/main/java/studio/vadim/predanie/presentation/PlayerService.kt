@@ -46,7 +46,7 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     private lateinit var dbInstance: AppDatabase
     private lateinit var currentPlaylistFromDB: MainPlaylist
 
-    private var mediaInfo: MediaInfo = MediaInfo("","",0)
+    private var mediaInfo: MediaInfo = MediaInfo("", "", 0)
 
     var savePlayerPositionJob: Job? = null
     var savePlayerPlaylistJob: Job? = null
@@ -54,6 +54,7 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     private var playlistIndex: Int = 0
     private var currentMediaItemPredanieId: String = ""
     private var currentMediaItemCompositionId: String = ""
+    private var currentPositionByFileId: String = ""
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     override fun onCreate() {
@@ -85,7 +86,6 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
             .also { player ->
                 //exoPlayer settings
             }
-
 
         val customCallback = CustomMediaSessionCallback()
         mediaSession = MediaSession.Builder(this, player).setCallback(customCallback).build()
@@ -272,6 +272,49 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
 
     @UnstableApi
     private inner class CustomMediaSessionCallback : MediaSession.Callback {
+        //Восстанавливаем позицию при возобновлении прослушивания Произведения
+        override fun onSetMediaItems(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            mediaItems: MutableList<MediaItem>,
+            startIndex: Int,
+            startPositionMs: Long
+        ): ListenableFuture<MediaItemsWithStartPosition> {
+            var index = 0
+            if (startIndex >= 0) {
+                index = startIndex
+            }
+            val position = getPositionByFileId(
+                mediaItems[index].mediaId,
+                mediaItems[index].mediaMetadata.compilation.toString()
+            )
+
+            Log.d("position", position)
+            Log.d("startIndex", startIndex.toString())
+            Log.d("mediaItems", mediaItems.toString())
+
+            return Futures.immediateFuture(
+                MediaItemsWithStartPosition(
+                    mediaItems,
+                    index,
+                    position.toLong()
+                )
+            )
+            /*
+            Для этого элемента запрашиваем в базе и ставим позицию плееру в возвращаемой
+            mediaItems[startIndex].mediaId
+            mediaItems[startIndex].mediaMetadata.compilation*/
+
+
+            /*return super.onSetMediaItems(
+                mediaSession,
+                controller,
+                mediaItems,
+                startIndex,
+                startPositionMs
+            )*/
+        }
+
         //Событие на восстановление плейлиста (клик по нотификейшену)
         /*Returns the last recent playlist of the player with which the player should be prepared when
         playback resumption from a media button receiver or the System UI notification is requested.*/
@@ -299,6 +342,14 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
             Log.d("onDisconnected", "onDisconnected fired")
             super.onDisconnected(session, controller)
         }
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun getPositionByFileId(fileid: String, compositionid: String): String {
+            currentPositionByFileId =
+                dbInstance.filePositionDao()
+                    .getPositionByFileId(fileid, compositionid)?.position.toString()
+        return currentPositionByFileId
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)

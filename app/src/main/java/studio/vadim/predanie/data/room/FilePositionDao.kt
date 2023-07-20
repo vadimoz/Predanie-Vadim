@@ -14,11 +14,11 @@ interface FilePositionDao {
     @Query("UPDATE FilePosition SET position = :position WHERE fileid = :fileid AND compositionid = :compositionid")
     fun updatePosition(fileid: String, position: Long, compositionid: String)
 
-    @Query("SELECT * from FilePosition WHERE fileid= :fileid")
-    fun getPositionByFileId(fileid: String): FilePosition?
+    @Query("SELECT * from FilePosition WHERE fileid= :fileid AND compositionid = :compositionid")
+    fun getPositionByFileId(fileid: String, compositionid: String): FilePosition?
 
     fun insertOrUpdate(filePosition: FilePosition) {
-        val itemsFromDB = getPositionByFileId(filePosition.fileid)
+        val itemsFromDB = getPositionByFileId(filePosition.fileid, filePosition.compositionid)
         if (itemsFromDB == null) {
             insert(filePosition)
         } else {
