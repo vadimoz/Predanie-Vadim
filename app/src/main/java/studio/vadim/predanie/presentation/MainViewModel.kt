@@ -208,7 +208,6 @@ class MainViewModel(
                             .setArtworkUri(Uri.parse(data.img_big.toString()))
                             .setCompilation(data.id.toString())
                             .setTrackNumber(it.id?.toInt())
-                            .setArtist(data.author_name.toString())
                             .setTitle(it.name)
                             .build()
                     )

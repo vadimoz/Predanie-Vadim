@@ -10,5 +10,7 @@ data class FilePosition(@PrimaryKey(autoGenerate = true) val uid: Int = 0,
                         @ColumnInfo(name = "fileid") val fileid: String,
                         @ColumnInfo(name = "compositionid") val compositionid: String,
                         @ColumnInfo(name = "position") val position: Long,
+                        @ColumnInfo(name = "lastPlayTimestamp") val lastPlayTimestamp: Long,
                         @ColumnInfo(name = "finished") val finished: Boolean = false,
+
 )

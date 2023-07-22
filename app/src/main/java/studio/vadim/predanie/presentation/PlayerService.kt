@@ -10,6 +10,7 @@ import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
@@ -46,7 +47,7 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     private lateinit var dbInstance: AppDatabase
     private lateinit var currentPlaylistFromDB: MainPlaylist
 
-    private var mediaInfo: MediaInfo = MediaInfo("", "", 0)
+    private var mediaInfo: MediaInfo = MediaInfo("", "", 0, 0)
 
     var savePlayerPositionJob: Job? = null
     var savePlayerPlaylistJob: Job? = null
@@ -54,6 +55,7 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     private var playlistIndex: Int = 0
     private var currentMediaItemPredanieId: String = ""
     private var currentMediaItemCompositionId: String = ""
+    private var currentMediaItemDuration: Long = 0
     private var currentPositionByFileId: String = ""
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
@@ -91,10 +93,66 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
         mediaSession = MediaSession.Builder(this, player).setCallback(customCallback).build()
 
         player.addListener(object : Player.Listener {
-            //Срабатывает при открытии нового файла
+            //Срабатывает при открытии нового файла - ставим тут последнюю позицию
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                Log.d("onMediaItemTransition", "onMediaItemTransition fired")
+                if (mediaItem != null) {
+                    val isFinished = isFinishedByFileId(
+                        mediaItem.mediaId,
+                        mediaItem.mediaMetadata.compilation.toString()
+                    )
+
+                    //Будем пропускать файлы, которые уже прослушаны
+                    if (isFinished == true){
+                        player.seekToNextMediaItem()
+                    }
+                }
+                dbInstance.filePositionDao()
+                    .getPositionByFileId(
+                        player.mediaMetadata.trackNumber.toString(),
+                        player.mediaMetadata.compilation.toString()
+                    )
+                    ?.let { player.seekTo(it.position) }
                 super.onMediaItemTransition(mediaItem, reason)
+            }
+
+            override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
+                super.onPlaybackParametersChanged(playbackParameters)
+            }
+
+            override fun onSeekForwardIncrementChanged(seekForwardIncrementMs: Long) {
+                val mInfo = getMediaInfo()
+                dbInstance.filePositionDao()
+                    .insertOrUpdate(
+                        FilePosition(
+                            fileid = mInfo.currentMediaItemPredanieId,
+                            position = mInfo.currentPlaylistPosition,
+                            compositionid = mInfo.currentMediaItemCompositionId,
+                            lastPlayTimestamp = System.currentTimeMillis()
+                        )
+                    )
+
+                savePlayerPositionJob = MainScope().launch {
+                    saveCurrentPositionToPlaylistDB(1) //store main playlist
+                }
+                super.onSeekForwardIncrementChanged(seekForwardIncrementMs)
+            }
+
+            override fun onSeekBackIncrementChanged(seekBackIncrementMs: Long) {
+                val mInfo = getMediaInfo()
+                dbInstance.filePositionDao()
+                    .insertOrUpdate(
+                        FilePosition(
+                            fileid = mInfo.currentMediaItemPredanieId,
+                            position = mInfo.currentPlaylistPosition,
+                            compositionid = mInfo.currentMediaItemCompositionId,
+                            lastPlayTimestamp = System.currentTimeMillis()
+                        )
+                    )
+                savePlayerPositionJob = MainScope().launch {
+                    saveCurrentPositionToPlaylistDB(1) //store main playlist
+                }
+
+                super.onSeekBackIncrementChanged(seekBackIncrementMs)
             }
 
             //Сохраняем текущий плейлист
@@ -170,15 +228,21 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
         //Использую fileid, значение в ms и completed как знак завершенности
         CoroutineScope(Dispatchers.IO).launch {
             val mInfo = getMediaInfo()
+            var isFinished = false
+
+            if (mInfo.currentPlaylistPosition > (mInfo.currentMediaItemDuration * 0.98)) {
+                isFinished = true
+            }
             dbInstance.filePositionDao()
                 .insertOrUpdate(
                     FilePosition(
                         fileid = mInfo.currentMediaItemPredanieId,
                         position = mInfo.currentPlaylistPosition,
-                        compositionid = mInfo.currentMediaItemCompositionId
+                        compositionid = mInfo.currentMediaItemCompositionId,
+                        lastPlayTimestamp = System.currentTimeMillis(),
+                        finished = isFinished
                     )
                 )
-
         }
     }
 
@@ -203,6 +267,7 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
                 currentPlaylistPosition = player.currentPosition,
                 currentMediaItemPredanieId = player.mediaMetadata.trackNumber.toString(),
                 currentMediaItemCompositionId = player.mediaMetadata.compilation.toString(),
+                currentMediaItemDuration = player.duration
             )
         }
         return mediaInfo
@@ -272,7 +337,7 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
 
     @UnstableApi
     private inner class CustomMediaSessionCallback : MediaSession.Callback {
-        //Восстанавливаем позицию при возобновлении прослушивания Произведения
+        //Восстанавливаем позицию при возобновлении прослушивания произведения по главной кнопке
         override fun onSetMediaItems(
             mediaSession: MediaSession,
             controller: MediaSession.ControllerInfo,
@@ -284,14 +349,14 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
             if (startIndex >= 0) {
                 index = startIndex
             }
-            val position = getPositionByFileId(
+            var position = getPositionByFileId(
                 mediaItems[index].mediaId,
                 mediaItems[index].mediaMetadata.compilation.toString()
             )
 
-            Log.d("position", position)
-            Log.d("startIndex", startIndex.toString())
-            Log.d("mediaItems", mediaItems.toString())
+            if (position == "null") {
+                position = "0"
+            }
 
             return Futures.immediateFuture(
                 MediaItemsWithStartPosition(
@@ -346,10 +411,16 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     fun getPositionByFileId(fileid: String, compositionid: String): String {
-            currentPositionByFileId =
-                dbInstance.filePositionDao()
-                    .getPositionByFileId(fileid, compositionid)?.position.toString()
+        currentPositionByFileId =
+            dbInstance.filePositionDao()
+                .getPositionByFileId(fileid, compositionid)?.position.toString()
         return currentPositionByFileId
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun isFinishedByFileId(fileid: String, compositionid: String): Boolean? {
+        return dbInstance.filePositionDao()
+            .getPositionByFileId(fileid, compositionid)?.finished
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)

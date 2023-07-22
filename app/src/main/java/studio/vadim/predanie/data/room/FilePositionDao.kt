@@ -11,8 +11,8 @@ interface FilePositionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(filePosition: FilePosition)
 
-    @Query("UPDATE FilePosition SET position = :position WHERE fileid = :fileid AND compositionid = :compositionid")
-    fun updatePosition(fileid: String, position: Long, compositionid: String)
+    @Query("UPDATE FilePosition SET position = :position, lastPlayTimestamp = :lastPlayTimestamp, finished = :finished WHERE fileid = :fileid AND compositionid = :compositionid")
+    fun updatePosition(fileid: String, position: Long, compositionid: String, lastPlayTimestamp: Long, finished: Boolean)
 
     @Query("SELECT * from FilePosition WHERE fileid= :fileid AND compositionid = :compositionid")
     fun getPositionByFileId(fileid: String, compositionid: String): FilePosition?
@@ -22,7 +22,7 @@ interface FilePositionDao {
         if (itemsFromDB == null) {
             insert(filePosition)
         } else {
-            updatePosition(filePosition.fileid, filePosition.position, filePosition.compositionid)
+            updatePosition(filePosition.fileid, filePosition.position, filePosition.compositionid, filePosition.lastPlayTimestamp, filePosition.finished)
         }
     }
 }
