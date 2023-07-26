@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
+import androidx.media3.common.Tracks
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -93,8 +94,15 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
         mediaSession = MediaSession.Builder(this, player).setCallback(customCallback).build()
 
         player.addListener(object : Player.Listener {
+
+            override fun onTracksChanged(tracks: Tracks) {
+                Log.d("onTracksChanged fires", tracks.toString())
+                super.onTracksChanged(tracks)
+            }
+
             //Срабатывает при открытии нового файла - ставим тут последнюю позицию
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                Log.d("Transition reason", reason.toString())
                 if (mediaItem != null) {
                     val isFinished = isFinishedByFileId(
                         mediaItem.mediaId,
@@ -102,57 +110,23 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
                     )
 
                     //Будем пропускать файлы, которые уже прослушаны
-                    if (isFinished == true){
+                    if (isFinished == true) {
                         player.seekToNextMediaItem()
                     }
                 }
+
                 dbInstance.filePositionDao()
                     .getPositionByFileId(
                         player.mediaMetadata.trackNumber.toString(),
                         player.mediaMetadata.compilation.toString()
                     )
                     ?.let { player.seekTo(it.position) }
-                super.onMediaItemTransition(mediaItem, reason)
+                //super.onMediaItemTransition(mediaItem, reason)
             }
 
             override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
+                Log.d("onPlaybackParametersChanged fired", "fired")
                 super.onPlaybackParametersChanged(playbackParameters)
-            }
-
-            override fun onSeekForwardIncrementChanged(seekForwardIncrementMs: Long) {
-                val mInfo = getMediaInfo()
-                dbInstance.filePositionDao()
-                    .insertOrUpdate(
-                        FilePosition(
-                            fileid = mInfo.currentMediaItemPredanieId,
-                            position = mInfo.currentPlaylistPosition,
-                            compositionid = mInfo.currentMediaItemCompositionId,
-                            lastPlayTimestamp = System.currentTimeMillis()
-                        )
-                    )
-
-                savePlayerPositionJob = MainScope().launch {
-                    saveCurrentPositionToPlaylistDB(1) //store main playlist
-                }
-                super.onSeekForwardIncrementChanged(seekForwardIncrementMs)
-            }
-
-            override fun onSeekBackIncrementChanged(seekBackIncrementMs: Long) {
-                val mInfo = getMediaInfo()
-                dbInstance.filePositionDao()
-                    .insertOrUpdate(
-                        FilePosition(
-                            fileid = mInfo.currentMediaItemPredanieId,
-                            position = mInfo.currentPlaylistPosition,
-                            compositionid = mInfo.currentMediaItemCompositionId,
-                            lastPlayTimestamp = System.currentTimeMillis()
-                        )
-                    )
-                savePlayerPositionJob = MainScope().launch {
-                    saveCurrentPositionToPlaylistDB(1) //store main playlist
-                }
-
-                super.onSeekBackIncrementChanged(seekBackIncrementMs)
             }
 
             //Сохраняем текущий плейлист
@@ -211,8 +185,8 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
 
         nBuilder = NotificationCompat.Builder(this, "1")
             .setSmallIcon(R.drawable.predanie)
-            .setContentTitle("your Content title")
-            .setContentText("your content text")
+            .setContentTitle("")
+            .setContentText("")
             .setContentIntent(createPendingIntent("https://predanie.ru/player"))
             .setStyle(MediaStyleNotificationHelper.MediaStyle(session))
     }
@@ -229,15 +203,17 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
         CoroutineScope(Dispatchers.IO).launch {
             val mInfo = getMediaInfo()
             var isFinished = false
+            var position = mInfo.currentPlaylistPosition
 
-            if (mInfo.currentPlaylistPosition > (mInfo.currentMediaItemDuration * 0.98)) {
+            if (mInfo.currentPlaylistPosition > (mInfo.currentMediaItemDuration * 0.95)) {
                 isFinished = true
+                position = 0
             }
             dbInstance.filePositionDao()
                 .insertOrUpdate(
                     FilePosition(
                         fileid = mInfo.currentMediaItemPredanieId,
-                        position = mInfo.currentPlaylistPosition,
+                        position = position,
                         compositionid = mInfo.currentMediaItemCompositionId,
                         lastPlayTimestamp = System.currentTimeMillis(),
                         finished = isFinished
@@ -255,9 +231,7 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     fun getCurrentPlaylistFromDB(): MainPlaylist {
-        CoroutineScope(Dispatchers.IO).launch {
-            currentPlaylistFromDB = dbInstance.mainPlaylistDao().findByName("Main")
-        }
+        currentPlaylistFromDB = dbInstance.mainPlaylistDao().findByName("Main")
         return currentPlaylistFromDB
     }
 
@@ -296,6 +270,8 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     }
 
     override fun onDestroy() {
+
+        notificationManager.cancelAll()
         super.onDestroy()
         Log.d("ONDESTROY MSERVICE", "FIRE")
 
@@ -303,7 +279,6 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
         mediaSession?.release()
         mediaSession = null
 
-        notificationManager.cancelAll()
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? =
@@ -387,25 +362,8 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
             session: MediaSession,
             controller: MediaSession.ControllerInfo
         ): ListenableFuture<MediaItemsWithStartPosition> {
-            Log.d("onPlaybackResumption", "fired event")
-            player.play()
-            return getLastPlaylist()
-        }
-
-        override fun onConnect(
-            session: MediaSession,
-            controller: MediaSession.ControllerInfo
-        ): MediaSession.ConnectionResult {
-            Log.d("onConnect", "onConnect fired")
-            return super.onConnect(session, controller)
-        }
-
-        override fun onDisconnected(
-            session: MediaSession,
-            controller: MediaSession.ControllerInfo
-        ) {
-            Log.d("onDisconnected", "onDisconnected fired")
-            super.onDisconnected(session, controller)
+            Log.d("onPlaybackResumption", "onPlaybackResumption")
+            return getLastPlaylistFuture()
         }
     }
 
@@ -424,7 +382,7 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-    fun getLastPlaylist(): ListenableFuture<MediaItemsWithStartPosition> {
+    fun getLastPlaylistFuture(): ListenableFuture<MediaItemsWithStartPosition> {
         return try {
             //получаем из базы текущий плейлист и данные
             val mediaItems = getCurrentPlaylistFromDB()

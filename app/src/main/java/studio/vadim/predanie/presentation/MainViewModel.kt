@@ -70,6 +70,8 @@ class MainViewModel(
                 )
             }
         }
+
+
     }
 
     fun getItemInfo(id: Int) {
@@ -183,6 +185,7 @@ class MainViewModel(
                         .setTag(it.name)
                         .setMediaMetadata(
                             MediaMetadata.Builder()
+                                .setArtworkUri(Uri.parse(data.img_medium))
                                 .setDisplayTitle(it.name)
                                 .setTrackNumber(it.id?.toInt()) //file id
                                 .setCompilation(data.id.toString())

@@ -41,7 +41,7 @@ class ApiImpl : ApiConnection {
                     }
                 }.body()
             } catch (e: Throwable) {
-                Log.d("getAuthor", e.message.toString())
+                //Log.d("getAuthor", e.message.toString())
                 delay(10000L)
             }
         }
@@ -62,7 +62,7 @@ class ApiImpl : ApiConnection {
                     }
                 }.body()
             } catch (e: Throwable) {
-                Log.d("getItem", e.message.toString())
+                //Log.d("getItem", e.message.toString())
                 delay(10000L)
             }
         }
@@ -80,7 +80,7 @@ class ApiImpl : ApiConnection {
                     }
                 }.body()
             } catch (e: Throwable) {
-                Log.d("getCatalogList", e.message.toString())
+                //Log.d("getCatalogList", e.message.toString())
                 delay(10000L)
             }
         }
@@ -104,7 +104,7 @@ class ApiImpl : ApiConnection {
                     }
                 }.body()
             } catch (e: Throwable) {
-                Log.d("getItemsList", e.message.toString())
+                //Log.d("getItemsList", e.message.toString())
                 delay(10000L)
             }
         }
@@ -126,7 +126,7 @@ class ApiImpl : ApiConnection {
                     }
                 }.body()
             } catch (e: Throwable) {
-                Log.d("getGlobalSearchList", e.message.toString())
+                //Log.d("getGlobalSearchList", e.message.toString())
                 delay(10000L)
             }
         }
@@ -149,7 +149,7 @@ class ApiImpl : ApiConnection {
                     }
                 }.body()
             } catch (e: Throwable) {
-                Log.d("getAuthorsList", e.message.toString())
+                //Log.d("getAuthorsList", e.message.toString())
                 delay(10000L)
             }
         }
@@ -158,17 +158,17 @@ class ApiImpl : ApiConnection {
     private fun createHttpClient(): HttpClient {
         return HttpClient(Android) {
             // Logging
-            install(Logging) {
+            /*install(Logging) {
                 level = LogLevel.ALL
-            }
+            }*/
             // JSON
             install(ContentNegotiation) {
                 gson()
             }
-            install(Logging) {
+            /*install(Logging) {
                 logger = Logger.DEFAULT
                 level = LogLevel.ALL
-            }
+            }*/
             // Timeout
             install(HttpTimeout) {
                 requestTimeoutMillis = 15000L

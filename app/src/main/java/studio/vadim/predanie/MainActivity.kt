@@ -86,9 +86,9 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun initController() {
-        playerController.playWhenReady = true
-        playerController.prepare()
-        playerController.play()
+        //playerController.playWhenReady = true
+        //playerController.prepare()
+        //playerController.play()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,7 +109,7 @@ class MainActivity : ComponentActivity() {
 
         //Интент на открытие плеера из нотификации
         if (getIntent().getStringExtra("player") == "true") {
-            navController.navigate(NavigationItem.Player.route)
+            navController.navigate("ProfileScreen/noplay")
         }
     }
 
@@ -169,8 +169,9 @@ class MainActivity : ComponentActivity() {
             }
             composable(
                 NavigationItem.Profile.route,
-            ) {
-                ProfileScreen(mainViewModel = mainViewModel, navController)
+            ) { navBackStackEntry ->
+                val play = navBackStackEntry.arguments?.getString("play")
+                ProfileScreen(mainViewModel = mainViewModel, navController, action = play)
             }
             composable(
                 NavigationItem.Home.route,

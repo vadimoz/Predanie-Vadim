@@ -65,7 +65,6 @@ fun SplashScreen(mainViewModel: MainViewModel, navController: NavHostController)
                 .align(Alignment.TopCenter)
                 .padding(20.dp)
         )*/
-        Log.d("NAVV",navController.backQueue.first().destination.route.toString())
         if (logoAnimationState.isAtEnd && logoAnimationState.isPlaying) {
             navController.navigate(NavigationItem.Home.route) {
                 popUpTo(NavigationItem.Splash.route){

@@ -1,5 +1,6 @@
 package studio.vadim.predanie.data.room
 
+import android.net.Uri
 import android.util.Log
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -17,7 +18,10 @@ class Converters {
             mediaItemsForStore.add(MediaItemToData(id = it.mediaId,
                 uri = it.playbackProperties?.uri.toString(),
                 author = it.mediaMetadata.artist.toString(),
-                title = it.mediaMetadata.albumTitle.toString()))
+                title = it.mediaMetadata.albumTitle.toString(),
+                fileid = it.mediaMetadata.trackNumber.toString(),
+                compositionid = it.mediaMetadata.compilation.toString(),
+                artworkUri = it.mediaMetadata.artworkUri.toString()))
         }
         return Gson().toJson(mediaItemsForStore)
     }
@@ -36,6 +40,9 @@ class Converters {
                    .setMediaMetadata(
                        MediaMetadata.Builder()
                            .setDisplayTitle(it.title)
+                           .setTrackNumber(it.fileid.toInt()) //file id
+                           .setCompilation(it.compositionid)
+                           .setArtworkUri(Uri.parse(it.artworkUri))
                            .build()
                    )
                    .build()

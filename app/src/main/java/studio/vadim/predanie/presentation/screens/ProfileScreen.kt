@@ -1,10 +1,12 @@
 package studio.vadim.predanie.presentation.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
@@ -15,6 +17,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -23,13 +26,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.ui.PlayerView
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.navigation.NavigationItem
 
 @Composable
-fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController) {
+fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController, action: String?) {
     val uiState by mainViewModel.uiState.collectAsState()
 
     val newItems = uiState.newList.collectAsLazyPagingItems()
@@ -49,10 +54,44 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
             modifier = Modifier.matchParentSize()
         )*/
 
+        LaunchedEffect(Unit){
+            if(action == "play"){
+                uiState.playerController?.play()
+            }
+        }
+
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
         ) {
+
+            Column(
+                Modifier.fillMaxSize()
+                    .height(300.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+
+                AndroidView(
+                    factory = { context ->
+                        PlayerView(context).apply {
+                            player = uiState.playerController
+                            controllerHideOnTouch = true
+                            setShowPreviousButton(false)
+                            setShowNextButton(false)
+                            setShowRewindButton(false)
+                            setShowVrButton(false)
+                            setShowFastForwardButton(false)
+                            controllerAutoShow = false
+                            controllerShowTimeoutMs = 0
+                            showController()
+                        }
+                    },
+                    update = {
+                        it.player = uiState.playerController
+                    }
+                )
+            }
 
             //Популярное аудио
             Column(

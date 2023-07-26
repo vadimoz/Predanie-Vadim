@@ -205,8 +205,7 @@ fun ItemScreen(
                                         .clickable {
                                             val playerList = mainViewModel.prepareCompositionForPlayer(uiState.itemInto?.data!!)
                                             uiState.playerController?.setMediaItems(playerList)
-                                            uiState.playerController?.play()
-                                            navController.navigate("PlayerScreen")
+                                            navController.navigate("ProfileScreen/play")
                                         },
                                     tint = Color.Black.copy(alpha = 0.5f),
                                 )
