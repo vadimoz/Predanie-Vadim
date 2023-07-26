@@ -12,5 +12,6 @@ data class FilePosition(@PrimaryKey(autoGenerate = true) val uid: Int = 0,
                         @ColumnInfo(name = "position") val position: Long,
                         @ColumnInfo(name = "lastPlayTimestamp") val lastPlayTimestamp: Long,
                         @ColumnInfo(name = "finished") val finished: Boolean = false,
+                        @ColumnInfo(name = "filelength")  val filelength: Long,
 
 )

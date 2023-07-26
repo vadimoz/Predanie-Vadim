@@ -56,6 +56,8 @@ import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.screens.accordion.AccordionGroup
 import studio.vadim.predanie.presentation.screens.accordion.AccordionModel
 import studio.vadim.predanie.presentation.screens.accordion.AccordionRow
+import kotlin.math.exp
+
 @Composable
 fun ItemScreen(
     mainViewModel: MainViewModel, itemId: String?,
@@ -329,16 +331,23 @@ fun ItemScreen(
                             uiState.itemInto!!.data!!.tracks.filter { s -> s.parent == null }
 
                         var counter = 1
+
+                        val rows = mutableListOf<Tracks>()
                         for (item in separateFiles) {
-                            AccordionRow(
-                                model = Tracks(
-                                    id = item.id,
-                                    name = item.name,
-                                    time = item.time
-                                ), index = counter
-                            )
+                            rows.add(item)
                             counter += 1
                         }
+                        val parts = AccordionModel(
+                            header = "",
+                            rows
+                        )
+
+                        val group = listOf(parts)
+                        AccordionGroup(
+                            modifier = Modifier.padding(top = 8.dp),
+                            group = group,
+                            exp = true
+                        )
                     }
                 }
             }

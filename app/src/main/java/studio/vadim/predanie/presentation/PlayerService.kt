@@ -116,7 +116,7 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
                 }
 
                 dbInstance.filePositionDao()
-                    .getPositionByFileId(
+                    .getPositionByFileIdAndCompositionId(
                         player.mediaMetadata.trackNumber.toString(),
                         player.mediaMetadata.compilation.toString()
                     )
@@ -216,7 +216,8 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
                         position = position,
                         compositionid = mInfo.currentMediaItemCompositionId,
                         lastPlayTimestamp = System.currentTimeMillis(),
-                        finished = isFinished
+                        finished = isFinished,
+                        filelength = mInfo.currentMediaItemDuration
                     )
                 )
         }
@@ -337,14 +338,14 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     fun getPositionByFileId(fileid: String, compositionid: String): String {
         currentPositionByFileId =
             dbInstance.filePositionDao()
-                .getPositionByFileId(fileid, compositionid)?.position.toString()
+                .getPositionByFileIdAndCompositionId(fileid, compositionid)?.position.toString()
         return currentPositionByFileId
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     fun isFinishedByFileId(fileid: String, compositionid: String): Boolean? {
         return dbInstance.filePositionDao()
-            .getPositionByFileId(fileid, compositionid)?.finished
+            .getPositionByFileIdAndCompositionId(fileid, compositionid)?.finished
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)

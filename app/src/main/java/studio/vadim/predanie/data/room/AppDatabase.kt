@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @UnstableApi
-@Database(entities = [MainPlaylist::class, FilePosition::class], version = 27)
+@Database(entities = [MainPlaylist::class, FilePosition::class], version = 28)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun mainPlaylistDao(): PlaylistDao
