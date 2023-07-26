@@ -39,6 +39,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import com.slaviboy.composeunits.initSize
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.PlayerService
 import studio.vadim.predanie.presentation.navigation.NavigationItem
@@ -85,10 +86,13 @@ class MainActivity : ComponentActivity() {
         MediaController.releaseFuture(controllerFuture)
     }
 
-    private fun initController() {
-        //playerController.playWhenReady = true
-        //playerController.prepare()
-        //playerController.play()
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    private fun  initController() {
+        val currentPlaylistFromDB =
+            AppDatabase.getInstance(applicationContext).mainPlaylistDao().findByName("Main")
+        playerController.addMediaItems(currentPlaylistFromDB.playlistJson)
+        playerController.prepare()
+        playerController.pause()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

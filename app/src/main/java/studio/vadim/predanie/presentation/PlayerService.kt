@@ -261,24 +261,11 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
         return playlistIndex
     }
 
-    private fun getCurrentMediaItemCompositionId(): String {
-        CoroutineScope(Dispatchers.Main).launch {
-            currentMediaItemCompositionId =
-                player.mediaMetadata.compilation.toString() //в это поле записываем id трека из Предания
-        }
-        return currentMediaItemCompositionId
-    }
-
     override fun onDestroy() {
-
-        notificationManager.cancelAll()
-        super.onDestroy()
-        Log.d("ONDESTROY MSERVICE", "FIRE")
-
         mediaSession?.player?.release()
         mediaSession?.release()
         mediaSession = null
-
+        super.onDestroy()
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? =
@@ -290,13 +277,6 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
         }
 
         startActivityIntent.putExtra("player", "true")
-        /*
-                val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(this).run {
-                    addNextIntentWithParentStack(startActivityIntent)
-                    getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
-                }
-
-                return resultPendingIntent!!*/
 
         val rootIntent =
             applicationContext.packageManager.getLaunchIntentForPackage(applicationContext.packageName)
@@ -340,19 +320,6 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
                     position.toLong()
                 )
             )
-            /*
-            Для этого элемента запрашиваем в базе и ставим позицию плееру в возвращаемой
-            mediaItems[startIndex].mediaId
-            mediaItems[startIndex].mediaMetadata.compilation*/
-
-
-            /*return super.onSetMediaItems(
-                mediaSession,
-                controller,
-                mediaItems,
-                startIndex,
-                startPositionMs
-            )*/
         }
 
         //Событие на восстановление плейлиста (клик по нотификейшену)
@@ -362,7 +329,6 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
             session: MediaSession,
             controller: MediaSession.ControllerInfo
         ): ListenableFuture<MediaItemsWithStartPosition> {
-            Log.d("onPlaybackResumption", "onPlaybackResumption")
             return getLastPlaylistFuture()
         }
     }
