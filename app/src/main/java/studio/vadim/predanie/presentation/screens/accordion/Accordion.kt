@@ -1,8 +1,6 @@
 package studio.vadim.predanie.presentation.screens.accordion
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -27,9 +25,13 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.MediaItem
+import androidx.navigation.NavHostController
 import studio.vadim.predanie.R
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.domain.models.api.items.Tracks
+import studio.vadim.predanie.presentation.MainViewModel
+import studio.vadim.predanie.presentation.UIState
 import studio.vadim.predanie.presentation.screens.accordion.theme.*
 
 data class AccordionModel(
@@ -46,19 +48,46 @@ data class AccordionModel(
 fun AccordionGroup(
     modifier: Modifier = Modifier,
     group: List<AccordionModel>,
-    exp: Boolean = false
+    exp: Boolean = false,
+    playerList: ArrayList<MediaItem>,
+    navController: NavHostController,
+    mainViewModel: MainViewModel,
+    globalItemCount: Int,
+    partCount: Int,
 ) {
+    val uiState by mainViewModel.uiState.collectAsState()
+
     Column(modifier = modifier) {
         group.forEach {
-            Accordion(model = it, exp = exp)
+            Accordion(
+                model = it,
+                exp = exp,
+                playerList = playerList,
+                navController = navController,
+                mainViewModel = mainViewModel,
+                uiState = uiState,
+                globalItemCount = globalItemCount,
+                partCount = partCount
+            )
         }
     }
 }
 
 @Composable
-fun Accordion(modifier: Modifier = Modifier, model: AccordionModel, exp: Boolean = false) {
+fun Accordion(
+    modifier: Modifier = Modifier,
+    model: AccordionModel,
+    exp: Boolean = false,
+    playerList: ArrayList<MediaItem>,
+    navController: NavHostController,
+    mainViewModel: MainViewModel,
+    uiState: UIState,
+    globalItemCount: Int,
+    partCount: Int
+) {
     var expanded by remember { mutableStateOf(false) }
 
+    //Без подкатегории
     Column(modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
         if (exp) {
             AnimatedVisibility(visible = true) {
@@ -73,7 +102,16 @@ fun Accordion(modifier: Modifier = Modifier, model: AccordionModel, exp: Boolean
 
                         var counter = 1
                         for (row in model.rows) {
-                            AccordionRow(row, counter)
+                            AccordionRow(
+                                row,
+                                counter,
+                                playerList = playerList,
+                                navController = navController,
+                                mainViewModel = mainViewModel,
+                                uiState = uiState,
+                                globalItemIndex = globalItemCount,
+                                partCount
+                            )
                             Divider(color = Gray200, thickness = 1.dp)
                             counter += 1
                         }
@@ -81,6 +119,7 @@ fun Accordion(modifier: Modifier = Modifier, model: AccordionModel, exp: Boolean
                 }
             }
         } else {
+            //С подкатегорией
             AccordionHeader(title = model.header, isExpanded = expanded) {
                 expanded = !expanded
             }
@@ -94,10 +133,18 @@ fun Accordion(modifier: Modifier = Modifier, model: AccordionModel, exp: Boolean
                     modifier = Modifier.padding(top = 8.dp)
                 ) {
                     Column {
-
                         var counter = 1
                         for (row in model.rows) {
-                            AccordionRow(row, counter)
+                            AccordionRow(
+                                row,
+                                counter,
+                                playerList = playerList,
+                                navController = navController,
+                                mainViewModel = mainViewModel,
+                                uiState = uiState,
+                                globalItemIndex = globalItemCount,
+                                partCount = partCount
+                            )
                             Divider(color = Gray200, thickness = 1.dp)
                             counter += 1
                         }
@@ -146,12 +193,23 @@ private fun AccordionHeader(
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 fun AccordionRow(
     model: Tracks,
-    index: Int
+    index: Int,
+    playerList: ArrayList<MediaItem>,
+    navController: NavHostController,
+    mainViewModel: MainViewModel,
+    uiState: UIState,
+    globalItemIndex: Int,
+    partCount: Int
 ) {
     Column(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
+            .clickable {
+                uiState.playerController?.setMediaItems(playerList)
+                uiState.playerController?.seekTo(globalItemIndex-partCount+index-1, 0)
+                navController.navigate("ProfileScreen/play")
+            },
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -187,13 +245,13 @@ fun AccordionRow(
                     )
                 }
 
-                Surface(color = Green500, shape = RoundedCornerShape(8.dp), tonalElevation = 2.dp) {
+                /*Surface(color = Green500, shape = RoundedCornerShape(8.dp), tonalElevation = 2.dp) {
                     Text(
                         text = "Запустить",
                         modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
                         color = White
                     )
-                }
+                }*/
             }
         }
 

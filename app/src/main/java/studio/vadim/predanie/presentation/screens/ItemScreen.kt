@@ -55,8 +55,6 @@ import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.screens.accordion.AccordionGroup
 import studio.vadim.predanie.presentation.screens.accordion.AccordionModel
-import studio.vadim.predanie.presentation.screens.accordion.AccordionRow
-import kotlin.math.exp
 
 @Composable
 fun ItemScreen(
@@ -81,6 +79,8 @@ fun ItemScreen(
     textAlign: TextAlign? = null
 ) {
     val uiState by mainViewModel.uiState.collectAsState()
+
+    var playerList = mainViewModel.prepareCompositionForPlayer(uiState.itemInto?.data!!)
 
     val ptsans = FontFamily(
         Font(R.raw.ptsans),
@@ -205,7 +205,7 @@ fun ItemScreen(
                                     modifier = Modifier
                                         .size(128.dp)
                                         .clickable {
-                                            val playerList = mainViewModel.prepareCompositionForPlayer(uiState.itemInto?.data!!)
+                                            playerList = mainViewModel.prepareCompositionForPlayer(uiState.itemInto?.data!!)
                                             uiState.playerController?.setMediaItems(playerList)
                                             navController.navigate("ProfileScreen/play")
                                         },
@@ -247,7 +247,6 @@ fun ItemScreen(
                         }
 
                         uiState.itemInto?.data?.desc?.let {
-
                             var isExpanded by remember { mutableStateOf(false) }
                             var clickable by remember { mutableStateOf(false) }
                             var lastCharIndex by remember { mutableStateOf(0) }
@@ -306,13 +305,19 @@ fun ItemScreen(
                             }
 
                         }
+
+                        var globalItemCount = -1
+
                         for (part in uiState.itemInto?.data?.parts!!) {
                             val rows = mutableListOf<Tracks>()
                             val accordionItems =
                                 uiState.itemInto?.data!!.tracks.filter { s -> s.parent == part.id.toString() }
 
+                            var partCount = -1
                             for (item in accordionItems) {
                                 rows.add(item)
+                                globalItemCount++
+                                partCount++
                             }
 
                             val parts = AccordionModel(
@@ -323,7 +328,12 @@ fun ItemScreen(
                             val group = listOf(parts)
                             AccordionGroup(
                                 modifier = Modifier.padding(top = 8.dp),
-                                group = group
+                                group = group,
+                                playerList = playerList,
+                                navController = navController,
+                                mainViewModel = mainViewModel,
+                                globalItemCount = globalItemCount,
+                                partCount = partCount
                             )
                         }
 
@@ -331,12 +341,15 @@ fun ItemScreen(
                             uiState.itemInto!!.data!!.tracks.filter { s -> s.parent == null }
 
                         var counter = 1
-
+                        var partCount = -1
                         val rows = mutableListOf<Tracks>()
                         for (item in separateFiles) {
                             rows.add(item)
                             counter += 1
+                            globalItemCount++
+                            partCount++
                         }
+
                         val parts = AccordionModel(
                             header = "",
                             rows
@@ -346,7 +359,12 @@ fun ItemScreen(
                         AccordionGroup(
                             modifier = Modifier.padding(top = 8.dp),
                             group = group,
-                            exp = true
+                            exp = true,
+                            playerList = playerList,
+                            navController = navController,
+                            mainViewModel = mainViewModel,
+                            globalItemCount = globalItemCount,
+                            partCount = partCount
                         )
                     }
                 }
