@@ -38,8 +38,10 @@ import studio.vadim.predanie.presentation.navigation.NavigationItem
 import studio.vadim.predanie.presentation.screens.playlistAccordion.PlaylistAccordionGroup
 import studio.vadim.predanie.presentation.screens.playlistAccordion.PlaylistAccordionModel
 
+
 @Composable
 fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController, action: String?) {
+
     val uiState by mainViewModel.uiState.collectAsState()
 
     val newItems = uiState.newList.collectAsLazyPagingItems()
@@ -113,27 +115,30 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                     val currentPlaylistFromDB =
                         AppDatabase.getInstance(LocalContext.current).mainPlaylistDao().findByName("Main")
 
-                    for (item in currentPlaylistFromDB.playlistJson) {
-                        rows.add(item)
+                    if(currentPlaylistFromDB != null) {
+
+                        for (item in currentPlaylistFromDB.playlistJson) {
+                            rows.add(item)
+                        }
+
+                        val parts = PlaylistAccordionModel(
+                            header = "Очередь воспроизведения",
+                            rows
+                        )
+
+                        val group = listOf(parts)
+
+                        PlaylistAccordionGroup(
+                            modifier = Modifier.padding(top = 8.dp),
+                            group = group,
+                            exp = false,
+                            playerList = currentPlaylistFromDB.playlistJson,
+                            navController = navController,
+                            mainViewModel = mainViewModel,
+                            globalItemCount = currentPlaylistFromDB.playlistJson.count(),
+                            partCount = currentPlaylistFromDB.playlistJson.count()
+                        )
                     }
-
-                    val parts = PlaylistAccordionModel(
-                        header = "Очередь воспроизведения",
-                        rows
-                    )
-
-                    val group = listOf(parts)
-
-                    PlaylistAccordionGroup(
-                        modifier = Modifier.padding(top = 8.dp),
-                        group = group,
-                        exp = false,
-                        playerList = currentPlaylistFromDB.playlistJson,
-                        navController = navController,
-                        mainViewModel = mainViewModel,
-                        globalItemCount = currentPlaylistFromDB.playlistJson.count(),
-                        partCount = currentPlaylistFromDB.playlistJson.count()
-                    )
                 }
             }
 

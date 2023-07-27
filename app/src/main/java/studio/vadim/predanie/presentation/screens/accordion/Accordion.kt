@@ -201,13 +201,16 @@ fun AccordionRow(
     globalItemIndex: Int,
     partCount: Int
 ) {
+    val itemPosition = AppDatabase.getInstance(LocalContext.current).filePositionDao().getPositionByFileId(model.id)?.position
     Column(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
             .clickable {
                 uiState.playerController?.setMediaItems(playerList)
-                uiState.playerController?.seekTo(globalItemIndex-partCount+index-1, 0)
+                if (itemPosition != null) {
+                    uiState.playerController?.seekTo(globalItemIndex-partCount+index-1, itemPosition)
+                }
                 navController.navigate("ProfileScreen/play")
             },
     ) {
