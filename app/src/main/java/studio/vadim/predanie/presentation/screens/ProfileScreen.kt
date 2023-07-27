@@ -23,15 +23,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.MediaItem
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
+import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.navigation.NavigationItem
+import studio.vadim.predanie.presentation.screens.playlistAccordion.PlaylistAccordionGroup
+import studio.vadim.predanie.presentation.screens.playlistAccordion.PlaylistAccordionModel
 
 @Composable
 fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController, action: String?) {
@@ -91,6 +96,45 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                         it.player = uiState.playerController
                     }
                 )
+
+            }
+
+            //Очередь воспроизведения
+            Column(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+            ) {
+                Row(modifier = Modifier.padding(bottom = 20.dp)) {
+                    //Выводим очередь воспроизведения
+
+                    val rows = mutableListOf<MediaItem>()
+
+                    val currentPlaylistFromDB =
+                        AppDatabase.getInstance(LocalContext.current).mainPlaylistDao().findByName("Main")
+
+                    for (item in currentPlaylistFromDB.playlistJson) {
+                        rows.add(item)
+                    }
+
+                    val parts = PlaylistAccordionModel(
+                        header = "Очередь воспроизведения",
+                        rows
+                    )
+
+                    val group = listOf(parts)
+
+                    PlaylistAccordionGroup(
+                        modifier = Modifier.padding(top = 8.dp),
+                        group = group,
+                        exp = false,
+                        playerList = currentPlaylistFromDB.playlistJson,
+                        navController = navController,
+                        mainViewModel = mainViewModel,
+                        globalItemCount = currentPlaylistFromDB.playlistJson.count(),
+                        partCount = currentPlaylistFromDB.playlistJson.count()
+                    )
+                }
             }
 
             //Популярное аудио
@@ -115,8 +159,6 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
 
                 }
             }
-
-
 
             //Популярное аудио
             Column(

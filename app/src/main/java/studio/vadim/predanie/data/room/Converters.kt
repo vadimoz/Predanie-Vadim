@@ -18,7 +18,7 @@ class Converters {
             mediaItemsForStore.add(MediaItemToData(id = it.mediaId,
                 uri = it.playbackProperties?.uri.toString(),
                 author = it.mediaMetadata.artist.toString(),
-                title = it.mediaMetadata.albumTitle.toString(),
+                title = it.mediaMetadata.title.toString(),
                 fileid = it.mediaMetadata.trackNumber.toString(),
                 compositionid = it.mediaMetadata.compilation.toString(),
                 artworkUri = it.mediaMetadata.artworkUri.toString()))
@@ -42,6 +42,7 @@ class Converters {
                            .setDisplayTitle(it.title)
                            .setTrackNumber(it.fileid.toInt()) //file id
                            .setCompilation(it.compositionid)
+                           .setTitle(it.title)
                            .setArtworkUri(Uri.parse(it.artworkUri))
                            .build()
                    )
