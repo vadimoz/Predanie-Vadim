@@ -1,5 +1,6 @@
 package studio.vadim.predanie.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -115,30 +116,28 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                     val currentPlaylistFromDB =
                         AppDatabase.getInstance(LocalContext.current).mainPlaylistDao().findByName("Main")
 
-                    if(currentPlaylistFromDB != null) {
-
-                        for (item in currentPlaylistFromDB.playlistJson) {
-                            rows.add(item)
-                        }
-
-                        val parts = PlaylistAccordionModel(
-                            header = "Очередь воспроизведения",
-                            rows
-                        )
-
-                        val group = listOf(parts)
-
-                        PlaylistAccordionGroup(
-                            modifier = Modifier.padding(top = 8.dp),
-                            group = group,
-                            exp = false,
-                            playerList = currentPlaylistFromDB.playlistJson,
-                            navController = navController,
-                            mainViewModel = mainViewModel,
-                            globalItemCount = currentPlaylistFromDB.playlistJson.count(),
-                            partCount = currentPlaylistFromDB.playlistJson.count()
-                        )
+                    for (item in currentPlaylistFromDB.playlistJson) {
+                        rows.add(item)
+                        Log.d("item", item.mediaMetadata.title.toString())
                     }
+
+                    val parts = PlaylistAccordionModel(
+                        header = "Очередь воспроизведения",
+                        rows
+                    )
+
+                    val group = listOf(parts)
+
+                    PlaylistAccordionGroup(
+                        modifier = Modifier.padding(top = 8.dp),
+                        group = group,
+                        exp = false,
+                        playerList = currentPlaylistFromDB.playlistJson,
+                        navController = navController,
+                        mainViewModel = mainViewModel,
+                        globalItemCount = currentPlaylistFromDB.playlistJson.count(),
+                        partCount = currentPlaylistFromDB.playlistJson.count()
+                    )
                 }
             }
 

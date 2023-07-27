@@ -177,7 +177,6 @@ class MainViewModel(
                 data.tracks.filter { s -> s.parent == part.id.toString() }
 
             for (it in accordionItems) {
-
                 mediaItems.add(
                     MediaItem.Builder()
                         .setUri(it.url)
@@ -186,6 +185,7 @@ class MainViewModel(
                         .setMediaMetadata(
                             MediaMetadata.Builder()
                                 .setArtworkUri(Uri.parse(data.img_medium))
+                                .setTitle(it.name)
                                 .setDisplayTitle(it.name)
                                 .setTrackNumber(it.id?.toInt()) //file id
                                 .setCompilation(data.id.toString())
@@ -200,7 +200,6 @@ class MainViewModel(
             data.tracks.filter { s -> s.parent == null }
 
         for (it in separateFiles) {
-            Log.d("MEDIAID", it.id.toString())
             mediaItems.add(
                 MediaItem.Builder()
                     .setUri(it.url)
