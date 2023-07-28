@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -37,7 +34,7 @@ import androidx.navigation.NavHostController
 import studio.vadim.predanie.R
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.domain.models.api.items.Tracks
-import studio.vadim.predanie.presentation.DownloadService.PredanieDownloadService
+import studio.vadim.predanie.presentation.downloadService.PredanieDownloadService
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.UIState
 import studio.vadim.predanie.presentation.screens.accordion.theme.Gray200
@@ -65,6 +62,7 @@ fun AccordionGroup(
     mainViewModel: MainViewModel,
     globalItemCount: Int,
     partCount: Int,
+    itemId: String,
 ) {
     val uiState by mainViewModel.uiState.collectAsState()
 
@@ -78,7 +76,8 @@ fun AccordionGroup(
                 mainViewModel = mainViewModel,
                 uiState = uiState,
                 globalItemCount = globalItemCount,
-                partCount = partCount
+                partCount = partCount,
+                itemId = itemId
             )
         }
     }
@@ -94,7 +93,8 @@ fun Accordion(
     mainViewModel: MainViewModel,
     uiState: UIState,
     globalItemCount: Int,
-    partCount: Int
+    partCount: Int,
+    itemId: String
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -121,7 +121,8 @@ fun Accordion(
                                 mainViewModel = mainViewModel,
                                 uiState = uiState,
                                 globalItemIndex = globalItemCount,
-                                partCount
+                                partCount,
+                                itemId = itemId
                             )
                             Divider(color = Gray200, thickness = 1.dp)
                             counter += 1
@@ -154,7 +155,8 @@ fun Accordion(
                                 mainViewModel = mainViewModel,
                                 uiState = uiState,
                                 globalItemIndex = globalItemCount,
-                                partCount = partCount
+                                partCount = partCount,
+                                itemId
                             )
                             Divider(color = Gray200, thickness = 1.dp)
                             counter += 1
@@ -210,7 +212,8 @@ fun AccordionRow(
     mainViewModel: MainViewModel,
     uiState: UIState,
     globalItemIndex: Int,
-    partCount: Int
+    partCount: Int,
+    itemId: String
 ) {
     val context = LocalContext.current
     Column(
@@ -271,15 +274,14 @@ fun AccordionRow(
 
                 Text(text = "Скачать", modifier = Modifier
                     .clickable {
-
-                        val downloadRequest = DownloadRequest.Builder(model.id.toString(), Uri.parse(model.url)).build()
+                        val downloadRequest = DownloadRequest.Builder("${itemId}_${model.url.toString()}", Uri.parse(model.url)).build()
                         Log.d("downloadRequest" , downloadRequest.uri.toString())
 
                         DownloadService.sendAddDownload(
                             context,
                             PredanieDownloadService::class.java,
                             downloadRequest,
-                            /* foreground = */ true
+                            /* foreground = */ false
                         )
                     })
 

@@ -1,5 +1,6 @@
 package studio.vadim.predanie.presentation.screens
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,11 +36,13 @@ import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.presentation.MainViewModel
+import studio.vadim.predanie.presentation.downloadService.DownloadManagerSingleton
+import studio.vadim.predanie.presentation.playerService.playlistAccordion.PlaylistAccordionGroup
+import studio.vadim.predanie.presentation.playerService.playlistAccordion.PlaylistAccordionModel
 import studio.vadim.predanie.presentation.navigation.NavigationItem
-import studio.vadim.predanie.presentation.PlayerService.playlistAccordion.PlaylistAccordionGroup
-import studio.vadim.predanie.presentation.PlayerService.playlistAccordion.PlaylistAccordionModel
 
 
+@SuppressLint("ServiceCast")
 @Composable
 fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController, action: String?) {
 
@@ -74,7 +77,8 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
         ) {
 
             Column(
-                Modifier.fillMaxSize()
+                Modifier
+                    .fillMaxSize()
                     .height(300.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
@@ -141,7 +145,6 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                 }
             }
 
-            //Популярное аудио
             Column(
                 modifier = Modifier
                     .wrapContentHeight()
@@ -156,7 +159,28 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                     )
                     Text(
                         modifier = Modifier.padding(start = 5.dp),
-                        text = "Ваши настройки",
+                        text = "Мои загрузки",
+                        fontSize = 35.sp,
+                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+            ) {
+                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                    Text(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = "§",
+                        fontSize = 25.sp,
+                        color = Color(android.graphics.Color.parseColor("#FFD600"))
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 5.dp),
+                        text = "Мои настройки",
                         fontSize = 35.sp,
                         color = Color(android.graphics.Color.parseColor("#2F2F2F"))
                     )

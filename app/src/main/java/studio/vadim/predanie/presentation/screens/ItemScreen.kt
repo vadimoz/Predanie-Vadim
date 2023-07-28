@@ -333,7 +333,8 @@ fun ItemScreen(
                                 navController = navController,
                                 mainViewModel = mainViewModel,
                                 globalItemCount = globalItemCount,
-                                partCount = partCount
+                                partCount = partCount,
+                                itemId = itemId
                             )
                         }
 
@@ -344,6 +345,7 @@ fun ItemScreen(
                         var partCount = -1
                         val rows = mutableListOf<Tracks>()
                         for (item in separateFiles) {
+                            item.composition = uiState.itemInto!!.data!!.id.toString()
                             rows.add(item)
                             counter += 1
                             globalItemCount++
@@ -364,7 +366,8 @@ fun ItemScreen(
                             navController = navController,
                             mainViewModel = mainViewModel,
                             globalItemCount = globalItemCount,
-                            partCount = partCount
+                            partCount = partCount,
+                            itemId = itemId
                         )
                     }
                 }

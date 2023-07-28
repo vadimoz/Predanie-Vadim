@@ -1,4 +1,4 @@
-package studio.vadim.predanie.presentation.PlayerService
+package studio.vadim.predanie.presentation.playerService
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -15,7 +15,11 @@ import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaNotification
 import androidx.media3.session.MediaSession
@@ -37,6 +41,8 @@ import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.data.room.FilePosition
 import studio.vadim.predanie.data.room.MainPlaylist
 import studio.vadim.predanie.presentation.MediaInfo
+import studio.vadim.predanie.presentation.downloadService.PlayerCacheSingleton
+import java.io.File
 
 
 class PlayerService : MediaSessionService(), MediaSession.Callback {
@@ -56,6 +62,14 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     private var playlistPosition: Long = 0
     private var playlistIndex: Int = 0
     private var currentPositionByFileId: String = ""
+
+    private fun getDownloadDirectory(context: Context): File? {
+        var downloadDirectory = context.getExternalFilesDir(null)
+        if (downloadDirectory == null) {
+            downloadDirectory = context.filesDir
+        }
+        return downloadDirectory
+    }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     override fun onCreate() {
@@ -83,7 +97,20 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
 
         dbInstance = AppDatabase.getInstance(this)
 
-        player = ExoPlayer.Builder(this).build()
+        val downloadCache = PlayerCacheSingleton.getInstance(this)
+        val dataSourceFactory = DefaultHttpDataSource.Factory()
+
+        val cacheDataSourceFactory: DataSource.Factory =
+            CacheDataSource.Factory()
+                .setCache(downloadCache)
+                .setUpstreamDataSourceFactory(dataSourceFactory)
+                .setCacheWriteDataSinkFactory(null) // Disable writing.
+
+
+        player = ExoPlayer.Builder(this)
+            .setMediaSourceFactory(
+            DefaultMediaSourceFactory(this).setDataSourceFactory(cacheDataSourceFactory)
+        ).build()
             .also { player ->
                 //exoPlayer settings
             }

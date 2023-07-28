@@ -5,11 +5,9 @@ import android.Manifest.permission.POST_NOTIFICATIONS
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -47,7 +45,7 @@ import com.slaviboy.composeunits.initSize
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.presentation.MainViewModel
-import studio.vadim.predanie.presentation.PlayerService.PlayerService
+import studio.vadim.predanie.presentation.playerService.PlayerService
 import studio.vadim.predanie.presentation.navigation.NavigationItem
 import studio.vadim.predanie.presentation.screens.AuthorScreen
 import studio.vadim.predanie.presentation.screens.CatalogItemsScreen

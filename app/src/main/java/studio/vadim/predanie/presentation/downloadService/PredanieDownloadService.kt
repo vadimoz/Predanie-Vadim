@@ -1,4 +1,4 @@
-package studio.vadim.predanie.presentation.DownloadService
+package studio.vadim.predanie.presentation.downloadService
 
 import android.app.Notification
 import android.content.Context
@@ -6,8 +6,6 @@ import android.util.Log
 import androidx.media3.common.util.Util
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.datasource.cache.NoOpCacheEvictor
-import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadManager
 import androidx.media3.exoplayer.offline.DownloadNotificationHelper
@@ -16,6 +14,7 @@ import androidx.media3.exoplayer.scheduler.PlatformScheduler
 import androidx.media3.exoplayer.scheduler.Scheduler
 import studio.vadim.predanie.R
 import java.io.File
+import java.lang.Exception
 import java.util.concurrent.Executor
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
@@ -27,14 +26,34 @@ class PredanieDownloadService : DownloadService(
     0
 ) {
     var downloadNotificationHelper: DownloadNotificationHelper? = null
+    private lateinit var dm: DownloadManager
 
     override fun getDownloadManager(): DownloadManager {
-        val databaseProvider = StandaloneDatabaseProvider(this)
-        val downloadDirectory = File(getDownloadDirectory(this), "DownloadPredanie")
-        val downloadCache = SimpleCache(downloadDirectory, NoOpCacheEvictor(), databaseProvider)
-        val dataSourceFactory = DefaultHttpDataSource.Factory()
-        val downloadExecutor = Executor(Runnable::run)
-        return DownloadManager(this, databaseProvider, downloadCache, dataSourceFactory, downloadExecutor)
+        dm = DownloadManagerSingleton.getInstance(this)
+        activateListeners()
+        return dm
+    }
+
+    private fun activateListeners() {
+        dm.addListener(
+            object : DownloadManager.Listener {
+                override fun onDownloadChanged(
+                    downloadManager: DownloadManager,
+                    download: Download,
+                    finalException: Exception?
+                ) {
+                    super.onDownloadChanged(downloadManager, download, finalException)
+                    if (download.state == 3) {
+                        Log.d("downloadManager", download.request.id.toString())
+                        //Материал скачан. Заносим его в список
+                        //Заношу в таблицу id композиции, uri материала
+
+                        //На страничке offline выводу по порядку все композиции собранные со своими материалами
+                        //При удалении закачки удаляю запись в таблице тоже
+                    }
+                }
+            }
+        )
     }
 
     override fun getScheduler(): Scheduler? {
@@ -53,7 +72,8 @@ class PredanieDownloadService : DownloadService(
             /* contentIntent = */ null,
             /* message = */ "Скачивание...",
             downloads,
-            notMetRequirements)
+            notMetRequirements
+        )
     }
 
     private fun getDownloadDirectory(context: Context): File? {

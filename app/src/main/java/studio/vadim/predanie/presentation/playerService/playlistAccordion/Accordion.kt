@@ -1,4 +1,4 @@
-package studio.vadim.predanie.presentation.PlayerService.playlistAccordion
+package studio.vadim.predanie.presentation.playerService.playlistAccordion
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke

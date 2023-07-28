@@ -38,7 +38,8 @@ data class Tracks (
     var id     : String? = null,
     var name   : String? = null,
     var time   : Int?    = null,
-    var url    : String? = null
+    var url    : String? = null,
+    var composition : String? = null
 
 )
 

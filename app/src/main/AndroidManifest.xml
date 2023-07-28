@@ -23,7 +23,7 @@
         tools:targetApi="33">
 
         <service
-            android:name=".presentation.PlayerService.PlayerService"
+            android:name=".presentation.playerService.PlayerService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback">
@@ -33,7 +33,7 @@
             </intent-filter>
         </service>
 
-        <service android:name=".presentation.DownloadService.PredanieDownloadService"
+        <service android:name=".presentation.downloadService.PredanieDownloadService"
             android:exported="false"
             android:foregroundServiceType="dataSync">
             <intent-filter>
