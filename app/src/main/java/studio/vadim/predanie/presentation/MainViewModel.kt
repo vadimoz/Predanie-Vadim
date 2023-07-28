@@ -217,7 +217,6 @@ class MainViewModel(
             )
         }
 
-        //TODO: Сделать на каждый трек запрос в Room
         return mediaItems
     }
 
