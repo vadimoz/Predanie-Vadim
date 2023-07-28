@@ -271,6 +271,7 @@ fun AccordionRow(
 
                 Text(text = "Скачать", modifier = Modifier
                     .clickable {
+
                         val downloadRequest = DownloadRequest.Builder(model.id.toString(), Uri.parse(model.url)).build()
                         Log.d("downloadRequest" , downloadRequest.uri.toString())
 
