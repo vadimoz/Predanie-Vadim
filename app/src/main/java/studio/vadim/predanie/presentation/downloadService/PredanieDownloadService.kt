@@ -45,11 +45,6 @@ class PredanieDownloadService : DownloadService(
                     super.onDownloadChanged(downloadManager, download, finalException)
                     if (download.state == 3) {
                         Log.d("downloadManager", download.request.id.toString())
-                        //Материал скачан. Заносим его в список
-                        //Заношу в таблицу id композиции, uri материала
-
-                        //На страничке offline выводу по порядку все композиции собранные со своими материалами
-                        //При удалении закачки удаляю запись в таблице тоже
                     }
                 }
             }

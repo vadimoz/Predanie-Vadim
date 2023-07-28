@@ -164,6 +164,9 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                         color = Color(android.graphics.Color.parseColor("#2F2F2F"))
                     )
                 }
+                val downloads = DownloadManagerSingleton.getInstance(LocalContext.current).downloadIndex.getDownload("7697_https://predanie.ru/uploads/ftp/platonov-andrey-plat/schastlivaya-moskva-dzhan-rasskazy-1930-h-godov/schastlivaya-moskva-chitayut-dina-korzun-maksim-suhanov/102.mp3")?.state
+
+                Log.d("downloads",downloads.toString() )
             }
 
             Column(

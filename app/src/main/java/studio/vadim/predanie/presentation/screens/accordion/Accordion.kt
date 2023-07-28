@@ -37,6 +37,7 @@ import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.presentation.downloadService.PredanieDownloadService
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.UIState
+import studio.vadim.predanie.presentation.downloadService.DownloadManagerSingleton
 import studio.vadim.predanie.presentation.screens.accordion.theme.Gray200
 import studio.vadim.predanie.presentation.screens.accordion.theme.Gray600
 import studio.vadim.predanie.presentation.screens.accordion.theme.Green500
@@ -272,18 +273,37 @@ fun AccordionRow(
                     )
                 }
 
-                Text(text = "Скачать", modifier = Modifier
-                    .clickable {
-                        val downloadRequest = DownloadRequest.Builder("${itemId}_${model.url.toString()}", Uri.parse(model.url)).build()
-                        Log.d("downloadRequest" , downloadRequest.uri.toString())
 
-                        DownloadService.sendAddDownload(
+
+                if (DownloadManagerSingleton.getInstance(LocalContext.current).downloadIndex.getDownload(
+                        "${itemId}_${model.url}"
+                    )?.state == 3
+                ) {
+                    Text(text = "Закачано", modifier = Modifier
+                        .clickable {
+                        DownloadService.sendRemoveDownload(
                             context,
                             PredanieDownloadService::class.java,
-                            downloadRequest,
+                            "${itemId}_${model.url}",
                             /* foreground = */ false
                         )
                     })
+                } else {
+                    Text(text = "Скачать", modifier = Modifier
+                        .clickable {
+                            val downloadRequest = DownloadRequest.Builder(
+                                "${itemId}_${model.url.toString()}",
+                                Uri.parse(model.url)
+                            ).build()
+
+                            DownloadService.sendAddDownload(
+                                context,
+                                PredanieDownloadService::class.java,
+                                downloadRequest,
+                                /* foreground = */ false
+                            )
+                        })
+                }
 
                 /*Surface(color = Green500, shape = RoundedCornerShape(8.dp), tonalElevation = 2.dp) {
                     Text(
