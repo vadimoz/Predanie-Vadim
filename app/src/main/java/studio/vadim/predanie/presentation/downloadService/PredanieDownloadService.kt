@@ -60,17 +60,19 @@ class PredanieDownloadService : DownloadService(
                     super.onDownloadChanged(downloadManager, download, finalException)
 
                     val dbInstance = AppDatabase.getInstance(context)
+                    //Добавляем произведение с его плейлистом в базу
+                    //Получаю композицию с картинкой
+                    val delim = "_"
+                    val id = download.request.id.split(delim).toTypedArray()
 
-                    if (download.state == 3) {
-                        //Добавляем произведение с его плейлистом в базу
-                        //Получаю композицию с картинкой
-                        val delim = "_"
-                        val id = download.request.id.split(delim).toTypedArray()
-
-                        GlobalScope.launch {
-                            val compositionInto = apiItems.getItem(id[0].toInt())
-                            val mediaItems =
-                                prepareDownloadedCompositionForPlayer(compositionInto.data!!)
+                    GlobalScope.launch {
+                        val compositionInto = apiItems.getItem(id[0].toInt())
+                        val mediaItems =
+                            prepareDownloadedCompositionForPlayer(compositionInto.data!!)
+                        if (mediaItems.isEmpty()) {
+                            dbInstance.downloadedCompositionsDao()
+                                .deleteByComposition(id[0].toInt())
+                        } else {
                             if (compositionInto.data != null) {
                                 dbInstance.downloadedCompositionsDao().insert(
                                     DownloadedCompositions(
@@ -80,38 +82,6 @@ class PredanieDownloadService : DownloadService(
                                         image = "1"
                                     )
                                 )
-                            }
-                        }
-
-                        //Ставлю ее в базу offline
-                        //dbInstance.downloadedCompositionsDao().insert()
-                    }
-                    if (download.state == 5) {
-                        //Удаляен файл из базы обновляя плейлист в db
-                        //Добавляем произведение с его плейлистом в базу
-                        //Получаю композицию с картинкой
-                        val delim = "_"
-                        val id = download.request.id.split(delim).toTypedArray()
-
-                        GlobalScope.launch {
-                            val compositionInto = apiItems.getItem(id[0].toInt())
-                            val mediaItems =
-                                prepareDownloadedCompositionForPlayer(compositionInto.data!!)
-
-                            //Если список скачанных уже пустой - удаляем запись в db на эту композицию
-                            if (mediaItems.isEmpty()){
-                                dbInstance.downloadedCompositionsDao().deleteByComposition(id[0].toInt())
-                            } else {
-                                if (compositionInto.data != null) {
-                                    dbInstance.downloadedCompositionsDao().insert(
-                                        DownloadedCompositions(
-                                            uid = compositionInto.data?.id,
-                                            title = compositionInto.data?.name.toString(),
-                                            playlistJson = mediaItems,
-                                            image = "1"
-                                        )
-                                    )
-                                }
                             }
                         }
                     }
