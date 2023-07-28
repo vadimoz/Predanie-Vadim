@@ -1,7 +1,8 @@
 package studio.vadim.predanie.presentation.screens.accordion
 
+import android.R.attr.data
 import android.net.Uri
-import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -27,21 +28,23 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.PendingIntentCompat.getActivity
 import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.offline.Download
+import androidx.media3.exoplayer.offline.DownloadManager
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.flow.MutableStateFlow
 import studio.vadim.predanie.R
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.domain.models.api.items.Tracks
-import studio.vadim.predanie.presentation.downloadService.PredanieDownloadService
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.UIState
 import studio.vadim.predanie.presentation.downloadService.DownloadManagerSingleton
-import studio.vadim.predanie.presentation.screens.accordion.theme.Gray200
-import studio.vadim.predanie.presentation.screens.accordion.theme.Gray600
-import studio.vadim.predanie.presentation.screens.accordion.theme.Green500
+import studio.vadim.predanie.presentation.downloadService.PredanieDownloadService
 import studio.vadim.predanie.presentation.screens.accordion.theme.*
+
 
 data class AccordionModel(
     val header: String,
@@ -273,24 +276,50 @@ fun AccordionRow(
                     )
                 }
 
-
-
                 if (DownloadManagerSingleton.getInstance(LocalContext.current).downloadIndex.getDownload(
                         "${itemId}_${model.url}"
                     )?.state == 3
                 ) {
-                    Text(text = "Закачано", modifier = Modifier
+                    val text = MutableStateFlow("Скачать")
+                    val status by text.collectAsState()
+
+                    text.value = "Закачано"
+                    Text(text = status, modifier = Modifier
                         .clickable {
-                        DownloadService.sendRemoveDownload(
-                            context,
-                            PredanieDownloadService::class.java,
-                            "${itemId}_${model.url}",
-                            /* foreground = */ false
-                        )
-                    })
+                            text.value = "Скачать"
+                            DownloadService.sendRemoveDownload(
+                                context,
+                                PredanieDownloadService::class.java,
+                                "${itemId}_${model.url}",
+                                /* foreground = */ false
+                            )
+                        })
                 } else {
-                    Text(text = "Скачать", modifier = Modifier
+                    val dm = DownloadManagerSingleton.getInstance(context)
+
+                    val text = MutableStateFlow("Скачать")
+                    val status by text.collectAsState()
+                    dm.addListener(
+                        object : DownloadManager.Listener {
+                            override fun onDownloadChanged(
+                                downloadManager: DownloadManager,
+                                download: Download,
+                                finalException: Exception?
+                            ) {
+                                super.onDownloadChanged(downloadManager, download, finalException)
+
+                                if (download.state == 3) {
+                                    text.value = ""
+                                }
+                            }
+                        }
+                    )
+
+                    Text(text = status, modifier = Modifier
                         .clickable {
+                            Toast.makeText(context, "Загружается...",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             val downloadRequest = DownloadRequest.Builder(
                                 "${itemId}_${model.url.toString()}",
                                 Uri.parse(model.url)
