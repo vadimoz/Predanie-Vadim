@@ -1,4 +1,4 @@
-package studio.vadim.predanie.presentation
+package studio.vadim.predanie.presentation.PlayerService
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -36,6 +36,7 @@ import studio.vadim.predanie.R
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.data.room.FilePosition
 import studio.vadim.predanie.data.room.MainPlaylist
+import studio.vadim.predanie.presentation.MediaInfo
 
 
 class PlayerService : MediaSessionService(), MediaSession.Callback {
@@ -54,9 +55,6 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     var savePlayerPlaylistJob: Job? = null
     private var playlistPosition: Long = 0
     private var playlistIndex: Int = 0
-    private var currentMediaItemPredanieId: String = ""
-    private var currentMediaItemCompositionId: String = ""
-    private var currentMediaItemDuration: Long = 0
     private var currentPositionByFileId: String = ""
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)

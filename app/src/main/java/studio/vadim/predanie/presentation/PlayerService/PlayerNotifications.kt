@@ -1,4 +1,4 @@
-package studio.vadim.predanie.presentation
+package studio.vadim.predanie.presentation.PlayerService
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

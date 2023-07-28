@@ -1,4 +1,4 @@
-package studio.vadim.predanie.presentation.screens.playlistAccordion
+package studio.vadim.predanie.presentation.PlayerService.playlistAccordion
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
@@ -31,6 +31,9 @@ import studio.vadim.predanie.R
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.UIState
+import studio.vadim.predanie.presentation.screens.accordion.theme.Gray200
+import studio.vadim.predanie.presentation.screens.accordion.theme.Gray600
+import studio.vadim.predanie.presentation.screens.accordion.theme.Green500
 import studio.vadim.predanie.presentation.screens.accordion.theme.*
 
 data class PlaylistAccordionModel(

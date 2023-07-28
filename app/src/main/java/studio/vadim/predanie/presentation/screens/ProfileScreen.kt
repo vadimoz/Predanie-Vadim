@@ -36,8 +36,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.navigation.NavigationItem
-import studio.vadim.predanie.presentation.screens.playlistAccordion.PlaylistAccordionGroup
-import studio.vadim.predanie.presentation.screens.playlistAccordion.PlaylistAccordionModel
+import studio.vadim.predanie.presentation.PlayerService.playlistAccordion.PlaylistAccordionGroup
+import studio.vadim.predanie.presentation.PlayerService.playlistAccordion.PlaylistAccordionModel
 
 
 @Composable

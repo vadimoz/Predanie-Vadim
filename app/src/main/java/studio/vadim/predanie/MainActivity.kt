@@ -41,7 +41,7 @@ import com.slaviboy.composeunits.initSize
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.presentation.MainViewModel
-import studio.vadim.predanie.presentation.PlayerService
+import studio.vadim.predanie.presentation.PlayerService.PlayerService
 import studio.vadim.predanie.presentation.navigation.NavigationItem
 import studio.vadim.predanie.presentation.screens.AuthorScreen
 import studio.vadim.predanie.presentation.screens.CatalogItemsScreen

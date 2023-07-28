@@ -1,5 +1,7 @@
 package studio.vadim.predanie.presentation.screens.accordion
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -11,6 +13,9 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -26,12 +31,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.offline.DownloadRequest
+import androidx.media3.exoplayer.offline.DownloadService
 import androidx.navigation.NavHostController
 import studio.vadim.predanie.R
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.domain.models.api.items.Tracks
+import studio.vadim.predanie.presentation.DownloadService.PredanieDownloadService
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.UIState
+import studio.vadim.predanie.presentation.screens.accordion.theme.Gray200
+import studio.vadim.predanie.presentation.screens.accordion.theme.Gray600
+import studio.vadim.predanie.presentation.screens.accordion.theme.Green500
 import studio.vadim.predanie.presentation.screens.accordion.theme.*
 
 data class AccordionModel(
@@ -207,13 +218,19 @@ fun AccordionRow(
             .wrapContentHeight()
             .fillMaxWidth()
             .clickable {
-                val itemPosition = AppDatabase.getInstance(context).filePositionDao().getPositionByFileId(model.id)?.position
+                val itemPosition = AppDatabase
+                    .getInstance(context)
+                    .filePositionDao()
+                    .getPositionByFileId(model.id)?.position
 
                 uiState.playerController?.setMediaItems(playerList)
                 if (itemPosition != null) {
-                    uiState.playerController?.seekTo(globalItemIndex-partCount+index-1, itemPosition)
+                    uiState.playerController?.seekTo(
+                        globalItemIndex - partCount + index - 1,
+                        itemPosition
+                    )
                 } else {
-                    uiState.playerController?.seekTo(globalItemIndex-partCount+index-1, 0)
+                    uiState.playerController?.seekTo(globalItemIndex - partCount + index - 1, 0)
                 }
                 navController.navigate("ProfileScreen/play")
             },
@@ -251,6 +268,19 @@ fun AccordionRow(
                         color = Color.Black
                     )
                 }
+
+                Text(text = "Скачать", modifier = Modifier
+                    .clickable {
+                        val downloadRequest = DownloadRequest.Builder(model.id.toString(), Uri.parse(model.url)).build()
+                        Log.d("downloadRequest" , downloadRequest.uri.toString())
+
+                        DownloadService.sendAddDownload(
+                            context,
+                            PredanieDownloadService::class.java,
+                            downloadRequest,
+                            /* foreground = */ true
+                        )
+                    })
 
                 /*Surface(color = Green500, shape = RoundedCornerShape(8.dp), tonalElevation = 2.dp) {
                     Text(
