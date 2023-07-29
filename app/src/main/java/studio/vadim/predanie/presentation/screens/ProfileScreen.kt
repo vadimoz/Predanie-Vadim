@@ -30,11 +30,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavHostController
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import androidx.paging.compose.collectAsLazyPagingItems
 import studio.vadim.predanie.data.room.AppDatabase
+import studio.vadim.predanie.presentation.DownloadsPagingSource
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.downloadService.DownloadManagerSingleton
 import studio.vadim.predanie.presentation.playerService.playlistAccordion.PlaylistAccordionGroup
@@ -45,13 +50,12 @@ import studio.vadim.predanie.presentation.navigation.NavigationItem
 @SuppressLint("ServiceCast")
 @Composable
 fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController, action: String?) {
-
+    val context = LocalContext.current
     val uiState by mainViewModel.uiState.collectAsState()
 
     val newItems = uiState.newList.collectAsLazyPagingItems()
-    val audioPopularList = uiState.audioPopularList.collectAsLazyPagingItems()
-    val musicPopularList = uiState.musicPopularList.collectAsLazyPagingItems()
     val favoritesList = uiState.favoritesList.collectAsLazyPagingItems()
+    val downloadsList = uiState.downloadsList?.collectAsLazyPagingItems()
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -65,8 +69,8 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
             modifier = Modifier.matchParentSize()
         )*/
 
-        LaunchedEffect(Unit){
-            if(action == "play"){
+        LaunchedEffect(Unit) {
+            if (action == "play") {
                 uiState.playerController?.play()
             }
         }
@@ -76,72 +80,77 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                 .verticalScroll(rememberScrollState())
         ) {
 
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .height(300.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
+            //
+            val currentPlaylistFromDB =
+                AppDatabase.getInstance(LocalContext.current).mainPlaylistDao().findByName("Main")
 
-                AndroidView(
-                    factory = { context ->
-                        PlayerView(context).apply {
-                            player = uiState.playerController
-                            controllerHideOnTouch = true
-                            setShowPreviousButton(false)
-                            setShowNextButton(false)
-                            setShowRewindButton(false)
-                            setShowVrButton(false)
-                            setShowFastForwardButton(false)
-                            controllerAutoShow = false
-                            controllerShowTimeoutMs = 0
-                            showController()
+
+            if (currentPlaylistFromDB.playlistJson[0].mediaMetadata.title != "null") {
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .height(300.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+
+                    AndroidView(
+                        factory = { context ->
+                            PlayerView(context).apply {
+                                player = uiState.playerController
+                                controllerHideOnTouch = true
+                                setShowPreviousButton(false)
+                                setShowNextButton(false)
+                                setShowRewindButton(false)
+                                setShowVrButton(false)
+                                setShowFastForwardButton(false)
+                                controllerAutoShow = false
+                                controllerShowTimeoutMs = 0
+                                showController()
+                            }
+                        },
+                        update = {
+                            it.player = uiState.playerController
                         }
-                    },
-                    update = {
-                        it.player = uiState.playerController
-                    }
-                )
-
-            }
-
-            //Очередь воспроизведения
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-            ) {
-                Row(modifier = Modifier.padding(bottom = 20.dp)) {
-                    //Выводим очередь воспроизведения
-
-                    val rows = mutableListOf<MediaItem>()
-
-                    val currentPlaylistFromDB =
-                        AppDatabase.getInstance(LocalContext.current).mainPlaylistDao().findByName("Main")
-
-                    for (item in currentPlaylistFromDB.playlistJson) {
-                        rows.add(item)
-                        Log.d("item", item.mediaMetadata.title.toString())
-                    }
-
-                    val parts = PlaylistAccordionModel(
-                        header = "Очередь воспроизведения",
-                        rows
                     )
 
-                    val group = listOf(parts)
+                }
 
-                    PlaylistAccordionGroup(
-                        modifier = Modifier.padding(top = 8.dp),
-                        group = group,
-                        exp = false,
-                        playerList = currentPlaylistFromDB.playlistJson,
-                        navController = navController,
-                        mainViewModel = mainViewModel,
-                        globalItemCount = currentPlaylistFromDB.playlistJson.count(),
-                        partCount = currentPlaylistFromDB.playlistJson.count()
-                    )
+                //Очередь воспроизведения
+                Column(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth()
+                ) {
+                    Row(modifier = Modifier.padding(bottom = 20.dp)) {
+                        //Выводим очередь воспроизведения
+
+                        val rows = mutableListOf<MediaItem>()
+
+
+                        for (item in currentPlaylistFromDB.playlistJson) {
+                            rows.add(item)
+                            Log.d("item", item.mediaMetadata.title.toString())
+                        }
+
+                        val parts = PlaylistAccordionModel(
+                            header = "Очередь воспроизведения",
+                            rows
+                        )
+
+                        val group = listOf(parts)
+
+                        PlaylistAccordionGroup(
+                            modifier = Modifier.padding(top = 8.dp),
+                            group = group,
+                            exp = false,
+                            playerList = currentPlaylistFromDB.playlistJson,
+                            navController = navController,
+                            mainViewModel = mainViewModel,
+                            globalItemCount = currentPlaylistFromDB.playlistJson.count(),
+                            partCount = currentPlaylistFromDB.playlistJson.count()
+                        )
+                    }
                 }
             }
 
@@ -164,9 +173,16 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                         color = Color(android.graphics.Color.parseColor("#2F2F2F"))
                     )
                 }
-                val downloads = DownloadManagerSingleton.getInstance(LocalContext.current).downloadIndex.getDownload("7697_https://predanie.ru/uploads/ftp/platonov-andrey-plat/schastlivaya-moskva-dzhan-rasskazy-1930-h-godov/schastlivaya-moskva-chitayut-dina-korzun-maksim-suhanov/102.mp3")?.state
+            }
 
-                Log.d("downloads",downloads.toString() )
+            LazyRow() {
+                if (downloadsList != null) {
+                    items(downloadsList.itemCount) { index ->
+                        downloadsList[index]?.let {
+                            ListRow(model = it, navController)
+                        }
+                    }
+                }
             }
 
             Column(

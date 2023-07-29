@@ -79,7 +79,7 @@ class PredanieDownloadService : DownloadService(
                                         uid = compositionInto.data?.id,
                                         title = compositionInto.data?.name.toString(),
                                         playlistJson = mediaItems,
-                                        image = "1"
+                                        image = compositionInto.data?.img_big
                                     )
                                 )
                             }
@@ -131,7 +131,6 @@ class PredanieDownloadService : DownloadService(
             data.tracks.filter { s -> s.parent == null }
 
         for (it in separateFiles) {
-
             //Делаем только если файл  есть в загруженных
             if (DownloadManagerSingleton.getInstance(this).downloadIndex.getDownload(
                     "${data.id}_${it.url}"

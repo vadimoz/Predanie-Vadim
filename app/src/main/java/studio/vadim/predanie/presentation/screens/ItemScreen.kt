@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -49,6 +50,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.slaviboy.composeunits.dh
 import studio.vadim.predanie.R
 import studio.vadim.predanie.domain.models.api.items.Tracks
@@ -109,7 +112,11 @@ fun ItemScreen(
                 matrix.setToSaturation(0F)
 
                 AsyncImage(
-                    model = uiState.itemInto!!.data?.img_big,
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(uiState.itemInto!!.data?.img_big)
+                        .memoryCachePolicy(CachePolicy.ENABLED)
+                        .diskCachePolicy(CachePolicy.ENABLED)
+                        .build(),
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
                     //colorFilter = ColorFilter.colorMatrix(matrix),

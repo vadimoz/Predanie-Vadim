@@ -102,6 +102,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainViewModel.initAppDb(applicationContext)
+        mainViewModel.loadDownloadedCompositions(this)
 
         initSize()
         setContent {

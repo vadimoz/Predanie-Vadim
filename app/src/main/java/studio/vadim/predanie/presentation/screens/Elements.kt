@@ -20,17 +20,58 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
+import coil.request.ImageRequest
+import studio.vadim.predanie.data.room.DownloadedCompositions
 import studio.vadim.predanie.domain.models.api.items.AuthorCompositions
 import studio.vadim.predanie.domain.models.api.lists.Categories
 import studio.vadim.predanie.domain.models.api.lists.Compositions
 import studio.vadim.predanie.domain.models.api.lists.Entities
+@Composable
+fun ListRow(model: DownloadedCompositions, navController: NavHostController) {
+    Column(
+        modifier = Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .width(130.dp)
+            .height(300.dp)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(model.image)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .build(),
+            contentDescription = null,
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("ItemScreen/${model.uid}")
+                }
+                .size(190.dp)
+                .fillMaxWidth()
+                .padding(5.dp)
+                .clip(RoundedCornerShape(5.dp)),
+            contentScale = ContentScale.Crop
+        )
+        Text(
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("ItemScreen/${model.uid}")
+                }
+                .padding(5.dp),
 
+            lineHeight = 22.sp,
+            text = model.title
+        )
+    }
+}
 @Composable
 fun ListRow(model: Compositions, navController: NavHostController) {
     Column(
@@ -65,7 +106,11 @@ fun ListRow(model: Compositions, navController: NavHostController) {
             )
         }
         AsyncImage(
-            model = model.img_s,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(model.img_s)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .build(),
             contentDescription = null,
             modifier = Modifier
                 .clickable {
@@ -191,7 +236,11 @@ fun ListRow(model: AuthorCompositions, navController: NavHostController) {
             .height(300.dp)
     ) {
         AsyncImage(
-            model = model.img_s,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(model.img_s)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .build(),
             contentDescription = null,
             modifier = Modifier
                 .clickable {

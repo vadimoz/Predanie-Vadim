@@ -293,6 +293,7 @@ fun AccordionRow(
                                 "${itemId}_${model.url}",
                                 /* foreground = */ false
                             )
+                            mainViewModel.loadDownloadedCompositions(context)
                         })
                 } else {
                     val dm = DownloadManagerSingleton.getInstance(context)
@@ -331,6 +332,7 @@ fun AccordionRow(
                                 downloadRequest,
                                 /* foreground = */ false
                             )
+                            mainViewModel.loadDownloadedCompositions(context)
                         })
                 }
 
