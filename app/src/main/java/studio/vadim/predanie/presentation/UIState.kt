@@ -4,6 +4,7 @@ import androidx.media3.session.MediaController
 import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import studio.vadim.predanie.data.room.DownloadedCompositions
+import studio.vadim.predanie.data.room.HistoryCompositions
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
 import studio.vadim.predanie.domain.models.api.lists.Compositions
@@ -22,5 +23,6 @@ data class UIState(
     val itemInto: ResponseItemModel? = ResponseItemModel(),
     val authorInto: ResponseAuthorModel = ResponseAuthorModel(),
     var catalogItemsList: Flow<PagingData<Compositions>>? = null,
-    var playerController: MediaController? = null
+    var playerController: MediaController? = null,
+    val historyList: Flow<PagingData<HistoryCompositions>>? = null,
 )

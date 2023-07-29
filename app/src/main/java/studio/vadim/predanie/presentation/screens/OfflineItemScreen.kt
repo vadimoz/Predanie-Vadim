@@ -48,20 +48,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.MediaItem
+import androidx.media3.extractor.mp4.Track
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.slaviboy.composeunits.dh
 import studio.vadim.predanie.R
+import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.screens.accordion.AccordionGroup
 import studio.vadim.predanie.presentation.screens.accordion.AccordionModel
 
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
-fun ItemScreen(
-    mainViewModel: MainViewModel, itemId: String?,
+fun  OfflineItemScreen(
+    mainViewModel: MainViewModel,
+    itemId: String?,
     navController: NavHostController,
     modifier: Modifier = Modifier,
     textModifier: Modifier = Modifier,
@@ -83,9 +88,9 @@ fun ItemScreen(
 ) {
     val uiState by mainViewModel.uiState.collectAsState()
 
-    val context = LocalContext.current
+    val composition = AppDatabase.getInstance(LocalContext.current).downloadedCompositionsDao().findById(itemId.toString())
 
-    var playerList = mainViewModel.prepareCompositionForPlayer(uiState.itemInto?.data!!)
+    val playerList = composition.playlistJson
 
     val ptsans = FontFamily(
         Font(R.raw.ptsans),
@@ -115,7 +120,7 @@ fun ItemScreen(
 
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(uiState.itemInto!!.data?.img_big)
+                        .data(composition.image)
                         .memoryCachePolicy(CachePolicy.ENABLED)
                         .diskCachePolicy(CachePolicy.ENABLED)
                         .build(),
@@ -145,39 +150,7 @@ fun ItemScreen(
                             .padding(top = 0.3.dh)
                     ) {
 
-                        uiState.itemInto?.data?.author_name?.let { it1 ->
-
-                            if (it1 != "Без автора") {
-                                Surface(
-                                    modifier = Modifier.padding(
-                                        start = 20.dp,
-                                        end = 20.dp,
-                                        bottom = 10.dp
-                                    ),
-                                    color = Color.White,
-                                    shape = RoundedCornerShape(8.dp),
-                                    tonalElevation = 2.dp
-                                ) {
-                                    Text(
-                                        text = it1,
-                                        color = Color.Black,
-                                        fontSize = 12.sp,
-                                        style = TextStyle(fontFamily = ptsans),
-                                        modifier = Modifier
-                                            .padding(
-                                                start = 5.dp,
-                                                end = 5.dp,
-                                                bottom = 0.dp
-                                            )
-                                            .clickable {
-                                                navController.navigate("AuthorScreen/${uiState.itemInto?.data?.author_id}")
-                                            }
-                                    )
-                                }
-                            }
-                        }
-
-                        uiState.itemInto?.data?.name?.let {
+                        composition.title.let {
                             Surface(
                                 modifier = Modifier.padding(
                                     start = 20.dp,
@@ -214,13 +187,7 @@ fun ItemScreen(
                                     modifier = Modifier
                                         .size(128.dp)
                                         .clickable {
-                                            playerList = mainViewModel.prepareCompositionForPlayer(uiState.itemInto?.data!!)
                                             uiState.playerController?.setMediaItems(playerList)
-
-                                            //Ставим композицию в историю
-                                            mainViewModel.setCompositionToHistory(itemId, context = context, title = uiState.itemInto!!.data?.name.toString(), image = uiState.itemInto!!.data?.img_big.toString())
-                                            mainViewModel.loadHistoryCompositions(context)
-
                                             navController.navigate("ProfileScreen/play")
                                         },
                                     tint = Color.Black.copy(alpha = 0.5f),
@@ -260,107 +227,14 @@ fun ItemScreen(
                             }
                         }
 
-                        uiState.itemInto?.data?.desc?.let {
-                            var isExpanded by remember { mutableStateOf(false) }
-                            var clickable by remember { mutableStateOf(false) }
-                            var lastCharIndex by remember { mutableStateOf(0) }
-                            val text = fromHtml(uiState.itemInto!!.data!!.desc)
-
-                            Box(
-                                modifier = Modifier
-                                    .clickable(clickable) {
-                                        isExpanded = !isExpanded
-                                    }
-                                    .then(Modifier.padding(20.dp))
-                            ) {
-                                Text(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .animateContentSize(),
-                                    text = buildAnnotatedString {
-                                        if (clickable) {
-                                            if (isExpanded) {
-                                                append(text)
-                                                withStyle(style = showLessStyle) {
-                                                    append(
-                                                        showLessText
-                                                    )
-                                                }
-                                            } else {
-                                                val adjustText = text?.substring(
-                                                    startIndex = 0,
-                                                    endIndex = lastCharIndex
-                                                )
-                                                    ?.dropLast(showMoreText.length)
-                                                    ?.dropLastWhile { Character.isWhitespace(it) || it == '.' }
-                                                append(adjustText)
-                                                withStyle(style = showMoreStyle) {
-                                                    append(
-                                                        showMoreText
-                                                    )
-                                                }
-                                            }
-                                        } else {
-                                            append(text)
-                                        }
-                                    },
-                                    maxLines = if (isExpanded) Int.MAX_VALUE else collapsedMaxLine,
-                                    fontStyle = fontStyle,
-                                    onTextLayout = { textLayoutResult ->
-                                        if (!isExpanded && textLayoutResult.hasVisualOverflow) {
-                                            clickable = true
-                                            lastCharIndex =
-                                                textLayoutResult.getLineEnd(collapsedMaxLine - 1)
-                                        }
-                                    },
-                                    style = style,
-                                    textAlign = textAlign
-                                )
-                            }
-
-                        }
-
                         var globalItemCount = -1
-
-                        for (part in uiState.itemInto?.data?.parts!!) {
-                            val rows = mutableListOf<Tracks>()
-                            val accordionItems =
-                                uiState.itemInto?.data!!.tracks.filter { s -> s.parent == part.id.toString() }
-
-                            var partCount = -1
-                            for (item in accordionItems) {
-                                rows.add(item)
-                                globalItemCount++
-                                partCount++
-                            }
-
-                            val parts = AccordionModel(
-                                header = part.name.toString(),
-                                rows
-                            )
-
-                            val group = listOf(parts)
-                            AccordionGroup(
-                                modifier = Modifier.padding(top = 8.dp),
-                                group = group,
-                                playerList = playerList,
-                                navController = navController,
-                                mainViewModel = mainViewModel,
-                                globalItemCount = globalItemCount,
-                                partCount = partCount,
-                                itemId = itemId
-                            )
-                        }
-
-                        val separateFiles =
-                            uiState.itemInto!!.data!!.tracks.filter { s -> s.parent == null }
 
                         var counter = 1
                         var partCount = -1
                         val rows = mutableListOf<Tracks>()
-                        for (item in separateFiles) {
-                            item.composition = uiState.itemInto!!.data!!.id.toString()
-                            rows.add(item)
+
+                        for (item in playerList) {
+                            rows.add(Tracks(id = item.mediaId, name = item.mediaMetadata.title.toString()))
                             counter += 1
                             globalItemCount++
                             partCount++

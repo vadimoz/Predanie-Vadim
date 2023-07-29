@@ -6,9 +6,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class DownloadedCompositions(
+data class HistoryCompositions(
     @PrimaryKey() val uid: Int?,
     @ColumnInfo(name = "title") val title: String,
-    @ColumnInfo(name = "playlistJson") val playlistJson: ArrayList<MediaItem>,
+    @ColumnInfo(name = "lastTimestamp") val lastPlayTimestamp: Long,
     @ColumnInfo(name = "image") val image: String?
 )

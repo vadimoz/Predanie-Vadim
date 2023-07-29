@@ -3,9 +3,16 @@ package studio.vadim.predanie
 
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -45,14 +52,15 @@ import com.slaviboy.composeunits.initSize
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.presentation.MainViewModel
-import studio.vadim.predanie.presentation.playerService.PlayerService
 import studio.vadim.predanie.presentation.navigation.NavigationItem
+import studio.vadim.predanie.presentation.playerService.PlayerService
 import studio.vadim.predanie.presentation.screens.AuthorScreen
 import studio.vadim.predanie.presentation.screens.CatalogItemsScreen
 import studio.vadim.predanie.presentation.screens.CatalogScreen
 import studio.vadim.predanie.presentation.screens.FundScreen
 import studio.vadim.predanie.presentation.screens.HomeScreen
 import studio.vadim.predanie.presentation.screens.ItemScreen
+import studio.vadim.predanie.presentation.screens.OfflineItemScreen
 import studio.vadim.predanie.presentation.screens.PlayerScreen
 import studio.vadim.predanie.presentation.screens.ProfileScreen
 import studio.vadim.predanie.presentation.screens.QuickScreen
@@ -101,8 +109,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         mainViewModel.initAppDb(applicationContext)
         mainViewModel.loadDownloadedCompositions(this)
+        mainViewModel.loadHistoryCompositions(this)
 
         initSize()
         setContent {
@@ -156,11 +166,16 @@ class MainActivity : ComponentActivity() {
     fun Navigation(navController: NavHostController) {
         var startDestination: String = ""
 
-        if (getIntent().getStringExtra("player") == "true") {
-            startDestination = NavigationItem.QuickSplash.route
+        //Если клик по нотификейшн-плееру - ставим дефолт скриин - плеер (Мое), если нет интернета - открываем страничку
+        //Мое, если все ок, то сплэш
+        startDestination = if (getIntent().getStringExtra("player") == "true") {
+            NavigationItem.QuickSplash.route
+        } else if (!mainViewModel.isInternetConnected(this)){
+            NavigationItem.Profile.route
         } else {
-            startDestination = NavigationItem.Splash.route
+            NavigationItem.Splash.route
         }
+
         AnimatedNavHost(navController, startDestination = startDestination) {
             composable(
                 NavigationItem.Splash.route,
@@ -245,6 +260,15 @@ class MainActivity : ComponentActivity() {
                 val itemId = navBackStackEntry.arguments?.getString("itemId")
 
                 ItemScreen(
+                    mainViewModel = mainViewModel,
+                    itemId,
+                    navController = navController
+                )
+            }
+            composable(NavigationItem.OfflineItem.route) { navBackStackEntry ->
+                val itemId = navBackStackEntry.arguments?.getString("itemId")
+
+                OfflineItemScreen(
                     mainViewModel = mainViewModel,
                     itemId,
                     navController = navController

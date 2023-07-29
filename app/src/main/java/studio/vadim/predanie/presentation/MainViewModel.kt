@@ -1,9 +1,12 @@
 package studio.vadim.predanie.presentation
 
 import android.content.Context
+import android.net.ConnectivityManager
 import android.net.Uri
+import android.os.Build
 import android.text.TextUtils
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
@@ -24,6 +27,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.data.room.DownloadedCompositions
+import studio.vadim.predanie.data.room.HistoryCompositions
 import studio.vadim.predanie.data.room.MainPlaylist
 import studio.vadim.predanie.domain.models.api.items.DataItem
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
@@ -259,6 +263,36 @@ class MainViewModel(
                     downloadsList = downloadsList
                 )
             }
+        }
+    }
+
+    fun loadHistoryCompositions(context: Context){
+        val historyList = Pager(PagingConfig(pageSize = 30)) {
+            HistoryPagingSource("history", context)
+        }.flow.cachedIn(viewModelScope)
+
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    historyList = historyList
+                )
+            }
+        }
+    }
+
+    fun isInternetConnected(context: Context): Boolean {
+        val cm = context.getSystemService(ComponentActivity.CONNECTIVITY_SERVICE) as ConnectivityManager
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            cm.activeNetwork != null && cm.getNetworkCapabilities(cm.activeNetwork) != null
+        } else {
+            cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnectedOrConnecting
+        }
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun setCompositionToHistory(itemId: String, title: String, image: String, context: Context) {
+        viewModelScope.launch {
+            AppDatabase.getInstance(context).historyCompositionsDao().insert(HistoryCompositions(uid = itemId.toInt(), lastPlayTimestamp = System.currentTimeMillis(), title = title, image = image))
         }
     }
 }

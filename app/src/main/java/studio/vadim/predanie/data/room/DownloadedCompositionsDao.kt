@@ -10,6 +10,9 @@ interface DownloadedCompositionsDao {
     @Query("SELECT * FROM DownloadedCompositions LIMIT :limit OFFSET :offset")
     fun getCompositions(offset: Int, limit: Int): List<DownloadedCompositions>
 
+    @Query("SELECT * FROM DownloadedCompositions WHERE uid LIKE :id LIMIT 1")
+    fun findById(id: String): DownloadedCompositions
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(downloadComposition: DownloadedCompositions)
 

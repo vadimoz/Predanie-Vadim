@@ -55,6 +55,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
 
     val newItems = uiState.newList.collectAsLazyPagingItems()
     val favoritesList = uiState.favoritesList.collectAsLazyPagingItems()
+    val historyList = uiState.historyList?.collectAsLazyPagingItems()
     val downloadsList = uiState.downloadsList?.collectAsLazyPagingItems()
 
     Box(
@@ -130,7 +131,6 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
 
                         for (item in currentPlaylistFromDB.playlistJson) {
                             rows.add(item)
-                            Log.d("item", item.mediaMetadata.title.toString())
                         }
 
                         val parts = PlaylistAccordionModel(
@@ -150,6 +150,38 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             globalItemCount = currentPlaylistFromDB.playlistJson.count(),
                             partCount = currentPlaylistFromDB.playlistJson.count()
                         )
+                    }
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+            ) {
+                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                    Text(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = "§",
+                        fontSize = 25.sp,
+                        color = Color(android.graphics.Color.parseColor("#FFD600"))
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 5.dp),
+                        text = "Моя история",
+                        fontSize = 35.sp,
+                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                    )
+                }
+            }
+
+            LazyRow() {
+
+                if (historyList != null) {
+                    items(historyList.itemCount) { index ->
+                        historyList[index]?.let {
+                            ListRow(model = it, navController)
+                        }
                     }
                 }
             }
@@ -261,33 +293,6 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                 }
             }
 
-            //Рекомендуем
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-            ) {
-                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
-                    Text(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = "§",
-                        fontSize = 25.sp,
-                        color = Color(android.graphics.Color.parseColor("#FFD600"))
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = "Ваша история",
-                        fontSize = 35.sp,
-                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                    )
-
-                }
-            }
-            LazyRow() {
-                items(favoritesList.itemCount) { index ->
-                    favoritesList[index]?.let { ListRow(model = it, navController) }
-                }
-            }
             //Новинки
             Column(
                 modifier = Modifier

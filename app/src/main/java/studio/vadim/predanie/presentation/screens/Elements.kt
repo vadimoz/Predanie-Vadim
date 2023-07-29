@@ -30,12 +30,13 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import studio.vadim.predanie.data.room.DownloadedCompositions
+import studio.vadim.predanie.data.room.HistoryCompositions
 import studio.vadim.predanie.domain.models.api.items.AuthorCompositions
 import studio.vadim.predanie.domain.models.api.lists.Categories
 import studio.vadim.predanie.domain.models.api.lists.Compositions
 import studio.vadim.predanie.domain.models.api.lists.Entities
 @Composable
-fun ListRow(model: DownloadedCompositions, navController: NavHostController) {
+fun ListRow(model: HistoryCompositions, navController: NavHostController) {
     Column(
         modifier = Modifier
             .wrapContentHeight()
@@ -72,6 +73,45 @@ fun ListRow(model: DownloadedCompositions, navController: NavHostController) {
         )
     }
 }
+
+@Composable
+fun ListRow(model: DownloadedCompositions, navController: NavHostController) {
+    Column(
+        modifier = Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .width(130.dp)
+            .height(300.dp)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(model.image)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .build(),
+            contentDescription = null,
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("OfflineItemScreen/${model.uid}")
+                }
+                .size(190.dp)
+                .fillMaxWidth()
+                .padding(5.dp)
+                .clip(RoundedCornerShape(5.dp)),
+            contentScale = ContentScale.Crop
+        )
+        Text(
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("OfflineItemScreen/${model.uid}")
+                }
+                .padding(5.dp),
+
+            lineHeight = 22.sp,
+            text = model.title
+        )
+    }
+}
 @Composable
 fun ListRow(model: Compositions, navController: NavHostController) {
     Column(
@@ -81,11 +121,28 @@ fun ListRow(model: Compositions, navController: NavHostController) {
             .width(130.dp)
             .height(300.dp)
     ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(model.img_s)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .build(),
+            contentDescription = null,
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("ItemScreen/${model.id}")
+                }
+                .size(190.dp)
+                .fillMaxWidth()
+                .padding(5.dp)
+                .clip(RoundedCornerShape(5.dp)),
+            contentScale = ContentScale.Crop
+        )
         if (model.author_name.toString() != "Без автора") {
             Text(
                 modifier = Modifier
                     .height(32.dp)
-                    .padding(end = 10.dp)
+                    .padding(end = 5.dp)
                     .clickable {
                         navController.navigate("SearchScreen/${model.author_name}")
                     },
@@ -105,23 +162,6 @@ fun ListRow(model: Compositions, navController: NavHostController) {
                 text = ""
             )
         }
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(model.img_s)
-                .memoryCachePolicy(CachePolicy.ENABLED)
-                .diskCachePolicy(CachePolicy.ENABLED)
-                .build(),
-            contentDescription = null,
-            modifier = Modifier
-                .clickable {
-                    navController.navigate("ItemScreen/${model.id}")
-                }
-                .size(190.dp)
-                .fillMaxWidth()
-                .padding(5.dp)
-                .clip(RoundedCornerShape(5.dp)),
-            contentScale = ContentScale.Crop
-        )
         Text(
             modifier = Modifier
                 .clickable {
@@ -129,7 +169,7 @@ fun ListRow(model: Compositions, navController: NavHostController) {
                 }
                 .padding(5.dp),
 
-            lineHeight = 22.sp,
+            lineHeight = 21.sp,
             text = model.name.toString()
         )
     }

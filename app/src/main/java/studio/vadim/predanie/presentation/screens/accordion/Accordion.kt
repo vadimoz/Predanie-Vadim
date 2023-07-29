@@ -239,6 +239,11 @@ fun AccordionRow(
                 } else {
                     uiState.playerController?.seekTo(globalItemIndex - partCount + index - 1, 0)
                 }
+
+                //Ставим композицию в историю и перезагружаем историю
+                mainViewModel.setCompositionToHistory(itemId, context = context, title = uiState.itemInto!!.data?.name.toString(), image = uiState.itemInto.data?.img_big.toString())
+                mainViewModel.loadHistoryCompositions(context)
+
                 navController.navigate("ProfileScreen/play")
             },
     ) {
