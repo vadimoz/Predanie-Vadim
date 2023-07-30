@@ -17,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,7 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -44,7 +47,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.slaviboy.composeunits.dh
+import studio.vadim.predanie.R
 import studio.vadim.predanie.presentation.MainViewModel
 
 @Composable
@@ -71,7 +77,11 @@ fun AuthorScreen(
 ) {
     val uiState by mainViewModel.uiState.collectAsState()
 
-    Log.d("NAVV",navController.backQueue.first().destination.route.toString())
+    val context = LocalContext.current
+
+    val isFavorite = mainViewModel.isAuthorFavorite(authorId.toString(), context)
+
+    Log.d("NAVV", navController.backQueue.first().destination.route.toString())
     DisposableEffect(authorId) {
         onDispose {
             mainViewModel.cleanAuthorState()
@@ -94,7 +104,11 @@ fun AuthorScreen(
                     .background(color = Color.White)
             ) {
                 AsyncImage(
-                    model = uiState.authorInto.data?.img,
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(uiState.authorInto.data?.img)
+                        .memoryCachePolicy(CachePolicy.ENABLED)
+                        .diskCachePolicy(CachePolicy.ENABLED)
+                        .build(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -112,7 +126,8 @@ fun AuthorScreen(
 
                     Column(
                         Modifier
-                            .padding(top = 0.2.dh)
+                            .padding(top = 0.2.dh),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Row(modifier = Modifier) {
                             if (uiState.authorInto.data?.name.toString() != "null") {
@@ -139,6 +154,40 @@ fun AuthorScreen(
                                 }
                             }
                         }
+
+                        if (!isFavorite) {
+                            Icon(
+                                painter = painterResource(R.drawable.bookmark),
+                                contentDescription = "Fav",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable {
+                                        mainViewModel.setAuthorToFavorites(
+                                            itemId = authorId,
+                                            uiState.authorInto.data?.name.toString(),
+                                            image = uiState.authorInto.data?.img.toString(),
+                                            context = context
+                                        )
+                                        mainViewModel.loadFavorites(context = context)
+                                    }
+                                    .fillMaxWidth(),
+                                tint = Color.Black.copy(alpha = 0.5f),
+                            )
+                        } else {
+                            Icon(
+                                painter = painterResource(R.drawable.bookmark),
+                                contentDescription = "Fav",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable {
+                                        mainViewModel.removeAuthorFromFavorite(authorId, context)
+                                        mainViewModel.loadFavorites(context = context)
+                                    }
+                                    .fillMaxWidth(),
+                                tint = Color(android.graphics.Color.parseColor("#FFD600")),
+                            )
+                        }
+
                         uiState.authorInto.data?.desc?.let {
 
                             var isExpanded by remember { mutableStateOf(false) }

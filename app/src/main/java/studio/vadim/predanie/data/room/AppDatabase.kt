@@ -8,7 +8,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @UnstableApi
-@Database(entities = [MainPlaylist::class, FilePosition::class, DownloadedCompositions::class, HistoryCompositions::class], version = 37)
+@Database(entities = [MainPlaylist::class, FilePosition::class, DownloadedCompositions::class, HistoryCompositions::class,
+                     FavoriteTracks::class, FavoriteCompositions::class, FavoriteAuthors::class], version = 40)
 @TypeConverters(Converters::class)
 
 abstract class AppDatabase : RoomDatabase() {
@@ -16,6 +17,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun filePositionDao(): FilePositionDao
     abstract fun downloadedCompositionsDao(): DownloadedCompositionsDao
     abstract fun historyCompositionsDao(): HistoryCompositionsDao
+    abstract fun favoriteAuthorsDao(): FavoriteAuthorsDao
+    abstract fun favoriteTracksDao(): FavoriteTracksDao
+    abstract fun favoriteCompositionsDao(): FavoriteCompositionsDao
 
     companion object {
         private var INSTANCE: AppDatabase? = null

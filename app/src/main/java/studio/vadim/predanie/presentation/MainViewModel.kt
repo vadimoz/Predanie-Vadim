@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.text.TextUtils
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,6 +28,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.data.room.DownloadedCompositions
+import studio.vadim.predanie.data.room.FavoriteAuthors
+import studio.vadim.predanie.data.room.FavoriteCompositions
+import studio.vadim.predanie.data.room.FavoriteTracks
 import studio.vadim.predanie.data.room.HistoryCompositions
 import studio.vadim.predanie.data.room.MainPlaylist
 import studio.vadim.predanie.domain.models.api.items.DataItem
@@ -224,7 +228,8 @@ class MainViewModel(
         return mediaItems
     }
 
-    fun initAppDb(context: Context) {
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun  initAppDb(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             dbInstance = initDb(context)
             try {
@@ -237,23 +242,22 @@ class MainViewModel(
                             playlistFile = 0,
                         )
                     )
-            } catch (e: Throwable){
+            } catch (e: Throwable) {
                 Log.d("DBERROR", e.message.toString())
             }
         }
     }
 
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun initDb(context: Context): AppDatabase {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java, "PredanieDB"
         ).fallbackToDestructiveMigration().build()
-
-        //db.mainPlaylistDao().insertAll(MainPlaylist(0, "Main", "100", ))
     }
 
-    fun loadDownloadedCompositions(context: Context){
-        val downloadsList = Pager(PagingConfig(pageSize = 30)) {
+    fun loadDownloadedCompositions(context: Context) {
+        val downloadsList = Pager(PagingConfig(pageSize = 15)) {
             DownloadsPagingSource("downloads", context)
         }.flow.cachedIn(viewModelScope)
 
@@ -266,8 +270,8 @@ class MainViewModel(
         }
     }
 
-    fun loadHistoryCompositions(context: Context){
-        val historyList = Pager(PagingConfig(pageSize = 30)) {
+    fun loadHistoryCompositions(context: Context) {
+        val historyList = Pager(PagingConfig(pageSize = 15)) {
             HistoryPagingSource("history", context)
         }.flow.cachedIn(viewModelScope)
 
@@ -280,8 +284,143 @@ class MainViewModel(
         }
     }
 
+    //Загружаем сразу 3 ленты Отложенных (при старте активити и при обновляем при добавлении элемента в compose)
+    fun loadFavorites(context: Context) {
+        val favCompositionsList = Pager(PagingConfig(pageSize = 15)) {
+            FavCompositionsPagingSource("favCompositions", context)
+        }.flow.cachedIn(viewModelScope)
+
+        val favAuthorsList = Pager(PagingConfig(pageSize = 15)) {
+            FavAuthorsPagingSource("favAuthors", context)
+        }.flow.cachedIn(viewModelScope)
+
+        val favTracksList = Pager(PagingConfig(pageSize = 15)) {
+            FavTracksPagingSource("favTracks", context)
+        }.flow.cachedIn(viewModelScope)
+
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    favCompositionsList = favCompositionsList,
+                    favAuthorsList = favAuthorsList,
+                    favTracksList = favTracksList
+                )
+            }
+        }
+    }
+
+    //Ставим композицию в Отложенные
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun setCompositionToFavorites(itemId: String, title: String, image: String, context: Context) {
+        viewModelScope.launch {
+            AppDatabase.getInstance(context).favoriteCompositionsDao().insert(
+                FavoriteCompositions(
+                    uid = itemId.toInt(),
+                    lastPlayTimestamp = System.currentTimeMillis(),
+                    title = title,
+                    image = image
+                )
+            )
+            Toast.makeText(
+                context, "Материал добавлен в Избранное",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    //Ставим Автора в Отложенные
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun setAuthorToFavorites(itemId: String, title: String, image: String, context: Context) {
+        viewModelScope.launch {
+            AppDatabase.getInstance(context).favoriteAuthorsDao().insert(
+                FavoriteAuthors(
+                    uid = itemId.toInt(),
+                    lastPlayTimestamp = System.currentTimeMillis(),
+                    title = title,
+                    image = image
+                )
+            )
+            Toast.makeText(
+                context, "Автор добавлен в Избранное",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    //Ставим Трек в Отложенные
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun setTrackToFavorites(
+        itemId: String,
+        title: String,
+        compositionid: String,
+        uri: String,
+        context: Context
+    ) {
+        viewModelScope.launch {
+            AppDatabase.getInstance(context).favoriteTracksDao().insertTrack(
+                FavoriteTracks(
+                    lastPlayTimestamp = System.currentTimeMillis(),
+                    title = title,
+                    compositionid = itemId,
+                    uri = uri
+                )
+            )
+            Toast.makeText(
+                context, "Файл добавлен в Избранное",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun isAuthorFavorite(itemId: String, context: Context): Boolean {
+        val author = AppDatabase.getInstance(context).favoriteAuthorsDao().getById(itemId)
+        return author != null
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun removeAuthorFromFavorite(itemId: String, context: Context) {
+        AppDatabase.getInstance(context).favoriteAuthorsDao().deleteById(itemId)
+        Toast.makeText(
+            context, "Удалено из Избранного",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun isCompositionFavorite(itemId: String, context: Context): Boolean {
+        val composition = AppDatabase.getInstance(context).favoriteCompositionsDao().getById(itemId)
+        return composition != null
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun removeCompositionFromFavorite(itemId: String, context: Context) {
+        AppDatabase.getInstance(context).favoriteCompositionsDao().deleteById(itemId)
+        Toast.makeText(
+            context, "Удалено из Избранного",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun isTrackFavorite(uri: String, context: Context): Boolean {
+        val track = AppDatabase.getInstance(context).favoriteTracksDao().getByUrl(uri)
+        return track != null
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun removeTrackFromFavorite(uri: String, context: Context) {
+        AppDatabase.getInstance(context).favoriteTracksDao().deleteByUri(uri)
+        Toast.makeText(
+            context, "Удалено из Избранного",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+
     fun isInternetConnected(context: Context): Boolean {
-        val cm = context.getSystemService(ComponentActivity.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val cm =
+            context.getSystemService(ComponentActivity.CONNECTIVITY_SERVICE) as ConnectivityManager
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             cm.activeNetwork != null && cm.getNetworkCapabilities(cm.activeNetwork) != null
         } else {
@@ -292,7 +431,14 @@ class MainViewModel(
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     fun setCompositionToHistory(itemId: String, title: String, image: String, context: Context) {
         viewModelScope.launch {
-            AppDatabase.getInstance(context).historyCompositionsDao().insert(HistoryCompositions(uid = itemId.toInt(), lastPlayTimestamp = System.currentTimeMillis(), title = title, image = image))
+            AppDatabase.getInstance(context).historyCompositionsDao().insert(
+                HistoryCompositions(
+                    uid = itemId.toInt(),
+                    lastPlayTimestamp = System.currentTimeMillis(),
+                    title = title,
+                    image = image
+                )
+            )
         }
     }
 }

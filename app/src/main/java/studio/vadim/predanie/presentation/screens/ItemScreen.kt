@@ -87,6 +87,8 @@ fun ItemScreen(
 
     var playerList = mainViewModel.prepareCompositionForPlayer(uiState.itemInto?.data!!)
 
+    val isFavorite = mainViewModel.isCompositionFavorite(itemId.toString(), context)
+
     val ptsans = FontFamily(
         Font(R.raw.ptsans),
     )
@@ -214,11 +216,17 @@ fun ItemScreen(
                                     modifier = Modifier
                                         .size(128.dp)
                                         .clickable {
-                                            playerList = mainViewModel.prepareCompositionForPlayer(uiState.itemInto?.data!!)
+                                            playerList =
+                                                mainViewModel.prepareCompositionForPlayer(uiState.itemInto?.data!!)
                                             uiState.playerController?.setMediaItems(playerList)
 
                                             //Ставим композицию в историю
-                                            mainViewModel.setCompositionToHistory(itemId, context = context, title = uiState.itemInto!!.data?.name.toString(), image = uiState.itemInto!!.data?.img_big.toString())
+                                            mainViewModel.setCompositionToHistory(
+                                                itemId,
+                                                context = context,
+                                                title = uiState.itemInto!!.data?.name.toString(),
+                                                image = uiState.itemInto!!.data?.img_big.toString()
+                                            )
                                             mainViewModel.loadHistoryCompositions(context)
 
                                             navController.navigate("ProfileScreen/play")
@@ -245,12 +253,38 @@ fun ItemScreen(
                                     modifier = Modifier.size(20.dp),
                                     tint = Color.Black.copy(alpha = 0.5f),
                                 )
-                                Icon(
-                                    painter = painterResource(R.drawable.bookmark),
-                                    contentDescription = "Play",
-                                    modifier = Modifier.size(20.dp),
-                                    tint = Color.Black.copy(alpha = 0.5f),
-                                )
+                                if (!isFavorite) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.bookmark),
+                                        contentDescription = "Fav",
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .clickable {
+                                                mainViewModel.setCompositionToFavorites(
+                                                    itemId = itemId,
+                                                    uiState.authorInto.data?.name.toString(),
+                                                    image = uiState.authorInto.data?.img.toString(),
+                                                    context = context
+                                                )
+                                                mainViewModel.loadFavorites(context = context)
+                                            }
+                                            .fillMaxWidth(),
+                                        tint = Color.Black.copy(alpha = 0.5f),
+                                    )
+                                } else {
+                                    Icon(
+                                        painter = painterResource(R.drawable.bookmark),
+                                        contentDescription = "Fav",
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .clickable {
+                                                mainViewModel.removeCompositionFromFavorite(itemId, context)
+                                                mainViewModel.loadFavorites(context = context)
+                                            }
+                                            .fillMaxWidth(),
+                                        tint = Color(android.graphics.Color.parseColor("#FFD600")),
+                                    )
+                                }
                                 Icon(
                                     painter = painterResource(R.drawable.dots),
                                     contentDescription = "Play",
@@ -359,7 +393,6 @@ fun ItemScreen(
                         var partCount = -1
                         val rows = mutableListOf<Tracks>()
                         for (item in separateFiles) {
-                            item.composition = uiState.itemInto!!.data!!.id.toString()
                             rows.add(item)
                             counter += 1
                             globalItemCount++
