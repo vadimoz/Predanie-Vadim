@@ -271,11 +271,11 @@ class MainViewModel(
     }
 
     fun loadHistoryCompositions(context: Context) {
-        val historyList = Pager(PagingConfig(pageSize = 15)) {
-            HistoryPagingSource("history", context)
-        }.flow.cachedIn(viewModelScope)
-
         viewModelScope.launch {
+            val historyList = Pager(PagingConfig(pageSize = 15)) {
+                HistoryPagingSource("history", context)
+            }.flow.cachedIn(viewModelScope)
+
             _uiState.update { currentState ->
                 currentState.copy(
                     historyList = historyList

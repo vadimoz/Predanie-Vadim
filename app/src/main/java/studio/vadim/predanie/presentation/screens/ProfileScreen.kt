@@ -19,6 +19,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -81,9 +82,33 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                 .verticalScroll(rememberScrollState())
         ) {
 
-            //
+
             val currentPlaylistFromDB =
                 AppDatabase.getInstance(LocalContext.current).mainPlaylistDao().findByName("Main")
+
+            if (!mainViewModel.isInternetConnected(context)) {
+                Column(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth()
+                ) {
+                    Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                        Text(
+                            modifier = Modifier.padding(top = 8.dp),
+                            text = "§",
+                            fontSize = 25.sp,
+                            color = Color(android.graphics.Color.parseColor("#FFD600"))
+                        )
+                        Text(
+                            modifier = Modifier.padding(start = 5.dp),
+                            text = "Offline режим",
+                            fontSize = 35.sp,
+                            color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                        )
+
+                    }
+                }
+            }
 
             if (currentPlaylistFromDB.playlistJson[0].mediaMetadata.title != "null") {
                 Column(
@@ -153,65 +178,69 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                 }
             }
 
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-            ) {
-                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
-                    Text(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = "§",
-                        fontSize = 25.sp,
-                        color = Color(android.graphics.Color.parseColor("#FFD600"))
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = "Моя история",
-                        fontSize = 35.sp,
-                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                    )
+            if (mainViewModel.isInternetConnected(context)) {
+                Column(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth()
+                ) {
+                    Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                        Text(
+                            modifier = Modifier.padding(top = 8.dp),
+                            text = "§",
+                            fontSize = 25.sp,
+                            color = Color(android.graphics.Color.parseColor("#FFD600"))
+                        )
+                        Text(
+                            modifier = Modifier.padding(start = 5.dp),
+                            text = "Моя история",
+                            fontSize = 35.sp,
+                            color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                        )
+                    }
                 }
-            }
 
-            LazyRow() {
-
-                if (historyList != null) {
-                    items(historyList.itemCount) { index ->
-                        historyList[index]?.let {
-                            ListRow(model = it, navController)
+                LazyRow() {
+                    if (historyList != null) {
+                        items(historyList.itemCount) { index ->
+                            historyList[index]?.let {
+                                ListRow(model = it, navController)
+                            }
                         }
                     }
                 }
             }
 
-            //Отложенные
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-            ) {
-                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
-                    Text(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = "§",
-                        fontSize = 25.sp,
-                        color = Color(android.graphics.Color.parseColor("#FFD600"))
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = "Мои отложенные",
-                        fontSize = 35.sp,
-                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                    )
+            if (mainViewModel.isInternetConnected(context)) {
+                //Отложенные
+                Column(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth()
+                ) {
+                    Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                        Text(
+                            modifier = Modifier.padding(top = 8.dp),
+                            text = "§",
+                            fontSize = 25.sp,
+                            color = Color(android.graphics.Color.parseColor("#FFD600"))
+                        )
+                        Text(
+                            modifier = Modifier.padding(start = 5.dp),
+                            text = "Мои отложенные",
+                            fontSize = 35.sp,
+                            color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                        )
 
+                    }
                 }
-            }
 
-            LazyRow() {
-                items(newItems.itemCount) { index ->
-                    newItems[index]?.let { ListRow(model = it, navController) }
+                LazyRow() {
+                    items(newItems.itemCount) { index ->
+                        newItems[index]?.let { ListRow(model = it, navController) }
+                    }
                 }
+
             }
 
             Column(
@@ -266,63 +295,28 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
 
                 }
             }
-
-            //Популярное аудио
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-            ) {
-                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
-                    Text(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = "§",
-                        fontSize = 25.sp,
-                        color = Color(android.graphics.Color.parseColor("#FFD600"))
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = "Мои плейлисты",
-                        fontSize = 35.sp,
-                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                    )
-                }
-            }
-
-            @Composable
-            fun BottomNavigationBar() {
-                val items = listOf(
-                    NavigationItem.Home,
-                    NavigationItem.Catalog,
-                    NavigationItem.Search,
-                    NavigationItem.CatalogItems,
-                    NavigationItem.Profile
-                )
-                NavigationBar(
-                    contentColor = androidx.compose.ui.graphics.Color.White
+            if (mainViewModel.isInternetConnected(context)) {
+                //Популярное аудио
+                Column(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth()
                 ) {
-                    items.forEach { item ->
-                        NavigationBarItem(
-                            icon = {
-                                Icon(
-                                    painterResource(id = item.icon),
-                                    contentDescription = item.title
-                                )
-                            },
-                            label = { Text(text = item.title) },
-                            alwaysShowLabel = false,
-                            selected = false,
-                            onClick = {
-                                /* Add code later */
-                            }
+                    Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                        Text(
+                            modifier = Modifier.padding(top = 8.dp),
+                            text = "§",
+                            fontSize = 25.sp,
+                            color = Color(android.graphics.Color.parseColor("#FFD600"))
+                        )
+                        Text(
+                            modifier = Modifier.padding(start = 5.dp),
+                            text = "Мои плейлисты",
+                            fontSize = 35.sp,
+                            color = Color(android.graphics.Color.parseColor("#2F2F2F"))
                         )
                     }
                 }
-            }
-
-            @Composable
-            fun BottomNavigationBarPreview() {
-                BottomNavigationBar()
             }
         }
     }

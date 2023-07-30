@@ -99,7 +99,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-    private fun  initController() {
+    private fun initController() {
         val currentPlaylistFromDB =
             AppDatabase.getInstance(applicationContext).mainPlaylistDao().findByName("Main")
         playerController.addMediaItems(currentPlaylistFromDB.playlistJson)
@@ -121,7 +121,11 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        if (ContextCompat.checkSelfPermission(this, POST_NOTIFICATIONS) == PackageManager.PERMISSION_DENIED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_DENIED
+        ) {
             ActivityCompat.requestPermissions(this, arrayOf(POST_NOTIFICATIONS), 1);
         }
     }
@@ -170,7 +174,7 @@ class MainActivity : ComponentActivity() {
         //Мое, если все ок, то сплэш
         startDestination = if (getIntent().getStringExtra("player") == "true") {
             NavigationItem.QuickSplash.route
-        } else if (!mainViewModel.isInternetConnected(this)){
+        } else if (!mainViewModel.isInternetConnected(this)) {
             NavigationItem.Profile.route
         } else {
             NavigationItem.Splash.route
@@ -287,13 +291,20 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun BottomNavigationBar(navController: NavController) {
-        val items = listOf(
-            NavigationItem.Home,
-            NavigationItem.Catalog,
-            NavigationItem.Profile,
-            NavigationItem.Search,
-            NavigationItem.Fund
-        )
+        var items = listOf<NavigationItem>()
+        if (mainViewModel.isInternetConnected(this)) {
+            items = listOf(
+                NavigationItem.Home,
+                NavigationItem.Catalog,
+                NavigationItem.Profile,
+                NavigationItem.Search,
+                NavigationItem.Fund
+            )
+        } else {
+            items = listOf(
+                NavigationItem.Profile,
+            )
+        }
         NavigationBar(
             contentColor = Color.White, containerColor = Color.White
         ) {

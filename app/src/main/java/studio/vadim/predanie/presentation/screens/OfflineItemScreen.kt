@@ -193,38 +193,6 @@ fun  OfflineItemScreen(
                                     tint = Color.Black.copy(alpha = 0.5f),
                                 )
                             }
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(10.dp),
-                                horizontalArrangement = Arrangement.SpaceAround
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.share),
-                                    contentDescription = "Play",
-                                    modifier = Modifier.size(20.dp),
-                                    tint = Color.Black.copy(alpha = 0.5f),
-                                )
-                                Icon(
-                                    painter = painterResource(R.drawable.playlist_add),
-                                    contentDescription = "Play",
-                                    modifier = Modifier.size(20.dp),
-                                    tint = Color.Black.copy(alpha = 0.5f),
-                                )
-                                Icon(
-                                    painter = painterResource(R.drawable.bookmark),
-                                    contentDescription = "Play",
-                                    modifier = Modifier.size(20.dp),
-                                    tint = Color.Black.copy(alpha = 0.5f),
-                                )
-                                Icon(
-                                    painter = painterResource(R.drawable.dots),
-                                    contentDescription = "Play",
-                                    modifier = Modifier.size(20.dp),
-                                    tint = Color.Black.copy(alpha = 0.5f),
-                                )
-                            }
                         }
 
                         var globalItemCount = -1
@@ -234,7 +202,7 @@ fun  OfflineItemScreen(
                         val rows = mutableListOf<Tracks>()
 
                         for (item in playerList) {
-                            rows.add(Tracks(id = item.mediaId, name = item.mediaMetadata.title.toString()))
+                            rows.add(Tracks(id = item.mediaId, name = item.mediaMetadata.title.toString(), url = item.playbackProperties?.uri.toString()))
                             counter += 1
                             globalItemCount++
                             partCount++

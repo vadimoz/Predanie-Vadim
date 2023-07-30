@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
@@ -241,15 +242,6 @@ fun AccordionRow(
                     uiState.playerController?.seekTo(globalItemIndex - partCount + index - 1, 0)
                 }
 
-                //Ставим композицию в историю и перезагружаем историю
-                mainViewModel.setCompositionToHistory(
-                    itemId,
-                    context = context,
-                    title = uiState.itemInto!!.data?.name.toString(),
-                    image = uiState.itemInto.data?.img_big.toString()
-                )
-                mainViewModel.loadHistoryCompositions(context)
-
                 navController.navigate("ProfileScreen/play")
             },
     ) {
@@ -267,35 +259,41 @@ fun AccordionRow(
             )
             Text(model.name.toString(), Modifier.weight(1f), color = Gray600)
 
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-            ) {
-                //style = bodyBold
+            if (model.time != null) {
+                val seconds: Int = model.time as Int
+                val S = seconds % 60
+                var H = seconds / 60
+                val M = H % 60
+                H = H / 60
 
-                if (model.time != null) {
-                    val seconds: Int = model.time as Int
-                    val S = seconds % 60
-                    var H = seconds / 60
-                    val M = H % 60
-                    H = H / 60
+                Text(
+                    text = "$H:$M:$S",
+                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
+                    color = Color.Black
+                )
+            }
 
-                    Text(
-                        text = "$H:$M:$S",
-                        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
-                        color = Color.Black
+            Row(modifier = Modifier.width(60.dp)) {
+
+                var isFavorite by remember {
+                    mutableStateOf(
+                        mainViewModel.isTrackFavorite(
+                            model.url.toString(),
+                            context
+                        )
                     )
                 }
+                val color =
+                    if (isFavorite) (Color(android.graphics.Color.parseColor("#FFD600"))) else (Color(
+                        android.graphics.Color.parseColor("#000000")
+                    ))
 
-                var isFavorite by remember { mutableStateOf(mainViewModel.isTrackFavorite(model.url.toString(), context)) }
-                val color = if (isFavorite) (Color(android.graphics.Color.parseColor("#FFD600"))) else (Color(android.graphics.Color.parseColor("#000000")))
-
-                if(!isFavorite) {
+                if (!isFavorite) {
                     Icon(
                         painter = painterResource(R.drawable.bookmark),
                         contentDescription = "Fav",
                         modifier = Modifier
-                            .size(24.dp)
+                            .size(30.dp)
                             .clickable {
                                 mainViewModel.setTrackToFavorites(
                                     itemId = itemId, title = model.name.toString(),
@@ -311,7 +309,7 @@ fun AccordionRow(
                         painter = painterResource(R.drawable.bookmark),
                         contentDescription = "Fav",
                         modifier = Modifier
-                            .size(24.dp)
+                            .size(30.dp)
                             .clickable {
                                 mainViewModel.removeTrackFromFavorite(model.url.toString(), context)
                                 isFavorite = !isFavorite
@@ -321,66 +319,80 @@ fun AccordionRow(
                     )
                 }
 
-                var isDownloaded by remember { mutableStateOf(DownloadManagerSingleton.getInstance(
-                    context = context).downloadIndex.getDownload(
-                    "${itemId}_${model.url}"
-                )?.state == 3) }
+                var isDownloaded by remember {
+                    mutableStateOf(
+                        DownloadManagerSingleton.getInstance(
+                            context = context
+                        ).downloadIndex.getDownload(
+                            "${itemId}_${model.url}"
+                        )?.state == 3
+                    )
+                }
 
-                val downloadColor = if (isDownloaded) (Color(android.graphics.Color.parseColor("#FFD600"))) else (Color(android.graphics.Color.parseColor("#000000")))
+                if(mainViewModel.isInternetConnected(context)) {
+                    val downloadColor =
+                        if (isDownloaded) (Color(android.graphics.Color.parseColor("#FFD600"))) else (Color(
+                            android.graphics.Color.parseColor("#000000")
+                        ))
 
-                if (!isDownloaded) {
-                    Icon(
-                        painter = painterResource(R.drawable.double_arrow),
-                        contentDescription = "Fav",
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clickable {
-                                val downloadRequest = DownloadRequest
-                                    .Builder(
-                                        "${itemId}_${model.url.toString()}",
-                                        Uri.parse(model.url)
+                    if (!isDownloaded) {
+                        Icon(
+                            painter = painterResource(R.drawable.double_arrow),
+                            contentDescription = "Fav",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clickable {
+                                    val downloadRequest = DownloadRequest
+                                        .Builder(
+                                            "${itemId}_${model.url.toString()}",
+                                            Uri.parse(model.url)
+                                        )
+                                        .build()
+
+                                    DownloadService.sendAddDownload(
+                                        context,
+                                        PredanieDownloadService::class.java,
+                                        downloadRequest,
+                                        /* foreground = */ false
                                     )
-                                    .build()
-
-                                DownloadService.sendAddDownload(
-                                    context,
-                                    PredanieDownloadService::class.java,
-                                    downloadRequest,
-                                    /* foreground = */ false
-                                )
-                                mainViewModel.loadDownloadedCompositions(context)
-                                isDownloaded = !isDownloaded
-                                Toast.makeText(
-                                    context, "Загружается",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                            .fillMaxWidth(),
-                        tint = downloadColor
-                    )
-                } else {
-                    Icon(
-                        painter = painterResource(R.drawable.double_arrow),
-                        contentDescription = "Fav",
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clickable {
-                                DownloadService.sendRemoveDownload(
-                                    context,
-                                    PredanieDownloadService::class.java,
-                                    "${itemId}_${model.url}",
-                                    /* foreground = */ false
-                                )
-                                mainViewModel.loadDownloadedCompositions(context)
-                                isDownloaded = !isDownloaded
-                                Toast.makeText(
-                                    context, "Удалено из загрузок",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                            .fillMaxWidth(),
-                        tint = downloadColor
-                    )
+                                    mainViewModel.loadDownloadedCompositions(context)
+                                    isDownloaded = !isDownloaded
+                                    Toast
+                                        .makeText(
+                                            context, "Загружается",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                }
+                                .fillMaxWidth(),
+                            tint = downloadColor
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(R.drawable.double_arrow),
+                            contentDescription = "Fav",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clickable {
+                                    DownloadService.sendRemoveDownload(
+                                        context,
+                                        PredanieDownloadService::class.java,
+                                        "${itemId}_${model.url}",
+                                        /* foreground = */ false
+                                    )
+                                    mainViewModel.loadDownloadedCompositions(context)
+                                    isDownloaded = !isDownloaded
+                                    Toast
+                                        .makeText(
+                                            context, "Удалено из загрузок",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                }
+                                .fillMaxWidth(),
+                            tint = downloadColor
+                        )
+                    }
                 }
             }
         }

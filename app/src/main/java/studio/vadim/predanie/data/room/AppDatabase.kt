@@ -9,7 +9,7 @@ import androidx.room.TypeConverters
 
 @UnstableApi
 @Database(entities = [MainPlaylist::class, FilePosition::class, DownloadedCompositions::class, HistoryCompositions::class,
-                     FavoriteTracks::class, FavoriteCompositions::class, FavoriteAuthors::class], version = 40)
+                     FavoriteTracks::class, FavoriteCompositions::class, FavoriteAuthors::class], version = 44)
 @TypeConverters(Converters::class)
 
 abstract class AppDatabase : RoomDatabase() {

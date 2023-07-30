@@ -89,6 +89,16 @@ fun ItemScreen(
 
     val isFavorite = mainViewModel.isCompositionFavorite(itemId.toString(), context)
 
+    //Ставим композицию в историю и перезагружаем историю
+    if (itemId != null) {
+        mainViewModel.setCompositionToHistory(
+            itemId,
+            context = context,
+            title = uiState.itemInto!!.data?.name.toString(),
+            image = uiState.itemInto!!.data?.img_big.toString()
+        )
+    }
+
     val ptsans = FontFamily(
         Font(R.raw.ptsans),
     )
@@ -96,6 +106,7 @@ fun ItemScreen(
     DisposableEffect(itemId) {
         onDispose {
             mainViewModel.cleanItemState()
+            mainViewModel.loadHistoryCompositions(context)
         }
     }
 
@@ -219,15 +230,6 @@ fun ItemScreen(
                                             playerList =
                                                 mainViewModel.prepareCompositionForPlayer(uiState.itemInto?.data!!)
                                             uiState.playerController?.setMediaItems(playerList)
-
-                                            //Ставим композицию в историю
-                                            mainViewModel.setCompositionToHistory(
-                                                itemId,
-                                                context = context,
-                                                title = uiState.itemInto!!.data?.name.toString(),
-                                                image = uiState.itemInto!!.data?.img_big.toString()
-                                            )
-                                            mainViewModel.loadHistoryCompositions(context)
 
                                             navController.navigate("ProfileScreen/play")
                                         },
