@@ -37,6 +37,7 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val audioPopularList = uiState.audioPopularList.collectAsLazyPagingItems()
     val musicPopularList = uiState.musicPopularList.collectAsLazyPagingItems()
     val favoritesList = uiState.favoritesList.collectAsLazyPagingItems()
+    val specialList = uiState.special?.collectAsLazyPagingItems()
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -167,6 +168,38 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
             LazyRow() {
                 items(musicPopularList.itemCount) { index ->
                     musicPopularList[index]?.let { ListRow(model = it, navController) }
+                }
+            }
+
+            //Спецпроект - видео
+            Column(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)
+                ) {
+                    Text(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = "§",
+                        fontSize = 25.sp,
+                        color = Color(android.graphics.Color.parseColor("#FFD600"))
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 5.dp),
+                        text = "Спецвидеопроект / Библиовидео",
+                        fontSize = 35.sp,
+                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                    )
+
+                }
+            }
+            LazyRow() {
+                if (specialList != null) {
+                    items(specialList.itemCount) { index ->
+                        specialList[index]?.let { ListRow(model = it, navController, mainViewModel = mainViewModel) }
+                    }
                 }
             }
 

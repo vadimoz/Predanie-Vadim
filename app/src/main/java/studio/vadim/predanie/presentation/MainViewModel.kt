@@ -15,19 +15,16 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.session.MediaController
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.room.Room
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import studio.vadim.predanie.data.room.AppDatabase
-import studio.vadim.predanie.data.room.DownloadedCompositions
 import studio.vadim.predanie.data.room.FavoriteAuthors
 import studio.vadim.predanie.data.room.FavoriteCompositions
 import studio.vadim.predanie.data.room.FavoriteTracks
@@ -38,6 +35,13 @@ import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
 import studio.vadim.predanie.domain.usecases.showItems.GetItems
 import studio.vadim.predanie.domain.usecases.showLists.GetLists
+import studio.vadim.predanie.presentation.pagination.CompositionsPagingSource
+import studio.vadim.predanie.presentation.pagination.DownloadsPagingSource
+import studio.vadim.predanie.presentation.pagination.FavAuthorsPagingSource
+import studio.vadim.predanie.presentation.pagination.FavCompositionsPagingSource
+import studio.vadim.predanie.presentation.pagination.FavTracksPagingSource
+import studio.vadim.predanie.presentation.pagination.HistoryPagingSource
+import studio.vadim.predanie.presentation.pagination.SpecialPagingSource
 
 
 class MainViewModel(
@@ -63,10 +67,16 @@ class MainViewModel(
         CompositionsPagingSource(apiLists, "favorites", 0)
     }.flow.cachedIn(viewModelScope)
 
+    val special = Pager(PagingConfig(pageSize = 15)) {
+        SpecialPagingSource(apiLists, "special")
+    }.flow.cachedIn(viewModelScope)
+
+
     private val _uiState = MutableStateFlow(
         UIState(
             newList, audioPopularList = audioPopularList,
-            musicPopularList = musicPopularList, favoritesList = favoritesList
+            musicPopularList = musicPopularList, favoritesList = favoritesList,
+            special = special
         )
     )
 
@@ -79,6 +89,8 @@ class MainViewModel(
                     catalogList = apiLists.getCatalogList(),
                 )
             }
+
+            Log.d("special", uiState.value.special.toString())
         }
     }
 
@@ -201,6 +213,8 @@ class MainViewModel(
                         )
                         .build()
                 )
+
+
             }
         }
 

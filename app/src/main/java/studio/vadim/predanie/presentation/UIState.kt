@@ -10,9 +10,12 @@ import studio.vadim.predanie.data.room.FavoriteTracks
 import studio.vadim.predanie.data.room.HistoryCompositions
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
+import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.domain.models.api.lists.Compositions
 import studio.vadim.predanie.domain.models.api.lists.ResponseCatalogModel
 import studio.vadim.predanie.domain.models.api.lists.ResponseGlobalSearchListModel
+import studio.vadim.predanie.domain.models.api.lists.ResponseVideoListModel
+import studio.vadim.predanie.domain.models.api.lists.VideoData
 
 data class UIState(
     val newList: Flow<PagingData<Compositions>>,
@@ -31,4 +34,5 @@ data class UIState(
     val favTracksList: Flow<PagingData<FavoriteTracks>>? = null,
     val favAuthorsList: Flow<PagingData<FavoriteAuthors>>? = null,
     val favCompositionsList: Flow<PagingData<FavoriteCompositions>>? = null,
+    val special: Flow<PagingData<VideoData>>? = null,
 )

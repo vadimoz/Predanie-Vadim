@@ -1,4 +1,4 @@
-package studio.vadim.predanie.presentation
+package studio.vadim.predanie.presentation.pagination
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState

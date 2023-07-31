@@ -113,6 +113,7 @@ class MainActivity : ComponentActivity() {
         mainViewModel.initAppDb(applicationContext)
         mainViewModel.loadDownloadedCompositions(this)
         mainViewModel.loadHistoryCompositions(this)
+        mainViewModel.loadFavorites(this)
 
         initSize()
         setContent {

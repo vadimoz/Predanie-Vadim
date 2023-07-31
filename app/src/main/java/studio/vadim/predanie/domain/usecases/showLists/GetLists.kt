@@ -3,9 +3,11 @@ package studio.vadim.predanie.domain.usecases.showLists
 import studio.vadim.predanie.domain.models.api.lists.RequestListModel
 import studio.vadim.predanie.domain.models.api.lists.ResponseItemsListModel
 import studio.vadim.predanie.domain.ApiConnection
+import studio.vadim.predanie.domain.models.api.lists.RequestVideoListModel
 import studio.vadim.predanie.domain.models.api.lists.ResponseAuthorsListModel
 import studio.vadim.predanie.domain.models.api.lists.ResponseCatalogModel
 import studio.vadim.predanie.domain.models.api.lists.ResponseGlobalSearchListModel
+import studio.vadim.predanie.domain.models.api.lists.ResponseVideoListModel
 
 class GetLists(private val api: ApiConnection) {
     suspend fun getListNew(type: String, offset: Int = 0, limit: Int = 40): ResponseItemsListModel {
@@ -39,5 +41,10 @@ class GetLists(private val api: ApiConnection) {
     suspend fun getCatalogList(): ResponseCatalogModel {
         val params = RequestListModel(route = "predanie.ru/api/mobile/v1/catalog/")
         return api.getCatalogList(params)
+    }
+
+    suspend fun getVideoList(): ResponseVideoListModel {
+        val params = RequestVideoListModel(route = "nasledie-college.ru:1337/uploads/predanie/strapi.json")
+        return api.getVideoList(params)
     }
 }

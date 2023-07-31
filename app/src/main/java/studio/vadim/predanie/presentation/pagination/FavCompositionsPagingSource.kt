@@ -1,13 +1,10 @@
-package studio.vadim.predanie.presentation
+package studio.vadim.predanie.presentation.pagination
 
 import android.content.Context
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import studio.vadim.predanie.data.room.AppDatabase
-import studio.vadim.predanie.data.room.FavoriteAuthors
 import studio.vadim.predanie.data.room.FavoriteCompositions
-import studio.vadim.predanie.data.room.FavoriteTracks
-import studio.vadim.predanie.data.room.HistoryCompositions
 
 class FavCompositionsPagingSource(
     val type: String,

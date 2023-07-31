@@ -264,8 +264,8 @@ fun ItemScreen(
                                             .clickable {
                                                 mainViewModel.setCompositionToFavorites(
                                                     itemId = itemId,
-                                                    uiState.authorInto.data?.name.toString(),
-                                                    image = uiState.authorInto.data?.img.toString(),
+                                                    uiState.itemInto!!.data?.name.toString(),
+                                                    image = uiState.itemInto!!.data?.img_big.toString(),
                                                     context = context
                                                 )
                                                 mainViewModel.loadFavorites(context = context)

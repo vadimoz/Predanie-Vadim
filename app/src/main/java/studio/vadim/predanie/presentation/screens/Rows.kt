@@ -1,5 +1,6 @@
 package studio.vadim.predanie.presentation.screens
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,6 +17,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -24,17 +28,202 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.slaviboy.composeunits.dh
 import studio.vadim.predanie.data.room.DownloadedCompositions
+import studio.vadim.predanie.data.room.FavoriteAuthors
+import studio.vadim.predanie.data.room.FavoriteCompositions
+import studio.vadim.predanie.data.room.FavoriteTracks
 import studio.vadim.predanie.data.room.HistoryCompositions
 import studio.vadim.predanie.domain.models.api.items.AuthorCompositions
 import studio.vadim.predanie.domain.models.api.lists.Categories
 import studio.vadim.predanie.domain.models.api.lists.Compositions
 import studio.vadim.predanie.domain.models.api.lists.Entities
+import studio.vadim.predanie.domain.models.api.lists.VideoData
+import studio.vadim.predanie.presentation.MainViewModel
+
+@Composable
+fun ListRow(model: VideoData, navController: NavHostController, mainViewModel: MainViewModel) {
+    val uiState by mainViewModel.uiState.collectAsState()
+
+    Column(
+        modifier = Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .width(0.13.dh)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(model.attributes?.image)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .build(),
+            contentDescription = null,
+            modifier = Modifier
+                .clickable {
+                    val mediaItems = arrayListOf<MediaItem>()
+
+                    mediaItems.add(
+                        MediaItem.Builder()
+                            .setUri(model.attributes?.url)
+                            .setMediaId(model.attributes?.url.toString())
+                            .setMediaMetadata(
+                                MediaMetadata.Builder()
+                                    .setArtworkUri(Uri.parse(model.attributes?.image ?: ""))
+                                    .setTitle(model.attributes?.title)
+                                    .setDisplayTitle(model.attributes?.title)
+                                    .build()
+                            )
+                            .build()
+                    )
+                    uiState.playerController?.removeMediaItems(0, 100000)
+                    uiState.playerController?.addMediaItems(mediaItems)
+                    uiState.playerController?.prepare()
+                    uiState.playerController?.play()
+
+                    navController.navigate("ProfileScreen/play")
+                }
+                .fillMaxWidth()
+                .size(0.13.dh),
+            contentScale = ContentScale.Crop
+        )
+        Text(
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("ProfileScreen/play")
+                }
+                .padding(5.dp),
+
+            lineHeight = 22.sp,
+            text = model.attributes?.title.toString()
+        )
+    }
+}
+
+@Composable
+fun ListRow(model: FavoriteAuthors, navController: NavHostController) {
+    Column(
+        modifier = Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .width(0.13.dh)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(model.image)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .build(),
+            contentDescription = null,
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("AuthorScreen/${model.uid}")
+                }
+                .fillMaxWidth()
+                .size(0.13.dh)
+                .clip(CircleShape)
+                .border(2.dp, Color(0xFFFFD600), CircleShape),
+            contentScale = ContentScale.Crop
+        )
+        Text(
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("AuthorScreen/${model.uid}")
+                }
+                .padding(5.dp),
+
+            lineHeight = 22.sp,
+            text = model.title
+        )
+    }
+}
+
+@Composable
+fun ListRow(model: FavoriteCompositions, navController: NavHostController) {
+    Column(
+        modifier = Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .width(130.dp)
+            .height(300.dp)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(model.image)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .build(),
+            contentDescription = null,
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("ItemScreen/${model.uid}")
+                }
+                .size(190.dp)
+                .fillMaxWidth()
+                .padding(5.dp)
+                .clip(RoundedCornerShape(5.dp)),
+            contentScale = ContentScale.Crop
+        )
+        Text(
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("ItemScreen/${model.uid}")
+                }
+                .padding(5.dp),
+
+            lineHeight = 22.sp,
+            text = model.title
+        )
+    }
+}
+
+@Composable
+fun ListRow(model: FavoriteTracks, navController: NavHostController) {
+    Column(
+        modifier = Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .width(130.dp)
+            .height(300.dp)
+    ) {
+        /*AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(model.image)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .build(),
+            contentDescription = null,
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("ItemScreen/${model.uid}")
+                }
+                .size(190.dp)
+                .fillMaxWidth()
+                .padding(5.dp)
+                .clip(RoundedCornerShape(5.dp)),
+            contentScale = ContentScale.Crop
+        )*/
+        Text(
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("ItemScreen/${model.uid}")
+                    //Добавить сюда проигрывание файла (отложенный трэк)
+                }
+                .padding(5.dp),
+
+            lineHeight = 22.sp,
+            text = model.title
+        )
+    }
+}
+
 @Composable
 fun ListRow(model: HistoryCompositions, navController: NavHostController) {
     Column(

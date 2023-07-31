@@ -21,10 +21,12 @@ import studio.vadim.predanie.domain.models.api.items.RequestItemModel
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
 import studio.vadim.predanie.domain.models.api.lists.RequestListModel
+import studio.vadim.predanie.domain.models.api.lists.RequestVideoListModel
 import studio.vadim.predanie.domain.models.api.lists.ResponseAuthorsListModel
 import studio.vadim.predanie.domain.models.api.lists.ResponseCatalogModel
 import studio.vadim.predanie.domain.models.api.lists.ResponseGlobalSearchListModel
 import studio.vadim.predanie.domain.models.api.lists.ResponseItemsListModel
+import studio.vadim.predanie.domain.models.api.lists.ResponseVideoListModel
 
 class ApiImpl : ApiConnection {
     override suspend fun getAuthor(request: RequestAuthorModel): ResponseAuthorModel {
@@ -132,6 +134,22 @@ class ApiImpl : ApiConnection {
         }
     }
 
+    override suspend fun getVideoList(request: RequestVideoListModel): ResponseVideoListModel {
+        val client = createHttpClient()
+        while (true) {
+            try {
+                return client.get {
+                    url() {
+                        host = request.route
+                        protocol = URLProtocol.HTTP
+                    }
+                }.body()
+            } catch (e: Throwable) {
+                delay(10000L)
+            }
+        }
+    }
+
     override suspend fun getAuthorsList(request: RequestListModel): ResponseAuthorsListModel {
         val client = createHttpClient()
         while (true) {
@@ -158,17 +176,17 @@ class ApiImpl : ApiConnection {
     private fun createHttpClient(): HttpClient {
         return HttpClient(Android) {
             // Logging
-            /*install(Logging) {
+            install(Logging) {
                 level = LogLevel.ALL
-            }*/
+            }
             // JSON
             install(ContentNegotiation) {
                 gson()
             }
-            /*install(Logging) {
+            install(Logging) {
                 logger = Logger.DEFAULT
                 level = LogLevel.ALL
-            }*/
+            }
             // Timeout
             install(HttpTimeout) {
                 requestTimeoutMillis = 15000L
