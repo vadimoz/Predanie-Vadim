@@ -453,6 +453,7 @@ class MainViewModel(
                     image = image
                 )
             )
+            loadHistoryCompositions(context)
         }
     }
 }

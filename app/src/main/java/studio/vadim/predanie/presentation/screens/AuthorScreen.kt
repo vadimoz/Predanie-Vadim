@@ -258,7 +258,8 @@ fun AuthorScreen(
                             ) {
                                 ListRow(
                                     model = uiState.authorInto.data?.compositions!![it],
-                                    navController
+                                    navController,
+                                    mainViewModel
                                 )
                             }
                         }

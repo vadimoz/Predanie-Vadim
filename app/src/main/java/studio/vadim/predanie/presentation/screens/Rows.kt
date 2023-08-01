@@ -71,11 +71,13 @@ fun ListRow(model: VideoData, navController: NavHostController, mainViewModel: M
                     val mediaItems = arrayListOf<MediaItem>()
 
                     mediaItems.add(
-                        MediaItem.Builder()
+                        MediaItem
+                            .Builder()
                             .setUri(model.attributes?.url)
                             .setMediaId(model.attributes?.url.toString())
                             .setMediaMetadata(
-                                MediaMetadata.Builder()
+                                MediaMetadata
+                                    .Builder()
                                     .setArtworkUri(Uri.parse(model.attributes?.image ?: ""))
                                     .setTitle(model.attributes?.title)
                                     .setDisplayTitle(model.attributes?.title)
@@ -146,7 +148,13 @@ fun ListRow(model: FavoriteAuthors, navController: NavHostController) {
 }
 
 @Composable
-fun ListRow(model: FavoriteCompositions, navController: NavHostController) {
+fun ListRow(
+    model: FavoriteCompositions,
+    navController: NavHostController,
+    mainViewModel: MainViewModel
+) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .wrapContentHeight()
@@ -163,6 +171,14 @@ fun ListRow(model: FavoriteCompositions, navController: NavHostController) {
             contentDescription = null,
             modifier = Modifier
                 .clickable {
+                    //Ставим композицию в историю и перезагружаем историю
+                    mainViewModel.setCompositionToHistory(
+                        model.uid.toString(),
+                        context = context,
+                        title = model.title,
+                        image = model.image.toString()
+                    )
+
                     navController.navigate("ItemScreen/${model.uid}")
                 }
                 .size(190.dp)
@@ -264,7 +280,9 @@ fun ListRow(model: HistoryCompositions, navController: NavHostController) {
 }
 
 @Composable
-fun ListRow(model: DownloadedCompositions, navController: NavHostController) {
+fun ListRow(model: DownloadedCompositions, navController: NavHostController, mainViewModel: MainViewModel) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .wrapContentHeight()
@@ -281,6 +299,14 @@ fun ListRow(model: DownloadedCompositions, navController: NavHostController) {
             contentDescription = null,
             modifier = Modifier
                 .clickable {
+                    //Ставим композицию в историю и перезагружаем историю
+                    mainViewModel.setCompositionToHistory(
+                        model.uid.toString(),
+                        context = context,
+                        title = model.title,
+                        image = model.image.toString()
+                    )
+
                     navController.navigate("OfflineItemScreen/${model.uid}")
                 }
                 .size(190.dp)
@@ -301,8 +327,11 @@ fun ListRow(model: DownloadedCompositions, navController: NavHostController) {
         )
     }
 }
+
 @Composable
-fun ListRow(model: Compositions, navController: NavHostController) {
+fun ListRow(model: Compositions, navController: NavHostController, mainViewModel: MainViewModel) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .wrapContentHeight()
@@ -319,6 +348,14 @@ fun ListRow(model: Compositions, navController: NavHostController) {
             contentDescription = null,
             modifier = Modifier
                 .clickable {
+                    //Ставим композицию в историю и перезагружаем историю
+                    mainViewModel.setCompositionToHistory(
+                        model.id.toString(),
+                        context = context,
+                        title = model.name.toString(),
+                        image = model.img_s.toString()
+                    )
+
                     navController.navigate("ItemScreen/${model.id}")
                 }
                 .size(190.dp)
@@ -395,7 +432,9 @@ fun ListAuthorsRow(model: Entities, navController: NavHostController) {
 }
 
 @Composable
-fun ListRow(model: Entities, navController: NavHostController) {
+fun ListRow(model: Entities, navController: NavHostController, mainViewModel: MainViewModel) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .wrapContentHeight()
@@ -403,6 +442,14 @@ fun ListRow(model: Entities, navController: NavHostController) {
             .width(130.dp)
             .height(250.dp)
             .clickable {
+                //Ставим композицию в историю и перезагружаем историю
+                mainViewModel.setCompositionToHistory(
+                    model.id.toString(),
+                    context = context,
+                    title = model.name.toString(),
+                    image = model.img.toString()
+                )
+
                 navController.navigate("ItemScreen/${model.id}")
             }
     ) {
@@ -456,7 +503,9 @@ fun NonlazyGrid(
 }
 
 @Composable
-fun ListRow(model: AuthorCompositions, navController: NavHostController) {
+fun ListRow(model: AuthorCompositions, navController: NavHostController, mainViewModel: MainViewModel) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .wrapContentHeight()
@@ -473,6 +522,14 @@ fun ListRow(model: AuthorCompositions, navController: NavHostController) {
             contentDescription = null,
             modifier = Modifier
                 .clickable {
+                    //Ставим композицию в историю и перезагружаем историю
+                    mainViewModel.setCompositionToHistory(
+                        model.id.toString(),
+                        context = context,
+                        title = model.name.toString(),
+                        image = model.img_s.toString()
+                    )
+
                     navController.navigate("ItemScreen/${model.id}")
                 }
                 .size(190.dp)

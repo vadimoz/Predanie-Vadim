@@ -230,7 +230,7 @@ fun  ProfileScreen(mainViewModel: MainViewModel, navController: NavHostControlle
 
                 LazyRow() {
                     items(newItems.itemCount) { index ->
-                        newItems[index]?.let { ListRow(model = it, navController) }
+                        newItems[index]?.let { ListRow(model = it, navController, mainViewModel) }
                     }
                 }
 
@@ -261,7 +261,7 @@ fun  ProfileScreen(mainViewModel: MainViewModel, navController: NavHostControlle
                 if (downloadsList != null) {
                     items(downloadsList.itemCount) { index ->
                         downloadsList[index]?.let {
-                            ListRow(model = it, navController)
+                            ListRow(model = it, navController, mainViewModel)
                         }
                     }
                 }

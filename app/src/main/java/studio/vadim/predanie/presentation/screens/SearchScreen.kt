@@ -128,7 +128,8 @@ fun SearchScreen(
         ) {
             ListRow(
                 model = compositionsItems[it],
-                navController
+                navController,
+                mainViewModel
             )
         }
     }

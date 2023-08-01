@@ -72,7 +72,8 @@ fun CatalogItemsScreen(
                     catalogItemsList[it]?.let { it1 ->
                         ListRow(
                             model = it1,
-                            navController
+                            navController,
+                            mainViewModel
                         )
                     }
                 }

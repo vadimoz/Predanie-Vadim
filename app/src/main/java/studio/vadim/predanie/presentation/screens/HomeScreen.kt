@@ -81,7 +81,7 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
 
             LazyRow() {
                 items(newItems.itemCount) { index ->
-                    newItems[index]?.let { ListRow(model = it, navController) }
+                    newItems[index]?.let { ListRow(model = it, navController, mainViewModel) }
                 }
             }
 
@@ -109,7 +109,7 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
             }
             LazyRow() {
                 items(favoritesList.itemCount) { index ->
-                    favoritesList[index]?.let { ListRow(model = it, navController) }
+                    favoritesList[index]?.let { ListRow(model = it, navController, mainViewModel) }
                 }
             }
 
@@ -137,7 +137,7 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
             }
             LazyRow() {
                 items(audioPopularList.itemCount) { index ->
-                    audioPopularList[index]?.let { ListRow(model = it, navController) }
+                    audioPopularList[index]?.let { ListRow(model = it, navController, mainViewModel) }
                 }
             }
 
@@ -167,7 +167,7 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
             }
             LazyRow() {
                 items(musicPopularList.itemCount) { index ->
-                    musicPopularList[index]?.let { ListRow(model = it, navController) }
+                    musicPopularList[index]?.let { ListRow(model = it, navController, mainViewModel) }
                 }
             }
 
