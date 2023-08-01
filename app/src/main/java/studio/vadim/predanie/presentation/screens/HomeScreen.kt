@@ -188,7 +188,7 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                     )
                     Text(
                         modifier = Modifier.padding(start = 5.dp),
-                        text = "Спецвидеопроект / Библиовидео",
+                        text = "Библиовидео / спецпроект",
                         fontSize = 35.sp,
                         color = Color(android.graphics.Color.parseColor("#2F2F2F"))
                     )

@@ -102,6 +102,7 @@ class MainActivity : ComponentActivity() {
     private fun initController() {
         val currentPlaylistFromDB =
             AppDatabase.getInstance(applicationContext).mainPlaylistDao().findByName("Main")
+
         playerController.addMediaItems(currentPlaylistFromDB.playlistJson)
         playerController.prepare()
         playerController.pause()
@@ -280,14 +281,6 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun TopBar() {
-        TopAppBar(
-            title = { Text(text = stringResource(R.string.app_name), fontSize = 18.sp) },
-        )
     }
 
     @Composable

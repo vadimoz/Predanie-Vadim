@@ -15,7 +15,7 @@ class SpecialPagingSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, VideoData> {
         return try {
-            val nextOffset = params.key ?: 0
+            val nextOffset = 0
 
             val response = when (type) {
                 "special" -> api.getVideoList()
@@ -24,8 +24,8 @@ class SpecialPagingSource(
 
             LoadResult.Page(
                 data = response.data,
-                prevKey = if (nextOffset == 0) null else nextOffset.minus(15),
-                nextKey = if (response.data.isEmpty()) null else nextOffset.plus(15),
+                prevKey = null,
+                nextKey = null,
             )
         } catch (e: Exception) {
             LoadResult.Error(e)
