@@ -23,6 +23,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,7 +49,7 @@ import studio.vadim.predanie.presentation.playerService.playlistAccordion.Playli
 import studio.vadim.predanie.presentation.navigation.NavigationItem
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-@SuppressLint("ServiceCast")
+@SuppressLint("ServiceCast", "UnrememberedMutableState")
 @Composable
 fun  ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController, action: String?) {
     val context = LocalContext.current
@@ -58,7 +59,8 @@ fun  ProfileScreen(mainViewModel: MainViewModel, navController: NavHostControlle
     val historyList = uiState.historyList?.collectAsLazyPagingItems()
     val downloadsList = uiState.downloadsList?.collectAsLazyPagingItems()
     val special = uiState.special?.collectAsLazyPagingItems()
-    var currentPlaylistFromDB = AppDatabase.getInstance(context).mainPlaylistDao().findByName("Main")
+
+    val currentPlaylistFromDB = mutableStateOf(AppDatabase.getInstance(context).mainPlaylistDao().findByName("Main"))
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -66,11 +68,11 @@ fun  ProfileScreen(mainViewModel: MainViewModel, navController: NavHostControlle
     ) {
 
         LaunchedEffect(Unit) {
+            currentPlaylistFromDB.value = AppDatabase.getInstance(context).mainPlaylistDao().findByName("Main")
+
             if (action == "play") {
                 uiState.playerController?.play()
             }
-            
-            currentPlaylistFromDB = AppDatabase.getInstance(context).mainPlaylistDao().findByName("Main")
         }
 
         Column(
@@ -102,7 +104,7 @@ fun  ProfileScreen(mainViewModel: MainViewModel, navController: NavHostControlle
                 }
             }
 
-            if (currentPlaylistFromDB.playlistJson[0].mediaMetadata.title != "null") {
+            if (currentPlaylistFromDB.value.playlistJson[0].mediaMetadata.title != "null") {
                 Column(
                     Modifier
                         .fillMaxSize()
@@ -144,8 +146,7 @@ fun  ProfileScreen(mainViewModel: MainViewModel, navController: NavHostControlle
 
                         val rows = mutableListOf<MediaItem>()
 
-
-                        for (item in currentPlaylistFromDB.playlistJson) {
+                        for (item in currentPlaylistFromDB.value.playlistJson) {
                             rows.add(item)
                         }
 
@@ -160,11 +161,11 @@ fun  ProfileScreen(mainViewModel: MainViewModel, navController: NavHostControlle
                             modifier = Modifier.padding(top = 8.dp),
                             group = group,
                             exp = false,
-                            playerList = currentPlaylistFromDB.playlistJson,
+                            playerList = currentPlaylistFromDB.value.playlistJson,
                             navController = navController,
                             mainViewModel = mainViewModel,
-                            globalItemCount = currentPlaylistFromDB.playlistJson.count(),
-                            partCount = currentPlaylistFromDB.playlistJson.count()
+                            globalItemCount = currentPlaylistFromDB.value.playlistJson.count(),
+                            partCount = currentPlaylistFromDB.value.playlistJson.count()
                         )
                     }
                 }
