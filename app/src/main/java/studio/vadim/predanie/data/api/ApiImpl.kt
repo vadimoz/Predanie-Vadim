@@ -20,8 +20,10 @@ import studio.vadim.predanie.domain.models.api.items.RequestAuthorModel
 import studio.vadim.predanie.domain.models.api.items.RequestItemModel
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
+import studio.vadim.predanie.domain.models.api.lists.RequestBlogListModel
 import studio.vadim.predanie.domain.models.api.lists.RequestListModel
 import studio.vadim.predanie.domain.models.api.lists.RequestVideoListModel
+import studio.vadim.predanie.domain.models.api.lists.ResponceBlogListModel
 import studio.vadim.predanie.domain.models.api.lists.ResponseAuthorsListModel
 import studio.vadim.predanie.domain.models.api.lists.ResponseCatalogModel
 import studio.vadim.predanie.domain.models.api.lists.ResponseGlobalSearchListModel
@@ -142,6 +144,25 @@ class ApiImpl : ApiConnection {
                     url() {
                         host = request.route
                         protocol = URLProtocol.HTTP
+                    }
+                }.body()
+            } catch (e: Throwable) {
+                delay(10000L)
+            }
+        }
+    }
+
+    override suspend fun getBlogList(request: RequestBlogListModel): List<ResponceBlogListModel> {
+        val client = createHttpClient()
+        while (true) {
+            try {
+                return client.get {
+                    url() {
+                        host = request.route
+                        protocol = URLProtocol.HTTPS
+
+                        parameters.append("page", request.page)
+                        parameters.append("per_page", request.per_page)
                     }
                 }.body()
             } catch (e: Throwable) {

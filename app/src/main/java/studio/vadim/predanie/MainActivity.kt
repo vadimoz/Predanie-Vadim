@@ -5,6 +5,7 @@ import android.Manifest.permission.POST_NOTIFICATIONS
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.Network
@@ -154,7 +155,7 @@ class MainActivity : ComponentActivity() {
                 }
             },
             bottomBar = {
-                if (currentRoute(navController) != NavigationItem.Splash.route) {
+                if ((currentRoute(navController) != NavigationItem.Splash.route) && (currentRoute(navController) != NavigationItem.Player.route)) {
                     BottomNavigationBar(navController)
                 }
             },

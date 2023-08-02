@@ -1,9 +1,12 @@
 package studio.vadim.predanie.presentation.screens
 
+import android.content.Context
 import android.net.Uri
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,20 +18,25 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.navigation.NavHostController
@@ -37,6 +45,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.slaviboy.composeunits.dh
+import studio.vadim.predanie.R
 import studio.vadim.predanie.data.room.DownloadedCompositions
 import studio.vadim.predanie.data.room.FavoriteAuthors
 import studio.vadim.predanie.data.room.FavoriteCompositions
@@ -46,8 +55,32 @@ import studio.vadim.predanie.domain.models.api.items.AuthorCompositions
 import studio.vadim.predanie.domain.models.api.lists.Categories
 import studio.vadim.predanie.domain.models.api.lists.Compositions
 import studio.vadim.predanie.domain.models.api.lists.Entities
+import studio.vadim.predanie.domain.models.api.lists.ResponceBlogListModel
 import studio.vadim.predanie.domain.models.api.lists.VideoData
 import studio.vadim.predanie.presentation.MainViewModel
+
+@Composable
+fun ListRow(model: ResponceBlogListModel, navController: NavHostController, mainViewModel: MainViewModel) {
+    val uiState by mainViewModel.uiState.collectAsState()
+
+    Column(
+        modifier = Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .width(0.13.dh)
+    ) {
+        Text(
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("ProfileScreen/play")
+                }
+                .padding(5.dp),
+
+            lineHeight = 22.sp,
+            text = model.title.toString()
+        )
+    }
+}
 
 @Composable
 fun ListRow(model: VideoData, navController: NavHostController, mainViewModel: MainViewModel) {
@@ -109,8 +142,14 @@ fun ListRow(model: VideoData, navController: NavHostController, mainViewModel: M
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ListRow(model: FavoriteAuthors, navController: NavHostController) {
+fun ListRow(
+    model: FavoriteAuthors,
+    navController: NavHostController,
+    mainViewModel: MainViewModel
+) {
+
     Column(
         modifier = Modifier
             .wrapContentHeight()
@@ -125,9 +164,11 @@ fun ListRow(model: FavoriteAuthors, navController: NavHostController) {
                 .build(),
             contentDescription = null,
             modifier = Modifier
-                .clickable {
-                    navController.navigate("AuthorScreen/${model.uid}")
-                }
+                .combinedClickable(
+                    onClick = {
+                        navController.navigate("AuthorScreen/${model.uid}")
+                    }
+                )
                 .fillMaxWidth()
                 .size(0.13.dh)
                 .clip(CircleShape)
@@ -200,41 +241,100 @@ fun ListRow(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ListRow(model: FavoriteTracks, navController: NavHostController) {
+fun ListRow(model: FavoriteTracks, navController: NavHostController, mainViewModel: MainViewModel) {
+    val uiState by mainViewModel.uiState.collectAsState()
+
+    val context = LocalContext.current
+
+    val showDeleteDialog = remember { mutableStateOf(false) }
+    val deleteItem = remember { mutableStateOf("") }
+
+    if (showDeleteDialog.value) {
+        SimpleAlertDialog(showDeleteDialog, deleteItem, mainViewModel, context)
+    }
+
     Column(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
-            .width(130.dp)
-            .height(300.dp)
+            .width(120.dp)
+            .height(120.dp)
     ) {
-        /*AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(model.image)
-                .memoryCachePolicy(CachePolicy.ENABLED)
-                .diskCachePolicy(CachePolicy.ENABLED)
-                .build(),
-            contentDescription = null,
+        Icon(
+            painter = painterResource(R.drawable.audiofile),
+            contentDescription = "file",
             modifier = Modifier
-                .clickable {
-                    navController.navigate("ItemScreen/${model.uid}")
-                }
-                .size(190.dp)
-                .fillMaxWidth()
-                .padding(5.dp)
-                .clip(RoundedCornerShape(5.dp)),
-            contentScale = ContentScale.Crop
-        )*/
+                .size(50.dp)
+                .combinedClickable(
+                    onClick = {
+                        //Добавить сюда проигрывание файла (отложенный трэк)
+
+                        val mediaItems = arrayListOf<MediaItem>()
+
+                        mediaItems.add(
+                            MediaItem
+                                .Builder()
+                                .setUri(model.uri)
+                                .setMediaId(model.uid.toString())
+                                .setMediaMetadata(
+                                    MediaMetadata
+                                        .Builder()
+                                        .setTitle(model.title)
+                                        .setDisplayTitle(model.title)
+                                        .build()
+                                )
+                                .build()
+                        )
+                        uiState.playerController?.removeMediaItems(0, 100000)
+                        uiState.playerController?.addMediaItems(mediaItems)
+                        uiState.playerController?.prepare()
+                        uiState.playerController?.play()
+                    },
+                    onLongClick = {
+                        deleteItem.value = model.uri
+                        showDeleteDialog.value = true
+                    }
+                ),
+            tint = Color(android.graphics.Color.parseColor("#FFD600")),
+        )
         Text(
             modifier = Modifier
-                .clickable {
-                    navController.navigate("ItemScreen/${model.uid}")
-                    //Добавить сюда проигрывание файла (отложенный трэк)
-                }
+                .combinedClickable(
+                    onClick = {
+                        //Добавить сюда проигрывание файла (отложенный трэк)
+
+                        val mediaItems = arrayListOf<MediaItem>()
+
+                        mediaItems.add(
+                            MediaItem
+                                .Builder()
+                                .setUri(model.uri)
+                                .setMediaId(model.uid.toString())
+                                .setMediaMetadata(
+                                    MediaMetadata
+                                        .Builder()
+                                        .setTitle(model.title)
+                                        .setDisplayTitle(model.title)
+                                        .build()
+                                )
+                                .build()
+                        )
+                        uiState.playerController?.removeMediaItems(0, 100000)
+                        uiState.playerController?.addMediaItems(mediaItems)
+                        uiState.playerController?.prepare()
+                        uiState.playerController?.play()
+                    },
+                    onLongClick = {
+                        deleteItem.value = model.uri
+                        showDeleteDialog.value = true
+                    }
+                )
                 .padding(5.dp),
 
-            lineHeight = 22.sp,
+            lineHeight = 15.sp,
+            fontSize = 12.sp,
             text = model.title
         )
     }
@@ -280,7 +380,11 @@ fun ListRow(model: HistoryCompositions, navController: NavHostController) {
 }
 
 @Composable
-fun ListRow(model: DownloadedCompositions, navController: NavHostController, mainViewModel: MainViewModel) {
+fun ListRow(
+    model: DownloadedCompositions,
+    navController: NavHostController,
+    mainViewModel: MainViewModel
+) {
     val context = LocalContext.current
 
     Column(
@@ -503,7 +607,11 @@ fun NonlazyGrid(
 }
 
 @Composable
-fun ListRow(model: AuthorCompositions, navController: NavHostController, mainViewModel: MainViewModel) {
+fun ListRow(
+    model: AuthorCompositions,
+    navController: NavHostController,
+    mainViewModel: MainViewModel
+) {
     val context = LocalContext.current
 
     Column(
@@ -574,4 +682,31 @@ fun CatalogListRow(model: Categories) {
             )
         }
     }
+}
+
+@Composable
+fun SimpleAlertDialog(
+    showDeleteDialog: MutableState<Boolean>,
+    deleteItem: MutableState<String>,
+    mainViewModel: MainViewModel,
+    context: Context
+) {
+    AlertDialog(
+        onDismissRequest = {
+            showDeleteDialog.value = false
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                showDeleteDialog.value = false
+                mainViewModel.removeTrackFromFavorite(deleteItem.value, context = context)
+            })
+            { Text(text = "Удалить") }
+        },
+        dismissButton = {
+            TextButton(onClick = { showDeleteDialog.value = false })
+            { Text(text = "Отменить") }
+        },
+        title = { Text(text = "Удалить элемент?") },
+        text = { Text(text = "") }
+    )
 }

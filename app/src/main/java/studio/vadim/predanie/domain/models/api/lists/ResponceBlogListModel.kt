@@ -1,6 +1,6 @@
 package studio.vadim.predanie.domain.models.api.lists
 
-data class RequestBlogListModel(
+data class ResponceBlogListModel(
     var id            : Int?              = null,
     var date          : String?           = null,
     var dateGmt       : String?           = null,

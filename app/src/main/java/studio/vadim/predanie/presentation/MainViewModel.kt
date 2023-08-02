@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.exoplayer.offline.DownloadService
 import androidx.media3.session.MediaController
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -35,6 +36,8 @@ import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
 import studio.vadim.predanie.domain.usecases.showItems.GetItems
 import studio.vadim.predanie.domain.usecases.showLists.GetLists
+import studio.vadim.predanie.presentation.downloadService.PredanieDownloadService
+import studio.vadim.predanie.presentation.pagination.BlogPagingSource
 import studio.vadim.predanie.presentation.pagination.CompositionsPagingSource
 import studio.vadim.predanie.presentation.pagination.DownloadsPagingSource
 import studio.vadim.predanie.presentation.pagination.FavAuthorsPagingSource
@@ -71,12 +74,15 @@ class MainViewModel(
         SpecialPagingSource(apiLists, "special")
     }.flow.cachedIn(viewModelScope)
 
+    val blogList = Pager(PagingConfig(pageSize = 5)) {
+        BlogPagingSource(apiLists, "blog")
+    }.flow.cachedIn(viewModelScope)
 
     private val _uiState = MutableStateFlow(
         UIState(
             newList, audioPopularList = audioPopularList,
             musicPopularList = musicPopularList, favoritesList = favoritesList,
-            special = special
+            special = special, blogList = blogList
         )
     )
 
@@ -89,8 +95,6 @@ class MainViewModel(
                     catalogList = apiLists.getCatalogList(),
                 )
             }
-
-            Log.d("special", uiState.value.special.toString())
         }
     }
 
@@ -383,6 +387,7 @@ class MainViewModel(
                 context, "Файл добавлен в Избранное",
                 Toast.LENGTH_SHORT
             ).show()
+            loadFavorites(context)
         }
     }
 
@@ -399,6 +404,25 @@ class MainViewModel(
             context, "Удалено из Избранного",
             Toast.LENGTH_SHORT
         ).show()
+        loadFavorites(context)
+    }
+
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun removeAllDownloads(context: Context) {
+        DownloadService.sendRemoveAllDownloads(
+            context,
+            PredanieDownloadService::class.java,
+            /* foreground= */ false
+        )
+
+        AppDatabase.getInstance(context).downloadedCompositionsDao().removeAll()
+
+        Toast.makeText(
+            context, "Все загрузки удалены",
+            Toast.LENGTH_SHORT
+        ).show()
+        loadDownloadedCompositions(context)
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
@@ -414,6 +438,7 @@ class MainViewModel(
             context, "Удалено из Избранного",
             Toast.LENGTH_SHORT
         ).show()
+        loadFavorites(context)
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
@@ -429,6 +454,7 @@ class MainViewModel(
             context, "Удалено из Избранного",
             Toast.LENGTH_SHORT
         ).show()
+        loadFavorites(context)
     }
 
 

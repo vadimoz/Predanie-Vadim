@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -38,206 +39,240 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val musicPopularList = uiState.musicPopularList.collectAsLazyPagingItems()
     val favoritesList = uiState.favoritesList.collectAsLazyPagingItems()
     val specialList = uiState.special?.collectAsLazyPagingItems()
+    val blogList = uiState.blogList.collectAsLazyPagingItems()
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
 
-        /*Image(
-            painter = painterResource(id = R.drawable.bg_gradient),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.matchParentSize()
-        )*/
-
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-        ) {
-
-            //Новинки
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
+    LazyColumn() {
+        item {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
-                    Text(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = "§",
-                        fontSize = 25.sp,
-                        color = Color(android.graphics.Color.parseColor("#FFD600"))
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = "Новинки медиатеки",
-                        fontSize = 35.sp,
-                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                    )
 
-                }
-            }
+                /*Image(
+                    painter = painterResource(id = R.drawable.bg_gradient),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.matchParentSize()
+                )*/
 
-            LazyRow() {
-                items(newItems.itemCount) { index ->
-                    newItems[index]?.let { ListRow(model = it, navController, mainViewModel) }
-                }
-            }
-
-            //Рекомендуем
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-            ) {
-                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
-                    Text(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = "§",
-                        fontSize = 25.sp,
-                        color = Color(android.graphics.Color.parseColor("#FFD600"))
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = "Рекомендуем",
-                        fontSize = 35.sp,
-                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                    )
-
-                }
-            }
-            LazyRow() {
-                items(favoritesList.itemCount) { index ->
-                    favoritesList[index]?.let { ListRow(model = it, navController, mainViewModel) }
-                }
-            }
-
-            //Популярное аудио
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-            ) {
-                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
-                    Text(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = "§",
-                        fontSize = 25.sp,
-                        color = Color(android.graphics.Color.parseColor("#FFD600"))
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = "Популярные аудио",
-                        fontSize = 35.sp,
-                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                    )
-
-                }
-            }
-            LazyRow() {
-                items(audioPopularList.itemCount) { index ->
-                    audioPopularList[index]?.let { ListRow(model = it, navController, mainViewModel) }
-                }
-            }
-
-            //Популярная музыка
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)
+                Column(
+                    modifier = Modifier
                 ) {
-                    Text(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = "§",
-                        fontSize = 25.sp,
-                        color = Color(android.graphics.Color.parseColor("#FFD600"))
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = "Популярная музыка",
-                        fontSize = 35.sp,
-                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                    )
 
-                }
-            }
-            LazyRow() {
-                items(musicPopularList.itemCount) { index ->
-                    musicPopularList[index]?.let { ListRow(model = it, navController, mainViewModel) }
-                }
-            }
+                    //Новинки
+                    Column(
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .fillMaxWidth()
+                    ) {
+                        Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                            Text(
+                                modifier = Modifier.padding(top = 8.dp),
+                                text = "§",
+                                fontSize = 25.sp,
+                                color = Color(android.graphics.Color.parseColor("#FFD600"))
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 5.dp),
+                                text = "Новинки медиатеки",
+                                fontSize = 35.sp,
+                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                            )
 
-            //Спецпроект - видео
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)
-                ) {
-                    Text(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = "§",
-                        fontSize = 25.sp,
-                        color = Color(android.graphics.Color.parseColor("#FFD600"))
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = "Библиовидео / спецпроект",
-                        fontSize = 35.sp,
-                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                    )
-
-                }
-            }
-            LazyRow() {
-                if (specialList != null) {
-                    items(specialList.itemCount) { index ->
-                        specialList[index]?.let { ListRow(model = it, navController, mainViewModel = mainViewModel) }
+                        }
                     }
-                }
-            }
 
-            @Composable
-            fun BottomNavigationBar() {
-                val items = listOf(
-                    NavigationItem.Home,
-                    NavigationItem.Catalog,
-                    NavigationItem.Search,
-                    NavigationItem.CatalogItems,
-                    NavigationItem.Profile
-                )
-                NavigationBar(
-                    contentColor = Color.White
-                ) {
-                    items.forEach { item ->
-                        NavigationBarItem(
-                            icon = {
-                                Icon(
-                                    painterResource(id = item.icon),
-                                    contentDescription = item.title
-                                )
-                            },
-                            label = { Text(text = item.title) },
-                            alwaysShowLabel = false,
-                            selected = false,
-                            onClick = {
-                                /* Add code later */
+                    LazyRow() {
+                        items(newItems.itemCount) { index ->
+                            newItems[index]?.let { ListRow(model = it, navController, mainViewModel) }
+                        }
+                    }
+
+                    //Рекомендуем
+                    Column(
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .fillMaxWidth()
+                    ) {
+                        Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                            Text(
+                                modifier = Modifier.padding(top = 8.dp),
+                                text = "§",
+                                fontSize = 25.sp,
+                                color = Color(android.graphics.Color.parseColor("#FFD600"))
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 5.dp),
+                                text = "Рекомендуем",
+                                fontSize = 35.sp,
+                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                            )
+
+                        }
+                    }
+                    LazyRow() {
+                        items(favoritesList.itemCount) { index ->
+                            favoritesList[index]?.let { ListRow(model = it, navController, mainViewModel) }
+                        }
+                    }
+
+                    //Популярное аудио
+                    Column(
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .fillMaxWidth()
+                    ) {
+                        Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                            Text(
+                                modifier = Modifier.padding(top = 8.dp),
+                                text = "§",
+                                fontSize = 25.sp,
+                                color = Color(android.graphics.Color.parseColor("#FFD600"))
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 5.dp),
+                                text = "Популярные аудио",
+                                fontSize = 35.sp,
+                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                            )
+
+                        }
+                    }
+                    LazyRow() {
+                        items(audioPopularList.itemCount) { index ->
+                            audioPopularList[index]?.let { ListRow(model = it, navController, mainViewModel) }
+                        }
+                    }
+
+                    //Популярная музыка
+                    Column(
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(top = 8.dp),
+                                text = "§",
+                                fontSize = 25.sp,
+                                color = Color(android.graphics.Color.parseColor("#FFD600"))
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 5.dp),
+                                text = "Популярная музыка",
+                                fontSize = 35.sp,
+                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                            )
+
+                        }
+                    }
+                    LazyRow() {
+                        items(musicPopularList.itemCount) { index ->
+                            musicPopularList[index]?.let { ListRow(model = it, navController, mainViewModel) }
+                        }
+                    }
+
+                    //Спецпроект - видео
+                    Column(
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(top = 8.dp),
+                                text = "§",
+                                fontSize = 25.sp,
+                                color = Color(android.graphics.Color.parseColor("#FFD600"))
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 5.dp),
+                                text = "Библиовидео / спецпроект",
+                                fontSize = 35.sp,
+                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                            )
+
+                        }
+                    }
+                    LazyRow() {
+                        if (specialList != null) {
+                            items(specialList.itemCount) { index ->
+                                specialList[index]?.let { ListRow(model = it, navController, mainViewModel = mainViewModel) }
                             }
+                        }
+                    }
+
+                    //Блог
+                    Column(
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(top = 8.dp),
+                                text = "§",
+                                fontSize = 25.sp,
+                                color = Color(android.graphics.Color.parseColor("#FFD600"))
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 5.dp),
+                                text = "Живое Предание",
+                                fontSize = 35.sp,
+                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                            )
+
+                        }
+                    }
+
+                    @Composable
+                    fun BottomNavigationBar() {
+                        val items = listOf(
+                            NavigationItem.Home,
+                            NavigationItem.Catalog,
+                            NavigationItem.Search,
+                            NavigationItem.CatalogItems,
+                            NavigationItem.Profile
                         )
+                        NavigationBar(
+                            contentColor = Color.White
+                        ) {
+                            items.forEach { item ->
+                                NavigationBarItem(
+                                    icon = {
+                                        Icon(
+                                            painterResource(id = item.icon),
+                                            contentDescription = item.title
+                                        )
+                                    },
+                                    label = { Text(text = item.title) },
+                                    alwaysShowLabel = false,
+                                    selected = false,
+                                    onClick = {
+                                        /* Add code later */
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    @Composable
+                    fun BottomNavigationBarPreview() {
+                        BottomNavigationBar()
                     }
                 }
             }
+        }
 
-            @Composable
-            fun BottomNavigationBarPreview() {
-                BottomNavigationBar()
-            }
+        items(blogList.itemCount) { index ->
+            blogList[index]?.let { ListRow(model = it, navController, mainViewModel = mainViewModel) }
         }
     }
 }

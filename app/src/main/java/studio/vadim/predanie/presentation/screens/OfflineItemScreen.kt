@@ -59,6 +59,7 @@ import studio.vadim.predanie.R
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.presentation.MainViewModel
+import studio.vadim.predanie.presentation.navigation.NavigationItem
 import studio.vadim.predanie.presentation.screens.accordion.AccordionGroup
 import studio.vadim.predanie.presentation.screens.accordion.AccordionModel
 
@@ -89,6 +90,15 @@ fun  OfflineItemScreen(
     val uiState by mainViewModel.uiState.collectAsState()
 
     val composition = AppDatabase.getInstance(LocalContext.current).downloadedCompositionsDao().findById(itemId.toString())
+
+    //Уходим на главную, если в базе нет элемента
+    /*if(composition == null){
+        navController.navigate(NavigationItem.Home.route) {
+            popUpTo(NavigationItem.OfflineItem.route){
+                inclusive = true
+            }
+        }
+    }*/
 
     val playerList = composition.playlistJson
 

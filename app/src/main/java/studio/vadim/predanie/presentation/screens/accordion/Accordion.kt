@@ -337,7 +337,7 @@ fun AccordionRow(
 
                     if (!isDownloaded) {
                         Icon(
-                            painter = painterResource(R.drawable.double_arrow),
+                            painter = painterResource(R.drawable.download),
                             contentDescription = "Fav",
                             modifier = Modifier
                                 .size(30.dp)
@@ -369,7 +369,7 @@ fun AccordionRow(
                         )
                     } else {
                         Icon(
-                            painter = painterResource(R.drawable.double_arrow),
+                            painter = painterResource(R.drawable.download),
                             contentDescription = "Fav",
                             modifier = Modifier
                                 .size(30.dp)

@@ -18,4 +18,7 @@ interface DownloadedCompositionsDao {
 
     @Query("DELETE FROM DownloadedCompositions WHERE uid = :uid")
     fun deleteByComposition(uid: Int)
+
+    @Query("DELETE FROM DownloadedCompositions")
+    fun removeAll()
 }
