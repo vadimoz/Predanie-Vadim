@@ -18,8 +18,10 @@ import kotlinx.coroutines.delay
 import studio.vadim.predanie.domain.ApiConnection
 import studio.vadim.predanie.domain.models.api.items.RequestAuthorModel
 import studio.vadim.predanie.domain.models.api.items.RequestItemModel
+import studio.vadim.predanie.domain.models.api.items.RequestPostModel
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
+import studio.vadim.predanie.domain.models.api.items.ResponsePostModel
 import studio.vadim.predanie.domain.models.api.lists.RequestBlogListModel
 import studio.vadim.predanie.domain.models.api.lists.RequestListModel
 import studio.vadim.predanie.domain.models.api.lists.RequestVideoListModel
@@ -60,13 +62,30 @@ class ApiImpl : ApiConnection {
                     url() {
                         host = request.route
                         protocol = URLProtocol.HTTPS
-                        //TODO: Промапить RequestListModel
 
                         parameters.append("composition_id", request.compositionId.toString())
                     }
                 }.body()
             } catch (e: Throwable) {
-                //Log.d("getItem", e.message.toString())
+                delay(10000L)
+            }
+        }
+    }
+
+    override suspend fun getPost(request: RequestPostModel): ResponsePostModel {
+        val client = createHttpClient()
+
+        while (true) {
+            try {
+                return client.get {
+                    url() {
+                        host = "${request.route}/${request.postId}/"
+                        protocol = URLProtocol.HTTPS
+
+                        parameters.append("_embed", "true")
+                    }
+                }.body()
+            } catch (e: Throwable) {
                 delay(10000L)
             }
         }
@@ -74,6 +93,7 @@ class ApiImpl : ApiConnection {
 
     override suspend fun getCatalogList(request: RequestListModel): ResponseCatalogModel {
         val client = createHttpClient()
+
         while (true) {
             try {
                 return client.get {
@@ -163,6 +183,7 @@ class ApiImpl : ApiConnection {
 
                         parameters.append("page", request.page)
                         parameters.append("per_page", request.per_page)
+                        parameters.append("_embed", "true")
                     }
                 }.body()
             } catch (e: Throwable) {

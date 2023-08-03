@@ -10,6 +10,7 @@ import studio.vadim.predanie.data.room.FavoriteTracks
 import studio.vadim.predanie.data.room.HistoryCompositions
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
+import studio.vadim.predanie.domain.models.api.items.ResponsePostModel
 import studio.vadim.predanie.domain.models.api.lists.Compositions
 import studio.vadim.predanie.domain.models.api.lists.ResponceBlogListModel
 import studio.vadim.predanie.domain.models.api.lists.ResponseCatalogModel
@@ -27,6 +28,7 @@ data class UIState(
     var searchString: String = "",
     val searchList: ResponseGlobalSearchListModel = ResponseGlobalSearchListModel(),
     val itemInto: ResponseItemModel? = ResponseItemModel(),
+    val postInfo: ResponsePostModel? = null,
     val authorInto: ResponseAuthorModel = ResponseAuthorModel(),
     var catalogItemsList: Flow<PagingData<Compositions>>? = null,
     var playerController: MediaController? = null,

@@ -70,6 +70,7 @@ dependencies {
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
     implementation "io.ktor:ktor-client-core:2.2.4"
     implementation "io.ktor:ktor-client-android:2.2.4"
+    implementation "io.ktor:ktor-client-gson:2.2.4"
     implementation "io.ktor:ktor-client-serialization:2.2.4"
     implementation "io.ktor:ktor-client-logging:2.2.4"
     implementation 'com.google.code.gson:gson:2.10.1'
@@ -82,8 +83,8 @@ dependencies {
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.27.0"
     implementation "androidx.compose.material3:material3:1.1.1"
 
-    implementation "androidx.paging:paging-runtime:3.1.1"
-    implementation "androidx.paging:paging-compose:3.2.0-rc01"
+    implementation "androidx.paging:paging-runtime:3.2.0"
+    implementation "androidx.paging:paging-compose:3.2.0"
 
     implementation 'com.airbnb.android:lottie-compose:5.2.0'
     implementation "com.google.accompanist:accompanist-navigation-animation:0.25.1"
@@ -96,6 +97,7 @@ dependencies {
     implementation "androidx.media3:media3-exoplayer:1.1.0"
     implementation "androidx.media3:media3-exoplayer-dash:1.1.0"
     implementation "androidx.media3:media3-ui:1.1.0"
+    implementation 'com.github.ireward:compose-html:1.0.2'
     implementation 'androidx.media3:media3-session:1.1.0'
 
     implementation("androidx.room:room-runtime:2.5.2")

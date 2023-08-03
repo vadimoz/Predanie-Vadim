@@ -34,6 +34,7 @@ import studio.vadim.predanie.data.room.MainPlaylist
 import studio.vadim.predanie.domain.models.api.items.DataItem
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
+import studio.vadim.predanie.domain.models.api.items.ResponsePostModel
 import studio.vadim.predanie.domain.usecases.showItems.GetItems
 import studio.vadim.predanie.domain.usecases.showLists.GetLists
 import studio.vadim.predanie.presentation.downloadService.PredanieDownloadService
@@ -108,6 +109,17 @@ class MainViewModel(
         }
     }
 
+
+    fun getPostInfo(postId: String) {
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    postInfo = apiItems.getPost(postId),
+                )
+            }
+        }
+    }
+
     fun getAuthorInfo(id: Int) {
         viewModelScope.launch {
             _uiState.update { currentState ->
@@ -133,6 +145,16 @@ class MainViewModel(
             _uiState.update { currentState ->
                 currentState.copy(
                     itemInto = ResponseItemModel(),
+                )
+            }
+        }
+    }
+
+    fun cleanPostState() {
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    postInfo = null
                 )
             }
         }

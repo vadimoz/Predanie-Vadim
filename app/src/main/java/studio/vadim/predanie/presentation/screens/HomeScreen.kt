@@ -192,13 +192,18 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                             )
                             Text(
                                 modifier = Modifier.padding(start = 5.dp),
-                                text = "Библиовидео / спецпроект",
+                                text = "Спецпроект - видео",
                                 fontSize = 35.sp,
                                 color = Color(android.graphics.Color.parseColor("#2F2F2F"))
                             )
-
                         }
                     }
+                    Text(
+                        modifier = Modifier.padding(start = 5.dp),
+                        text = "Библейское обучение, совместный проект",
+                        fontSize = 15.sp,
+                        color = Color(android.graphics.Color.parseColor("#000000"))
+                    )
                     LazyRow() {
                         if (specialList != null) {
                             items(specialList.itemCount) { index ->
@@ -228,7 +233,6 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                 fontSize = 35.sp,
                                 color = Color(android.graphics.Color.parseColor("#2F2F2F"))
                             )
-
                         }
                     }
 

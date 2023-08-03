@@ -2,6 +2,8 @@ package studio.vadim.predanie.presentation.screens
 
 import android.content.Context
 import android.net.Uri
+import android.text.Html
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -59,6 +61,7 @@ import studio.vadim.predanie.domain.models.api.lists.ResponceBlogListModel
 import studio.vadim.predanie.domain.models.api.lists.VideoData
 import studio.vadim.predanie.presentation.MainViewModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListRow(model: ResponceBlogListModel, navController: NavHostController, mainViewModel: MainViewModel) {
     val uiState by mainViewModel.uiState.collectAsState()
@@ -67,17 +70,46 @@ fun ListRow(model: ResponceBlogListModel, navController: NavHostController, main
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
-            .width(0.13.dh)
+            .width(250.dp)
+            .padding(20.dp)
     ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(model.Embedded?.wp_featuredmedia?.get(0)?.source_url)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .build(),
+            contentDescription = null,
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("PostScreen/${model.id}")
+                }
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(10.dp))
+                .size(250.dp),
+            contentScale = ContentScale.Crop
+        )
         Text(
             modifier = Modifier
                 .clickable {
-                    navController.navigate("ProfileScreen/play")
+                    navController.navigate("PostScreen/${model.id}")
                 }
-                .padding(5.dp),
+                .padding(top = 10.dp),
 
-            lineHeight = 22.sp,
-            text = model.title.toString()
+            lineHeight = 33.sp,
+            fontSize = 28.sp,
+            text = model.title?.rendered.toString()
+        )
+        Text(
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("PostScreen/${model.id}")
+                }
+                .padding(top = 10.dp),
+
+            lineHeight = 20.sp,
+            fontSize = 15.sp,
+            text = Html.fromHtml(model.excerpt?.rendered.toString()).toString()
         )
     }
 }

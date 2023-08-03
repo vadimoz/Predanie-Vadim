@@ -13,8 +13,6 @@ class BlogPagingSource(
 ) : PagingSource<Int, ResponceBlogListModel>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ResponceBlogListModel> {
-
-        Log.d("loaderror2", "1")
         return try {
             val nextOffset = params.key ?: 1
 
@@ -25,7 +23,7 @@ class BlogPagingSource(
 
             LoadResult.Page(
                 data = response,
-                prevKey = if (nextOffset == 0) null else nextOffset.minus(1),
+                prevKey = if (nextOffset == 1) null else nextOffset.minus(1),
                 nextKey = if (response.isEmpty()) null else nextOffset.plus(1),
             )
         } catch (e: Exception) {
@@ -36,7 +34,6 @@ class BlogPagingSource(
 
     override fun getRefreshKey(state: PagingState<Int, ResponceBlogListModel>): Int? {
 
-        Log.d("loaderror2", "1")
         return state.anchorPosition?.let { anchorPosition ->
             state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
                 ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)

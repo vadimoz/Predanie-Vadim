@@ -63,6 +63,7 @@ import studio.vadim.predanie.presentation.screens.HomeScreen
 import studio.vadim.predanie.presentation.screens.ItemScreen
 import studio.vadim.predanie.presentation.screens.OfflineItemScreen
 import studio.vadim.predanie.presentation.screens.PlayerScreen
+import studio.vadim.predanie.presentation.screens.PostScreen
 import studio.vadim.predanie.presentation.screens.ProfileScreen
 import studio.vadim.predanie.presentation.screens.QuickScreen
 import studio.vadim.predanie.presentation.screens.SearchScreen
@@ -201,6 +202,12 @@ class MainActivity : ComponentActivity() {
                 }),
             ) {
                 PlayerScreen(mainViewModel = mainViewModel, navController)
+            }
+            composable(
+                NavigationItem.Post.route,
+            ) { navBackStackEntry ->
+                val postId = navBackStackEntry.arguments?.getString("postId")
+                PostScreen(mainViewModel = mainViewModel, navController, postId)
             }
             composable(
                 NavigationItem.Profile.route,
