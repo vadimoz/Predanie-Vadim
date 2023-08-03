@@ -1,16 +1,12 @@
 package studio.vadim.predanie.presentation.screens
 
 import android.annotation.SuppressLint
-import android.content.pm.ActivityInfo
-import android.text.Html
+import android.content.Intent
+import android.net.Uri
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -32,13 +27,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.media3.ui.PlayerView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import studio.vadim.predanie.presentation.MainViewModel
+
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -93,19 +88,30 @@ fun PostScreen(mainViewModel: MainViewModel, navController: NavHostController, p
             text = Html.fromHtml(uiState.postInfo?.content?.rendered.toString()).toString()
         )*/
 
-        val mUrl = "https://www.geeksforgeeks.org"
-
         AndroidView(factory = {
             WebView(it).apply {
                 layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
-                webViewClient = WebViewClient()
+                webViewClient = object :  WebViewClient(){
+                    @Deprecated("Deprecated in Java")
+                    override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                        if (url.contains(".")) {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                            view.getContext().startActivity(intent);
+                            return true
+                        }
+                        else{
+                            view.loadUrl(url)
+                        }
+                        return false
+                    }
+                }
             }
         }, update = {
             val htmlContent =
-                "<!DOCTYPE html> <html> <head> </head><meta name= viewport content= width=device-width  initial-scale=1.0 > <style>img{display: inline;height: auto;max-width: 100%;} video{display: inline;width: 100%;poster=} p{height: auto;width: 100%; font-size: 18px;font-family:serif;} iframe{width: 100%} </style> <body>   ${uiState.postInfo?.content?.rendered?.replace("\"","")} </body></html>"
+                "<!DOCTYPE html> <html> <head> </head><meta name= viewport content= width=device-width  initial-scale=1.0 > <style>a{color:black;} img{display: inline;height: auto;max-width: 100%;} video{display: inline;width: 100%;poster=} p{height: auto;width: 100%; font-size: 18px;font-family:serif;} iframe{width: 100%} </style> <body>   ${uiState.postInfo?.content?.rendered?.replace("\"","")} </body></html>"
 
             it.loadDataWithBaseURL(
                 null,
