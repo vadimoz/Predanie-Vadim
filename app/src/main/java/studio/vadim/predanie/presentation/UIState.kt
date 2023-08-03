@@ -37,4 +37,7 @@ data class UIState(
     val favAuthorsList: Flow<PagingData<FavoriteAuthors>>? = null,
     val favCompositionsList: Flow<PagingData<FavoriteCompositions>>? = null,
     val special: Flow<PagingData<VideoData>>? = null,
+    //settings
+    var goToNext: Boolean = true,
+    var percentToFileReady: Int = 95
 )

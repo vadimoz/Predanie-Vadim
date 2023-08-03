@@ -20,8 +20,16 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
@@ -34,6 +42,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -350,29 +359,8 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                 }
             }
 
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-            ) {
-                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
-                    Text(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = "§",
-                        fontSize = 25.sp,
-                        color = Color(android.graphics.Color.parseColor("#FFD600"))
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = "Мои настройки",
-                        fontSize = 35.sp,
-                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                    )
-
-                }
-            }
             if (mainViewModel.isInternetConnected(context)) {
-                //Популярное аудио
+                //Плейлисты
                 Column(
                     modifier = Modifier
                         .wrapContentHeight()
@@ -392,6 +380,81 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             color = Color(android.graphics.Color.parseColor("#2F2F2F"))
                         )
                     }
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+            ) {
+                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                    Text(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = "§",
+                        fontSize = 25.sp,
+                        color = Color(android.graphics.Color.parseColor("#FFD600"))
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 5.dp),
+                        text = "Мои настройки",
+                        fontSize = 35.sp,
+                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                    )
+                }
+
+                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                    Checkbox(
+                        checked = uiState.goToNext,
+                        onCheckedChange = {
+                            mainViewModel.setGoToNextSettings(it, context)
+                        }
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 5.dp),
+                        text = "Пропускать в плеере файлы, которые я уже слушал",
+                        fontSize = 20.sp,
+                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                    )
+                }
+
+                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+
+                    var expanded by remember { mutableStateOf(false) }
+                    Box {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "Показать меню")
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            DropdownMenuItem(onClick = {
+                                mainViewModel.setPercentToFileReady(90, context)
+                                expanded = false
+                            }, text = {
+                                Text("90%")
+                            })
+                            DropdownMenuItem(onClick = {
+                                mainViewModel.setPercentToFileReady(95, context)
+                                expanded = false
+                            }, text = {
+                                Text("95%")
+                            })
+                            DropdownMenuItem(onClick = {
+                                mainViewModel.setPercentToFileReady(100, context)
+                                expanded = false
+                            }, text = {
+                                Text("100%")
+                            })
+                        }
+                    }
+                    Text(
+                        modifier = Modifier.padding(start = 5.dp),
+                        text = "Помечать файл прослушанным по достижении ${uiState.percentToFileReady}%",
+                        fontSize = 20.sp,
+                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                    )
                 }
             }
         }

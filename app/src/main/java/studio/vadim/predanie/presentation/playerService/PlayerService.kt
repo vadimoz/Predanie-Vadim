@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
@@ -63,6 +64,8 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     private var playlistIndex: Int = 0
     private var currentPositionByFileId: String = ""
 
+    private lateinit var settingsPrefs: SharedPreferences
+
     private fun getDownloadDirectory(context: Context): File? {
         var downloadDirectory = context.getExternalFilesDir(null)
         if (downloadDirectory == null) {
@@ -74,6 +77,10 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     override fun onCreate() {
         super.onCreate()
+
+        settingsPrefs = this.getSharedPreferences(
+            "settings", Context.MODE_PRIVATE
+        )
 
         this.setMediaNotificationProvider(object : MediaNotification.Provider {
             override fun createNotification(
@@ -135,7 +142,7 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
                     )
 
                     //Будем пропускать файлы, которые уже прослушаны
-                    if (isFinished == true) {
+                    if (isFinished == true && settingsPrefs.getBoolean("goToNext", true)) {
                         player.seekToNextMediaItem()
                     }
                 }
@@ -150,7 +157,6 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
             }
 
             override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
-                Log.d("onPlaybackParametersChanged fired", "fired")
                 super.onPlaybackParametersChanged(playbackParameters)
             }
 
@@ -230,7 +236,9 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
             var isFinished = false
             var position = mInfo.currentPlaylistPosition
 
-            if (mInfo.currentPlaylistPosition > (mInfo.currentMediaItemDuration * 0.95)) {
+            val percent = settingsPrefs.getInt("percentToFileReady", 95).toFloat() / 100
+
+            if (mInfo.currentPlaylistPosition > (mInfo.currentMediaItemDuration * percent)) {
                 isFinished = true
                 position = 0
             }

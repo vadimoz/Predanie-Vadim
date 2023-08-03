@@ -1,6 +1,7 @@
 package studio.vadim.predanie.presentation
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
@@ -502,6 +503,54 @@ class MainViewModel(
                 )
             )
             loadHistoryCompositions(context)
+        }
+    }
+
+    fun loadSettingsFromStore(context: Context){
+        viewModelScope.launch {
+            val settingsPrefs: SharedPreferences = context.getSharedPreferences(
+                "settings", Context.MODE_PRIVATE
+            )
+            _uiState.update { currentState ->
+                currentState.copy(
+
+                    //Беру значения, если нет, то ставлю дефолтные
+                    goToNext = settingsPrefs.getBoolean("goToNext", true),
+                    percentToFileReady = settingsPrefs.getInt("percentToFileReady", 95)
+                )
+            }
+        }
+    }
+
+    fun setGoToNextSettings(it: Boolean, context: Context) {
+        viewModelScope.launch {
+            val settingsPrefs: SharedPreferences = context.getSharedPreferences(
+                "settings", Context.MODE_PRIVATE
+            )
+
+            settingsPrefs.edit().putBoolean("goToNext", it).apply()
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    goToNext = it,
+                )
+            }
+        }
+    }
+
+    fun setPercentToFileReady(i: Int, context: Context) {
+        viewModelScope.launch {
+            val settingsPrefs: SharedPreferences = context.getSharedPreferences(
+                "settings", Context.MODE_PRIVATE
+            )
+
+            settingsPrefs.edit().putInt("percentToFileReady", i).apply()
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    percentToFileReady = i,
+                )
+            }
         }
     }
 }
