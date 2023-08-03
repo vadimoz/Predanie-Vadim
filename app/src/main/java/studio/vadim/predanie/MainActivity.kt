@@ -3,17 +3,9 @@ package studio.vadim.predanie
 
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -26,16 +18,13 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.media3.session.MediaController
@@ -102,8 +91,7 @@ class MainActivity : ComponentActivity() {
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun initController() {
-        val currentPlaylistFromDB =
-            AppDatabase.getInstance(applicationContext).mainPlaylistDao().findByName("Main")
+        val currentPlaylistFromDB = mainViewModel.getPlaylistFromDB("Main", this)
 
         playerController.addMediaItems(currentPlaylistFromDB.playlistJson)
         playerController.prepare()
@@ -113,7 +101,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mainViewModel.initAppDb(applicationContext)
+        mainViewModel.initMainPlaylist(applicationContext)
         mainViewModel.loadDownloadedCompositions(this)
         mainViewModel.loadHistoryCompositions(this)
         mainViewModel.loadFavorites(this)

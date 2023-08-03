@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
@@ -58,6 +59,8 @@ fun PlaylistAccordionGroup(
     partCount: Int,
 ) {
     val uiState by mainViewModel.uiState.collectAsState()
+
+    val context = LocalContext.current
 
     Column(modifier = modifier) {
         group.forEach {
@@ -203,20 +206,25 @@ fun PlaylistAccordionRow(
     globalItemIndex: Int,
     partCount: Int
 ) {
-    val itemPosition = AppDatabase.getInstance(LocalContext.current).filePositionDao().getPositionByFileId(model.mediaId)?.position
+    val itemPosition = AppDatabase.getInstance(LocalContext.current).filePositionDao()
+        .getPositionByFileId(model.mediaId)?.position
     Column(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
             .clickable {
                 if (itemPosition != null) {
-                    uiState.playerController?.seekTo(globalItemIndex-partCount+index-1, itemPosition)
+                    uiState.playerController?.seekTo(
+                        globalItemIndex - partCount + index - 1,
+                        itemPosition
+                    )
                 } else {
-                    uiState.playerController?.seekTo(globalItemIndex-partCount+index-1, 0)
+                    uiState.playerController?.seekTo(globalItemIndex - partCount + index - 1, 0)
                 }
                 uiState.playerController?.play()
             },
     ) {
+        val context = LocalContext.current
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(15.dp)
@@ -230,6 +238,51 @@ fun PlaylistAccordionRow(
                     .padding(end = 5.dp), color = Gray600
             )
             Text(model.mediaMetadata.title.toString(), Modifier.weight(1f), color = Gray600)
+
+            Icon(
+                painter = painterResource(R.drawable.up),
+                contentDescription = "Fav",
+                modifier = Modifier
+                    .size(30.dp)
+                    .clickable {
+                        if (index - 1 != 0) {
+                            uiState.playerController?.moveMediaItem(index - 1, index - 2)
+                            mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
+                            mainViewModel.setCurrentPlaylistToDb(uiState.playerController, context)
+                        }
+                    }
+                    .fillMaxWidth(),
+                //tint = color
+            )
+
+            Icon(
+                painter = painterResource(R.drawable.down),
+                contentDescription = "Fav",
+                modifier = Modifier
+                    .size(30.dp)
+                    .clickable {
+                        uiState.playerController?.moveMediaItem(index - 1, index)
+                        mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
+                        mainViewModel.setCurrentPlaylistToDb(uiState.playerController, context)
+                    }
+                    .fillMaxWidth(),
+                //tint = color
+            )
+
+
+            Icon(
+                painter = painterResource(R.drawable.remove),
+                contentDescription = "Delete from playlist",
+                modifier = Modifier
+                    .size(30.dp)
+                    .clickable {
+                        uiState.playerController?.removeMediaItem(index - 1)
+                        mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
+                        mainViewModel.setCurrentPlaylistToDb(uiState.playerController, context)
+                    }
+                    .fillMaxWidth(),
+                //tint = color
+            )
 
             Column(
                 modifier = Modifier

@@ -35,7 +35,6 @@ import studio.vadim.predanie.data.room.MainPlaylist
 import studio.vadim.predanie.domain.models.api.items.DataItem
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
-import studio.vadim.predanie.domain.models.api.items.ResponsePostModel
 import studio.vadim.predanie.domain.usecases.showItems.GetItems
 import studio.vadim.predanie.domain.usecases.showLists.GetLists
 import studio.vadim.predanie.presentation.downloadService.PredanieDownloadService
@@ -270,7 +269,7 @@ class MainViewModel(
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-    fun  initAppDb(context: Context) {
+    fun  initMainPlaylist(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             dbInstance = initDb(context)
             try {
@@ -284,7 +283,7 @@ class MainViewModel(
                         )
                     )
             } catch (e: Throwable) {
-                Log.d("DBERROR", e.message.toString())
+                Log.d("initMainPlaylist", e.message.toString())
             }
         }
     }
@@ -552,5 +551,42 @@ class MainViewModel(
                 )
             }
         }
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun getPlaylistFromDB(name: String, context: Context): MainPlaylist {
+        val playlist = AppDatabase.getInstance(context).mainPlaylistDao().findByName(name)
+        setPlaylistToState(playlist)
+        return AppDatabase.getInstance(context).mainPlaylistDao().findByName(name)
+    }
+
+    private fun setPlaylistToState(playlist: MainPlaylist) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                mainPlaylist = playlist,
+            )
+        }
+    }
+
+    fun updateCurrentPlaylistToUi(player: MediaController?) {
+        val playlistArray = arrayListOf<MediaItem>()
+
+        if (player != null) {
+            repeat(player.mediaItemCount) {
+                playlistArray.add(player.getMediaItemAt(it))
+            }
+        }
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                mainPlaylist = MainPlaylist(uid = uiState.value.mainPlaylist?.uid ?: 0, playlistName = "Main", playlistTime = uiState.value.mainPlaylist?.playlistTime
+                    ?: 0, playlistFile = uiState.value.mainPlaylist?.playlistFile?.toInt() ?: 0, playlistJson = playlistArray)
+            )
+        }
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun setCurrentPlaylistToDb(player: MediaController?, context: Context) {
+
     }
 }

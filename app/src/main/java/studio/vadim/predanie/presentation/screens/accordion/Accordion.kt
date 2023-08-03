@@ -242,6 +242,8 @@ fun AccordionRow(
                     uiState.playerController?.seekTo(globalItemIndex - partCount + index - 1, 0)
                 }
 
+                mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
+
                 navController.navigate("ProfileScreen/play")
             },
     ) {

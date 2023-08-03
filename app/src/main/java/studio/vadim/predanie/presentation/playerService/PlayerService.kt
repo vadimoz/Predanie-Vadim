@@ -11,8 +11,10 @@ import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import androidx.media3.common.Tracks
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
@@ -116,8 +118,8 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
 
         player = ExoPlayer.Builder(this)
             .setMediaSourceFactory(
-            DefaultMediaSourceFactory(this).setDataSourceFactory(cacheDataSourceFactory)
-        ).build()
+                DefaultMediaSourceFactory(this).setDataSourceFactory(cacheDataSourceFactory)
+            ).build()
             .also { player ->
                 //exoPlayer settings
             }
@@ -126,10 +128,20 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
         mediaSession = MediaSession.Builder(this, player).setCallback(customCallback).build()
 
         player.addListener(object : Player.Listener {
+            override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+                val playlistArray = arrayListOf<MediaItem>()
 
-            override fun onTracksChanged(tracks: Tracks) {
-                Log.d("onTracksChanged fires", tracks.toString())
-                super.onTracksChanged(tracks)
+                repeat(player.mediaItemCount) {
+                    playlistArray.add(player.getMediaItemAt(it))
+                }
+
+                saveCurrentPlaylistToDB(playlistArray) //store main playlist
+                super.onTimelineChanged(timeline, reason)
+            }
+
+            override fun onPlaylistMetadataChanged(mediaMetadata: MediaMetadata) {
+                Log.d("Playlist changer", "Playlist changer")
+                super.onPlaylistMetadataChanged(mediaMetadata)
             }
 
             //Срабатывает при открытии нового файла - ставим тут последнюю позицию

@@ -269,7 +269,10 @@ fun ItemScreen(
                                         modifier = Modifier
                                             .size(24.dp)
                                             .clickable {
-                                                mainViewModel.removeCompositionFromFavorite(itemId, context)
+                                                mainViewModel.removeCompositionFromFavorite(
+                                                    itemId,
+                                                    context
+                                                )
                                                 mainViewModel.loadFavorites(context = context)
                                             }
                                             .fillMaxWidth(),

@@ -8,6 +8,7 @@ import studio.vadim.predanie.data.room.FavoriteAuthors
 import studio.vadim.predanie.data.room.FavoriteCompositions
 import studio.vadim.predanie.data.room.FavoriteTracks
 import studio.vadim.predanie.data.room.HistoryCompositions
+import studio.vadim.predanie.data.room.MainPlaylist
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
 import studio.vadim.predanie.domain.models.api.items.ResponsePostModel
@@ -37,6 +38,7 @@ data class UIState(
     val favAuthorsList: Flow<PagingData<FavoriteAuthors>>? = null,
     val favCompositionsList: Flow<PagingData<FavoriteCompositions>>? = null,
     val special: Flow<PagingData<VideoData>>? = null,
+    var mainPlaylist: MainPlaylist? = null,
     //settings
     var goToNext: Boolean = true,
     var percentToFileReady: Int = 95

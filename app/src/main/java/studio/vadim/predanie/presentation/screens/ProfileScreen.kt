@@ -84,8 +84,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
     val favCompositionsList = uiState.favCompositionsList?.collectAsLazyPagingItems()
     val favTracksList = uiState.favTracksList?.collectAsLazyPagingItems()
 
-    val currentPlaylistFromDB =
-        mutableStateOf(AppDatabase.getInstance(context).mainPlaylistDao().findByName("Main"))
+    val currentPlaylistFromDB = uiState.mainPlaylist
 
     val showDeleteDialog = remember { mutableStateOf(false) }
 
@@ -99,8 +98,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
     ) {
 
         LaunchedEffect(Unit) {
-            currentPlaylistFromDB.value =
-                AppDatabase.getInstance(context).mainPlaylistDao().findByName("Main")
+            mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
 
             if (action == "play") {
                 uiState.playerController?.play()
@@ -191,8 +189,10 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
 
                     val rows = mutableListOf<MediaItem>()
 
-                    for (item in currentPlaylistFromDB.value.playlistJson) {
-                        rows.add(item)
+                    if (currentPlaylistFromDB != null) {
+                        for (item in currentPlaylistFromDB.playlistJson) {
+                            rows.add(item)
+                        }
                     }
 
                     val parts = PlaylistAccordionModel(
@@ -202,16 +202,18 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
 
                     val group = listOf(parts)
 
-                    PlaylistAccordionGroup(
-                        modifier = Modifier.padding(top = 8.dp),
-                        group = group,
-                        exp = false,
-                        playerList = currentPlaylistFromDB.value.playlistJson,
-                        navController = navController,
-                        mainViewModel = mainViewModel,
-                        globalItemCount = currentPlaylistFromDB.value.playlistJson.count(),
-                        partCount = currentPlaylistFromDB.value.playlistJson.count()
-                    )
+                    if (currentPlaylistFromDB != null) {
+                        PlaylistAccordionGroup(
+                            modifier = Modifier.padding(top = 8.dp),
+                            group = group,
+                            exp = false,
+                            playerList = currentPlaylistFromDB.playlistJson,
+                            navController = navController,
+                            mainViewModel = mainViewModel,
+                            globalItemCount = currentPlaylistFromDB.playlistJson.count(),
+                            partCount = currentPlaylistFromDB.playlistJson.count()
+                        )
+                    }
                 }
             }
 

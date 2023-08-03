@@ -155,7 +155,10 @@ fun ListRow(model: VideoData, navController: NavHostController, mainViewModel: M
                     uiState.playerController?.prepare()
                     uiState.playerController?.play()
 
+                    mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
+
                     navController.navigate("ProfileScreen/play")
+
                 }
                 .fillMaxWidth()
                 .size(0.13.dh),
@@ -301,8 +304,6 @@ fun ListRow(model: FavoriteTracks, navController: NavHostController, mainViewMod
                 .size(50.dp)
                 .combinedClickable(
                     onClick = {
-                        //Добавить сюда проигрывание файла (отложенный трэк)
-
                         val mediaItems = arrayListOf<MediaItem>()
 
                         mediaItems.add(
@@ -323,6 +324,8 @@ fun ListRow(model: FavoriteTracks, navController: NavHostController, mainViewMod
                         uiState.playerController?.addMediaItems(mediaItems)
                         uiState.playerController?.prepare()
                         uiState.playerController?.play()
+
+                        mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
                     },
                     onLongClick = {
                         deleteItem.value = model.uri
@@ -357,6 +360,8 @@ fun ListRow(model: FavoriteTracks, navController: NavHostController, mainViewMod
                         uiState.playerController?.addMediaItems(mediaItems)
                         uiState.playerController?.prepare()
                         uiState.playerController?.play()
+
+                        mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
                     },
                     onLongClick = {
                         deleteItem.value = model.uri

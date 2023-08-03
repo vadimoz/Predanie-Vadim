@@ -18,7 +18,7 @@ class Converters {
             mediaItemsForStore.add(
                 MediaItemToData(
                     id = it.mediaId,
-                    uri = it.playbackProperties?.uri.toString(),
+                    uri = it.localConfiguration?.uri.toString(),
                     author = it.mediaMetadata.artist.toString(),
                     title = it.mediaMetadata.title.toString(),
                     fileid = it.mediaMetadata.trackNumber.toString(),
