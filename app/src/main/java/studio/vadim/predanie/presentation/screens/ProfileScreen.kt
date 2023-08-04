@@ -164,9 +164,10 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
 
                 Icon(
                     painter = painterResource(R.drawable.fullscreen),
-                    contentDescription = "Fav",
+                    contentDescription = "Fullscreen",
                     modifier = Modifier
                         .size(24.dp)
+                        .padding(top = 10.dp)
                         .clickable {
                             navController.navigate("PlayerScreen")
                         }
@@ -402,7 +403,9 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                                 shape = RoundedCornerShape(size = 10.dp)
                             ) {
 
-                                Column(modifier = Modifier.padding(all = 16.dp).verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally,) {
+                                Column(modifier = Modifier
+                                    .padding(all = 16.dp)
+                                    .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally,) {
                                     Text(text = "Добавить Очередь воспроизведения в новый плейлист:")
 
                                     var playlistName by rememberSaveable { mutableStateOf("") }
@@ -424,18 +427,42 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                                         Text("Создать", fontSize = 13.sp)
                                     }
 
-                                    Text(modifier = Modifier.padding(10.dp), text = "В существующем плейлисте:")
+                                    val currentPlaylists = mainViewModel.getAllPlaylists(context)
+
+                                    if(currentPlaylists.isNotEmpty()) {
+                                        Text(
+                                            modifier = Modifier.padding(10.dp),
+                                            text = "Добавить в существующий плейлист (все треки будут заменены):"
+                                        )
+                                        Column() {
+                                            currentPlaylists.forEach(){
+                                                Text(modifier = Modifier
+                                                    .padding(20.dp)
+                                                    .clickable {
+                                                        mainViewModel.setCurrentPlaylistToDb(
+                                                            uiState.playerController,
+                                                            context,
+                                                            it.playlistName
+                                                        )
+                                                        mainViewModel.loadPlaylists(context)
+                                                        dialogOpen = false
+                                                    }, text = it.playlistName)
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
 
-                    Button(onClick = {
-                                    dialogOpen = true
-                    }, colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(android.graphics.Color.parseColor("#ffcd00")),
-                        contentColor = Color.White)){
-                        Text("Сохранить очередь воспроизведения в плейлист", fontSize = 13.sp)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                        Button(onClick = {
+                            dialogOpen = true
+                        }, colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(android.graphics.Color.parseColor("#ffcd00")),
+                            contentColor = Color.White)){
+                            Text("Сохранить очередь воспроизведения в плейлист", fontSize = 13.sp)
+                        }
                     }
                 }
             }

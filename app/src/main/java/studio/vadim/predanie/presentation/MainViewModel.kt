@@ -620,6 +620,11 @@ class MainViewModel(
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun getAllPlaylists(context: Context): List<UserPlaylist>{
+        return AppDatabase.getInstance(context).userPlaylistDao().getAll()
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     fun setCurrentPlaylistToDb(player: MediaController?, context: Context, playlistName: String) {
         val playlistArray = arrayListOf<MediaItem>()
 
