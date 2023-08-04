@@ -212,7 +212,7 @@ fun  OfflineItemScreen(
                         val rows = mutableListOf<Tracks>()
 
                         for (item in playerList) {
-                            rows.add(Tracks(id = item.mediaId, name = item.mediaMetadata.title.toString(), url = item.playbackProperties?.uri.toString()))
+                            rows.add(Tracks(id = item.mediaId, name = item.mediaMetadata.title.toString(), url = item.mediaMetadata.description.toString()))
                             counter += 1
                             globalItemCount++
                             partCount++

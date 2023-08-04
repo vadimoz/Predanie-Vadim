@@ -117,6 +117,7 @@ class PredanieDownloadService : DownloadService(
                                     .setArtworkUri(Uri.parse(data.img_medium))
                                     .setTitle(it.name)
                                     .setDisplayTitle(it.name)
+                                    .setDescription(it.url)
                                     .setTrackNumber(it.id?.toInt()) //file id
                                     .setCompilation(data.id.toString())
                                     .build()

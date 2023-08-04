@@ -7,7 +7,7 @@ import androidx.room.Query
 
 @Dao
 interface DownloadedCompositionsDao {
-    @Query("SELECT * FROM DownloadedCompositions LIMIT :limit OFFSET :offset")
+    @Query("SELECT * FROM DownloadedCompositions ORDER BY uid DESC LIMIT :limit OFFSET :offset")
     fun getCompositions(offset: Int, limit: Int): List<DownloadedCompositions>
 
     @Query("SELECT * FROM DownloadedCompositions WHERE uid LIKE :id LIMIT 1")

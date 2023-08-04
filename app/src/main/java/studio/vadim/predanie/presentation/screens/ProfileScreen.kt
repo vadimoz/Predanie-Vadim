@@ -2,12 +2,8 @@ package studio.vadim.predanie.presentation.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.ActivityInfo
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,31 +15,30 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,22 +48,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.viewModelScope
+import androidx.compose.ui.window.Dialog
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavHostController
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
 import androidx.paging.compose.collectAsLazyPagingItems
 import studio.vadim.predanie.R
-import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.presentation.MainViewModel
-import studio.vadim.predanie.presentation.downloadService.DownloadManagerSingleton
 import studio.vadim.predanie.presentation.playerService.playlistAccordion.PlaylistAccordionGroup
 import studio.vadim.predanie.presentation.playerService.playlistAccordion.PlaylistAccordionModel
-import studio.vadim.predanie.presentation.navigation.NavigationItem
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -79,12 +67,12 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
     val context = LocalContext.current
     val uiState by mainViewModel.uiState.collectAsState()
 
-    val newItems = uiState.newList.collectAsLazyPagingItems()
     val historyList = uiState.historyList?.collectAsLazyPagingItems()
     val downloadsList = uiState.downloadsList?.collectAsLazyPagingItems()
     val favAuthorsList = uiState.favAuthorsList?.collectAsLazyPagingItems()
     val favCompositionsList = uiState.favCompositionsList?.collectAsLazyPagingItems()
     val favTracksList = uiState.favTracksList?.collectAsLazyPagingItems()
+    val playlistsList = uiState.playlistsList?.collectAsLazyPagingItems()
 
     val currentPlaylistFromDB = uiState.mainPlaylist
 
@@ -141,7 +129,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                     .fillMaxSize()
                     .height(300.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                //verticalArrangement = Arrangement.Center
             ) {
 
                 AndroidView(
@@ -216,12 +204,6 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             partCount = currentPlaylistFromDB.playlistJson.count()
                         )
                     }
-                }
-
-                Button(onClick = {}, colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(android.graphics.Color.parseColor("#ffcd00")),
-                    contentColor = Color.White)){
-                    Text("Сохранить очередь в плейлист", fontSize = 16.sp)
                 }
             }
 
@@ -389,6 +371,71 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             fontSize = 35.sp,
                             color = Color(android.graphics.Color.parseColor("#2F2F2F"))
                         )
+                    }
+
+                    LazyRow() {
+                        if (playlistsList != null) {
+                            items(playlistsList.itemCount) { index ->
+                                playlistsList[index]?.let {
+                                    ListRow(
+                                        model = it,
+                                        navController,
+                                        mainViewModel
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    var dialogOpen by remember {
+                        mutableStateOf(false)
+                    }
+
+                    if (dialogOpen) {
+                        Dialog(onDismissRequest = {
+                            dialogOpen = false
+                        }) {
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight(),
+                                shape = RoundedCornerShape(size = 10.dp)
+                            ) {
+
+                                Column(modifier = Modifier.padding(all = 16.dp).verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally,) {
+                                    Text(text = "Добавить Очередь воспроизведения в новый плейлист:")
+
+                                    var playlistName by rememberSaveable { mutableStateOf("") }
+                                    TextField(
+                                        value = playlistName,
+                                        onValueChange = {
+                                            playlistName = it
+                                        },
+                                        label = { Text("Название нового плейлиста") }
+                                    )
+
+                                    Button(modifier = Modifier.padding(10.dp), onClick = {
+                                        mainViewModel.setCurrentPlaylistToDb(uiState.playerController, context, playlistName)
+                                        mainViewModel.loadPlaylists(context)
+                                        dialogOpen = false
+                                    }, colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(android.graphics.Color.parseColor("#ffcd00")),
+                                        contentColor = Color.White)){
+                                        Text("Создать", fontSize = 13.sp)
+                                    }
+
+                                    Text(modifier = Modifier.padding(10.dp), text = "В существующем плейлисте:")
+                                }
+                            }
+                        }
+                    }
+
+                    Button(onClick = {
+                                    dialogOpen = true
+                    }, colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(android.graphics.Color.parseColor("#ffcd00")),
+                        contentColor = Color.White)){
+                        Text("Сохранить очередь воспроизведения в плейлист", fontSize = 13.sp)
                     }
                 }
             }

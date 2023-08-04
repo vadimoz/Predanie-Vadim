@@ -7,9 +7,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class UserPlaylist(
-    @PrimaryKey(autoGenerate = true) val uid: Int = 1,
+    @PrimaryKey(autoGenerate = true) val uid: Int = 0,
     @ColumnInfo(name = "playlist_name") val playlistName: String,
-    @ColumnInfo(name = "timeWhereStopped") val playlistTime: Long,
-    @ColumnInfo(name = "fileWhereStopped") val playlistFile: Int,
     @ColumnInfo(name = "playlistJson") val playlistJson: ArrayList<MediaItem>,
 )

@@ -106,6 +106,7 @@ class MainActivity : ComponentActivity() {
         mainViewModel.loadHistoryCompositions(this)
         mainViewModel.loadFavorites(this)
         mainViewModel.loadSettingsFromStore(this)
+        mainViewModel.loadPlaylists(this)
 
         initSize()
         setContent {

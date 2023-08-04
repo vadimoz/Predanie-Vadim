@@ -248,7 +248,6 @@ fun PlaylistAccordionRow(
                         if (index - 1 != 0) {
                             uiState.playerController?.moveMediaItem(index - 1, index - 2)
                             mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
-                            mainViewModel.setCurrentPlaylistToDb(uiState.playerController, context)
                         }
                     }
                     .fillMaxWidth(),
@@ -263,7 +262,6 @@ fun PlaylistAccordionRow(
                     .clickable {
                         uiState.playerController?.moveMediaItem(index - 1, index)
                         mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
-                        mainViewModel.setCurrentPlaylistToDb(uiState.playerController, context)
                     }
                     .fillMaxWidth(),
                 //tint = color
@@ -278,7 +276,6 @@ fun PlaylistAccordionRow(
                     .clickable {
                         uiState.playerController?.removeMediaItem(index - 1)
                         mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
-                        mainViewModel.setCurrentPlaylistToDb(uiState.playerController, context)
                     }
                     .fillMaxWidth(),
                 //tint = color

@@ -10,5 +10,6 @@ data class MediaItemToData(
     val author: String,
     val fileid: String,
     val compositionid: String,
-    val artworkUri: String
+    val artworkUri: String,
+    val urlFromDescription: String,
 )

@@ -23,7 +23,8 @@ class Converters {
                     title = it.mediaMetadata.title.toString(),
                     fileid = it.mediaMetadata.trackNumber.toString(),
                     compositionid = it.mediaMetadata.compilation.toString(),
-                    artworkUri = it.mediaMetadata.artworkUri.toString()
+                    artworkUri = it.mediaMetadata.artworkUri.toString(),
+                    urlFromDescription = it.mediaMetadata.description.toString()
                 )
             )
         }
@@ -39,7 +40,7 @@ class Converters {
         for (it in list) {
             playlist.add(
                 MediaItem.Builder()
-                    .setUri(it.uri)
+                    .setUri(it.urlFromDescription)
                     .setMediaId(it.id)
                     .setMediaMetadata(
                         MediaMetadata.Builder()
@@ -47,6 +48,7 @@ class Converters {
                             .setTrackNumber(it.fileid.toIntOrNull())
                             .setCompilation(it.compositionid)
                             .setTitle(it.title)
+                            .setDescription(it.urlFromDescription)
                             .setArtworkUri(Uri.parse(it.artworkUri))
                             .build()
                     )

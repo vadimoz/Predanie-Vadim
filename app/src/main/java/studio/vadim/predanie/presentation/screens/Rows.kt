@@ -53,6 +53,7 @@ import studio.vadim.predanie.data.room.FavoriteAuthors
 import studio.vadim.predanie.data.room.FavoriteCompositions
 import studio.vadim.predanie.data.room.FavoriteTracks
 import studio.vadim.predanie.data.room.HistoryCompositions
+import studio.vadim.predanie.data.room.UserPlaylist
 import studio.vadim.predanie.domain.models.api.items.AuthorCompositions
 import studio.vadim.predanie.domain.models.api.lists.Categories
 import studio.vadim.predanie.domain.models.api.lists.Compositions
@@ -63,7 +64,11 @@ import studio.vadim.predanie.presentation.MainViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ListRow(model: ResponceBlogListModel, navController: NavHostController, mainViewModel: MainViewModel) {
+fun ListRow(
+    model: ResponceBlogListModel,
+    navController: NavHostController,
+    mainViewModel: MainViewModel
+) {
     val uiState by mainViewModel.uiState.collectAsState()
 
     Column(
@@ -272,6 +277,74 @@ fun ListRow(
 
             lineHeight = 22.sp,
             text = model.title
+        )
+    }
+}
+
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ListRow(model: UserPlaylist, navController: NavHostController, mainViewModel: MainViewModel) {
+    val uiState by mainViewModel.uiState.collectAsState()
+
+    val context = LocalContext.current
+
+    val showDeletePlaylistDialog = remember { mutableStateOf(false) }
+    val deletePlaylist = remember { mutableStateOf("") }
+
+    if (showDeletePlaylistDialog.value) {
+        PlaylistAlertDialog(showDeletePlaylistDialog, deletePlaylist, mainViewModel, context)
+    }
+
+    Column(
+        modifier = Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .width(120.dp)
+            .height(120.dp)
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.playlist),
+            contentDescription = "playlist",
+            modifier = Modifier
+                .size(55.dp)
+                .combinedClickable(
+                    onClick = {
+                        uiState.playerController?.removeMediaItems(0, 100000)
+                        uiState.playerController?.addMediaItems(model.playlistJson)
+                        uiState.playerController?.prepare()
+                        uiState.playerController?.play()
+
+                        mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
+                    },
+                    onLongClick = {
+                        deletePlaylist.value = model.playlistName
+                        showDeletePlaylistDialog.value = true
+                    }
+                ),
+            tint = Color(android.graphics.Color.parseColor("#FFD600")),
+        )
+        Text(
+            modifier = Modifier
+                .combinedClickable(
+                    onClick = {
+                        uiState.playerController?.removeMediaItems(0, 100000)
+                        uiState.playerController?.addMediaItems(model.playlistJson)
+                        uiState.playerController?.prepare()
+                        uiState.playerController?.play()
+
+                        mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
+                    },
+                    onLongClick = {
+                        deletePlaylist.value = model.playlistName
+                        showDeletePlaylistDialog.value = true
+                    }
+                )
+                .padding(5.dp),
+
+            lineHeight = 15.sp,
+            fontSize = 12.sp,
+            text = model.playlistName
         )
     }
 }
@@ -719,6 +792,33 @@ fun CatalogListRow(model: Categories) {
             )
         }
     }
+}
+
+@Composable
+fun PlaylistAlertDialog(
+    showDeleteDialog: MutableState<Boolean>,
+    deleteItem: MutableState<String>,
+    mainViewModel: MainViewModel,
+    context: Context
+) {
+    AlertDialog(
+        onDismissRequest = {
+            showDeleteDialog.value = false
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                showDeleteDialog.value = false
+                mainViewModel.removePlaylist(deleteItem.value, context = context)
+            })
+            { Text(text = "Удалить") }
+        },
+        dismissButton = {
+            TextButton(onClick = { showDeleteDialog.value = false })
+            { Text(text = "Отменить") }
+        },
+        title = { Text(text = "Удалить плейлист?") },
+        text = { Text(text = "") }
+    )
 }
 
 @Composable

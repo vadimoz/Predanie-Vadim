@@ -32,6 +32,7 @@ import studio.vadim.predanie.data.room.FavoriteCompositions
 import studio.vadim.predanie.data.room.FavoriteTracks
 import studio.vadim.predanie.data.room.HistoryCompositions
 import studio.vadim.predanie.data.room.MainPlaylist
+import studio.vadim.predanie.data.room.UserPlaylist
 import studio.vadim.predanie.domain.models.api.items.DataItem
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
@@ -45,6 +46,7 @@ import studio.vadim.predanie.presentation.pagination.FavAuthorsPagingSource
 import studio.vadim.predanie.presentation.pagination.FavCompositionsPagingSource
 import studio.vadim.predanie.presentation.pagination.FavTracksPagingSource
 import studio.vadim.predanie.presentation.pagination.HistoryPagingSource
+import studio.vadim.predanie.presentation.pagination.PlaylistsPagingSource
 import studio.vadim.predanie.presentation.pagination.SpecialPagingSource
 
 
@@ -232,6 +234,7 @@ class MainViewModel(
                             MediaMetadata.Builder()
                                 .setArtworkUri(Uri.parse(data.img_medium))
                                 .setTitle(it.name)
+                                .setDescription(it.url)
                                 .setDisplayTitle(it.name)
                                 .setTrackNumber(it.id?.toInt()) //file id
                                 .setCompilation(data.id.toString())
@@ -256,6 +259,7 @@ class MainViewModel(
                         MediaMetadata.Builder()
                             .setDisplayTitle(it.name)
                             .setArtworkUri(Uri.parse(data.img_big.toString()))
+                            .setDescription(it.url)
                             .setCompilation(data.id.toString())
                             .setTrackNumber(it.id?.toInt())
                             .setTitle(it.name)
@@ -269,7 +273,7 @@ class MainViewModel(
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-    fun  initMainPlaylist(context: Context) {
+    fun initMainPlaylist(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             dbInstance = initDb(context)
             try {
@@ -344,6 +348,21 @@ class MainViewModel(
                     favCompositionsList = favCompositionsList,
                     favAuthorsList = favAuthorsList,
                     favTracksList = favTracksList
+                )
+            }
+        }
+    }
+
+    fun loadPlaylists(context: Context) {
+
+        val playlists = Pager(PagingConfig(pageSize = 15)) {
+            PlaylistsPagingSource("playlists", context)
+        }.flow.cachedIn(viewModelScope)
+
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    playlistsList = playlists,
                 )
             }
         }
@@ -479,6 +498,15 @@ class MainViewModel(
         loadFavorites(context)
     }
 
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun removePlaylist(name: String, context: Context) {
+        AppDatabase.getInstance(context).userPlaylistDao().deleteByName(name)
+        Toast.makeText(
+            context, "Плейлист удален!",
+            Toast.LENGTH_SHORT
+        ).show()
+        loadPlaylists(context)
+    }
 
     fun isInternetConnected(context: Context): Boolean {
         val cm =
@@ -505,7 +533,7 @@ class MainViewModel(
         }
     }
 
-    fun loadSettingsFromStore(context: Context){
+    fun loadSettingsFromStore(context: Context) {
         viewModelScope.launch {
             val settingsPrefs: SharedPreferences = context.getSharedPreferences(
                 "settings", Context.MODE_PRIVATE
@@ -579,14 +607,49 @@ class MainViewModel(
 
         _uiState.update { currentState ->
             currentState.copy(
-                mainPlaylist = MainPlaylist(uid = uiState.value.mainPlaylist?.uid ?: 0, playlistName = "Main", playlistTime = uiState.value.mainPlaylist?.playlistTime
-                    ?: 0, playlistFile = uiState.value.mainPlaylist?.playlistFile?.toInt() ?: 0, playlistJson = playlistArray)
+                mainPlaylist = MainPlaylist(
+                    uid = uiState.value.mainPlaylist?.uid ?: 0,
+                    playlistName = "Main",
+                    playlistTime = uiState.value.mainPlaylist?.playlistTime
+                        ?: 0,
+                    playlistFile = uiState.value.mainPlaylist?.playlistFile?.toInt() ?: 0,
+                    playlistJson = playlistArray
+                )
             )
         }
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-    fun setCurrentPlaylistToDb(player: MediaController?, context: Context) {
+    fun setCurrentPlaylistToDb(player: MediaController?, context: Context, playlistName: String) {
+        val playlistArray = arrayListOf<MediaItem>()
 
+        if (player != null) {
+            repeat(player.mediaItemCount) {
+                val mediaItem = player.getMediaItemAt(it)
+
+                //Ставим uri через другое поле, т.к. есть баг, в котором не передается uri через getMediaItemAt
+                val item =
+                    MediaItem.Builder()
+                        .setUri(mediaItem.mediaMetadata.description.toString())
+                        .setMediaId(mediaItem.mediaId)
+                        .setTag(mediaItem.mediaMetadata.title)
+                        .setMediaMetadata(
+                            MediaMetadata.Builder()
+                                .setArtworkUri(Uri.parse(mediaItem.mediaMetadata.artworkUri.toString()))
+                                .setTitle(mediaItem.mediaMetadata.title)
+                                .setDescription(mediaItem.mediaMetadata.description.toString())
+                                .setDisplayTitle(mediaItem.mediaMetadata.title)
+                                .setTrackNumber(mediaItem.mediaId.toInt()) //file id
+                                .setCompilation((mediaItem.mediaId))
+                                .build()
+                        )
+                        .build()
+
+                playlistArray.add(item)
+            }
+        }
+
+        AppDatabase.getInstance(context).userPlaylistDao()
+            .insertPlaylist(UserPlaylist(playlistName = playlistName, playlistJson = playlistArray))
     }
 }
