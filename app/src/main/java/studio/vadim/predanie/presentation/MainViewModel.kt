@@ -684,4 +684,14 @@ class MainViewModel(
             Toast.LENGTH_SHORT
         ).show()
     }
+
+    fun cleanQueue(context: Context){
+        uiState.value.playerController?.removeMediaItems(0, 100000)
+        updateCurrentPlaylistToUi(uiState.value.playerController)
+
+        Toast.makeText(
+            context, "Очередь воспроизведения очищена!",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
 }

@@ -206,6 +206,9 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                         )
                     }
                 }
+                Text(text = "Очистить", fontSize = 12.sp, modifier = Modifier.clickable {
+                    mainViewModel.cleanQueue(context)
+                })
             }
 
             if (mainViewModel.isInternetConnected(context)) {
