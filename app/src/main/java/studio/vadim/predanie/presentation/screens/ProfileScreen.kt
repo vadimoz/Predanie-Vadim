@@ -24,6 +24,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
@@ -166,14 +168,14 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
 
             //Очередь воспроизведения
             Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .wrapContentHeight()
                     .fillMaxWidth()
             ) {
 
-
                 Icon(
-                    painter = painterResource(R.drawable.bookmark),
+                    painter = painterResource(R.drawable.fullscreen),
                     contentDescription = "Fav",
                     modifier = Modifier
                         .size(24.dp)
@@ -181,10 +183,10 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             navController.navigate("PlayerScreen")
                         }
                         .fillMaxWidth(),
-                    tint = Color(android.graphics.Color.parseColor("#FFD600")),
+                    tint = Color(android.graphics.Color.parseColor("#000000")),
                 )
 
-                Row(modifier = Modifier.padding(bottom = 20.dp)) {
+                Row(modifier = Modifier.padding(bottom = 5.dp)) {
                     //Выводим очередь воспроизведения
 
                     val rows = mutableListOf<MediaItem>()
@@ -214,6 +216,12 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             partCount = currentPlaylistFromDB.playlistJson.count()
                         )
                     }
+                }
+
+                Button(onClick = {}, colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(android.graphics.Color.parseColor("#ffcd00")),
+                    contentColor = Color.White)){
+                    Text("Сохранить очередь в плейлист", fontSize = 16.sp)
                 }
             }
 

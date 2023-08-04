@@ -6,7 +6,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class MainPlaylist(
+data class UserPlaylist(
     @PrimaryKey(autoGenerate = true) val uid: Int = 1,
     @ColumnInfo(name = "playlist_name") val playlistName: String,
     @ColumnInfo(name = "timeWhereStopped") val playlistTime: Long,
