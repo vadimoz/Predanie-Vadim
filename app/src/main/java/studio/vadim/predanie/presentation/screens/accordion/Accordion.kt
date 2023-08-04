@@ -275,7 +275,7 @@ fun AccordionRow(
                 )
             }
 
-            Row(modifier = Modifier.width(60.dp)) {
+            Row(modifier = Modifier.width(90.dp)) {
 
                 var isFavorite by remember {
                     mutableStateOf(
@@ -395,6 +395,18 @@ fun AccordionRow(
                             tint = downloadColor
                         )
                     }
+
+                    Icon(
+                        painter = painterResource(R.drawable.add),
+                        contentDescription = "Добавить в очередь",
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clickable {
+                                mainViewModel.addToQueue(model, context)
+                            }
+                            .fillMaxWidth(),
+                        tint = color
+                    )
                 }
             }
         }

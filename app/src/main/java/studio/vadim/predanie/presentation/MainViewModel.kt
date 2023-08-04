@@ -36,6 +36,7 @@ import studio.vadim.predanie.data.room.UserPlaylist
 import studio.vadim.predanie.domain.models.api.items.DataItem
 import studio.vadim.predanie.domain.models.api.items.ResponseAuthorModel
 import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
+import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.domain.usecases.showItems.GetItems
 import studio.vadim.predanie.domain.usecases.showLists.GetLists
 import studio.vadim.predanie.presentation.downloadService.PredanieDownloadService
@@ -656,5 +657,31 @@ class MainViewModel(
 
         AppDatabase.getInstance(context).userPlaylistDao()
             .insertPlaylist(UserPlaylist(playlistName = playlistName, playlistJson = playlistArray))
+    }
+
+    fun addToQueue(model: Tracks, context: Context) {
+        val item =
+            MediaItem.Builder()
+                .setUri(model.url)
+                .setMediaId(model.id.toString())
+                .setTag(model.name)
+                .setMediaMetadata(
+                    MediaMetadata.Builder()
+                        .setTitle(model.name)
+                        .setDescription(model.url)
+                        .setDisplayTitle(model.name)
+                        .setTrackNumber(model.id?.toInt()) //file id
+                        .setCompilation((model.id))
+                        .build()
+                )
+                .build()
+
+        uiState.value.playerController?.addMediaItem(item)
+        updateCurrentPlaylistToUi(uiState.value.playerController)
+
+        Toast.makeText(
+            context, "Файл добавлен в очередь воспроизведения",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }
