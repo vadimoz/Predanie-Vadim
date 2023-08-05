@@ -68,20 +68,27 @@ class PredanieDownloadService : DownloadService(
                     GlobalScope.launch {
                         val compositionInto = apiItems.getItem(id[0].toInt())
                         val mediaItems =
-                            prepareDownloadedCompositionForPlayer(compositionInto.data!!)
-                        if (mediaItems.isEmpty()) {
-                            dbInstance.downloadedCompositionsDao()
-                                .deleteByComposition(id[0].toInt())
-                        } else {
-                            if (compositionInto.data != null) {
-                                dbInstance.downloadedCompositionsDao().insert(
-                                    DownloadedCompositions(
-                                        uid = compositionInto.data?.id,
-                                        title = compositionInto.data?.name.toString(),
-                                        playlistJson = mediaItems,
-                                        image = compositionInto.data?.img_big
-                                    )
-                                )
+                            compositionInto.data?.let { prepareDownloadedCompositionForPlayer(it) }
+                        if (mediaItems != null) {
+                            if (mediaItems.isEmpty()) {
+                                dbInstance.downloadedCompositionsDao()
+                                    .deleteByComposition(id[0].toInt())
+                            } else {
+                                if (compositionInto.data != null) {
+                                    Log.d("iddd", id.toString())
+                                    mediaItems.let {
+                                        DownloadedCompositions(
+                                            uid = compositionInto.data?.id,
+                                            title = compositionInto.data?.name.toString(),
+                                            playlistJson = it,
+                                            image = compositionInto.data?.img_big
+                                        )
+                                    }.let {
+                                        dbInstance.downloadedCompositionsDao().insert(
+                                            it
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -101,7 +108,6 @@ class PredanieDownloadService : DownloadService(
 
             for (it in accordionItems) {
 
-                Log.d("itemsM", "${data.id}_${it.url}")
                 //Делаем только если файл  есть в загруженных
                 if (DownloadManagerSingleton.getInstance(this).downloadIndex.getDownload(
                         "${data.id}_${it.url}"
@@ -144,6 +150,7 @@ class PredanieDownloadService : DownloadService(
                         .setMediaMetadata(
                             MediaMetadata.Builder()
                                 .setDisplayTitle(it.name)
+                                .setDescription(it.url)
                                 .setArtworkUri(Uri.parse(data.img_big.toString()))
                                 .setCompilation(data.id.toString())
                                 .setTrackNumber(it.id?.toInt())

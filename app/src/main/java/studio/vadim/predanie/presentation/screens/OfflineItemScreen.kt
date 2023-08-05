@@ -1,7 +1,5 @@
 package studio.vadim.predanie.presentation.screens
 
-import android.text.Html.fromHtml
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,9 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -39,17 +34,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.media3.common.MediaItem
-import androidx.media3.extractor.mp4.Track
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
@@ -59,7 +50,6 @@ import studio.vadim.predanie.R
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.presentation.MainViewModel
-import studio.vadim.predanie.presentation.navigation.NavigationItem
 import studio.vadim.predanie.presentation.screens.accordion.AccordionGroup
 import studio.vadim.predanie.presentation.screens.accordion.AccordionModel
 
@@ -212,7 +202,7 @@ fun  OfflineItemScreen(
                         val rows = mutableListOf<Tracks>()
 
                         for (item in playerList) {
-                            rows.add(Tracks(id = item.mediaId, name = item.mediaMetadata.title.toString(), url = item.mediaMetadata.description.toString()))
+                            rows.add(Tracks(id = item.mediaId, name = item.mediaMetadata.title.toString(), url = item.playbackProperties?.uri.toString()))
                             counter += 1
                             globalItemCount++
                             partCount++
@@ -233,7 +223,8 @@ fun  OfflineItemScreen(
                             mainViewModel = mainViewModel,
                             globalItemCount = globalItemCount,
                             partCount = partCount,
-                            itemId = itemId
+                            itemId = itemId,
+                            showButtons = false
                         )
                     }
                 }

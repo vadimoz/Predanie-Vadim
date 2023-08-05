@@ -13,6 +13,7 @@ data class DataItem (
     var author_name : String?           = null,
     var img_medium  : String?           = null,
     var img_big     : String?           = null,
+    var share_url   : String?           = null,
     var topics     : ArrayList<Topics> = arrayListOf(),
     var forms      : ArrayList<Forms>  = arrayListOf(),
     var genre      : ArrayList<Genre>  = arrayListOf(),

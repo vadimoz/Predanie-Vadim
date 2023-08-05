@@ -1,5 +1,7 @@
 package studio.vadim.predanie.presentation.screens
 
+import android.content.Context
+import android.content.Intent
 import android.text.Html.fromHtml
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -16,12 +18,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +53,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.media3.common.MediaItem
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
@@ -235,7 +242,23 @@ fun ItemScreen(
                                 Icon(
                                     painter = painterResource(R.drawable.share),
                                     contentDescription = "Play",
-                                    modifier = Modifier.size(20.dp),
+                                    modifier = Modifier.size(20.dp).clickable{
+                                        val type = "text/plain"
+                                        val subject = uiState.itemInto!!.data?.name
+                                        val extraText = uiState.itemInto!!.data?.share_url
+                                        val shareWith = ""
+
+                                        val intent = Intent(Intent.ACTION_SEND)
+                                        intent.type = type
+                                        intent.putExtra(Intent.EXTRA_SUBJECT, subject)
+                                        intent.putExtra(Intent.EXTRA_TEXT, extraText)
+
+                                        ContextCompat.startActivity(
+                                            context,
+                                            Intent.createChooser(intent, shareWith),
+                                            null
+                                        )
+                                    },
                                     tint = Color.Black.copy(alpha = 0.5f),
                                 )
                                 Icon(
@@ -279,10 +302,19 @@ fun ItemScreen(
                                         tint = Color(android.graphics.Color.parseColor("#FFD600")),
                                     )
                                 }
+                                val showDownloadDialog = remember { mutableStateOf(false) }
+
+                                if (showDownloadDialog.value) {
+                                    DownloadDialog(showDownloadDialog, playerList, mainViewModel = mainViewModel, context = context, itemId = itemId)
+                                }
+
                                 Icon(
-                                    painter = painterResource(R.drawable.dots),
-                                    contentDescription = "Play",
-                                    modifier = Modifier.size(20.dp),
+                                    painter = painterResource(R.drawable.download),
+                                    contentDescription = "DownloadAll",
+                                    modifier = Modifier.size(20.dp).clickable {
+                                        //Загружаем все файлы
+                                        showDownloadDialog.value = true
+                                    },
                                     tint = Color.Black.copy(alpha = 0.5f),
                                 )
                             }
@@ -376,7 +408,8 @@ fun ItemScreen(
                                 mainViewModel = mainViewModel,
                                 globalItemCount = globalItemCount,
                                 partCount = partCount,
-                                itemId = itemId
+                                itemId = itemId,
+                                showButtons = true
                             )
                         }
 
@@ -408,7 +441,8 @@ fun ItemScreen(
                             mainViewModel = mainViewModel,
                             globalItemCount = globalItemCount,
                             partCount = partCount,
-                            itemId = itemId
+                            itemId = itemId,
+                            showButtons = true
                         )
                     }
                 }
@@ -416,4 +450,37 @@ fun ItemScreen(
 
         }
     }
+}
+
+@Composable
+fun DownloadDialog(
+    showDownloadDialog: MutableState<Boolean>,
+    playerList: ArrayList<MediaItem>,
+    itemId: String?,
+    mainViewModel: MainViewModel,
+    context: Context
+) {
+    AlertDialog(
+        onDismissRequest = {
+            showDownloadDialog.value = false
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                showDownloadDialog.value = false
+
+                //Загружаем все файлы
+                if (itemId != null) {
+                    mainViewModel.downloadAll(playerList, context = context, itemId = itemId)
+                }
+                mainViewModel.loadDownloadedCompositions(context)
+            })
+            { Text(text = "Загрузить") }
+        },
+        dismissButton = {
+            TextButton(onClick = { showDownloadDialog.value = false })
+            { Text(text = "Отменить") }
+        },
+        title = { Text(text = "Загрузить все файлы?") },
+        text = { Text(text = "") }
+    )
 }

@@ -12,7 +12,7 @@ import androidx.room.TypeConverters
 @Database(
     entities = [MainPlaylist::class, FilePosition::class, DownloadedCompositions::class, HistoryCompositions::class,
         FavoriteTracks::class, FavoriteCompositions::class, FavoriteAuthors::class, UserPlaylist::class],
-    version = 5,
+    version = 1,
     /*autoMigrations = [
         AutoMigration(from = 1, to = 2)
     ]*/

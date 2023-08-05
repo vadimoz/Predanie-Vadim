@@ -1,7 +1,6 @@
 package studio.vadim.predanie.presentation.screens.accordion
 
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
@@ -31,12 +30,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
-import androidx.media3.exoplayer.offline.Download
-import androidx.media3.exoplayer.offline.DownloadManager
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.flow.MutableStateFlow
 import studio.vadim.predanie.R
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.domain.models.api.items.Tracks
@@ -57,6 +53,7 @@ data class AccordionModel(
     )
 }
 
+
 @Composable
 fun AccordionGroup(
     modifier: Modifier = Modifier,
@@ -68,6 +65,7 @@ fun AccordionGroup(
     globalItemCount: Int,
     partCount: Int,
     itemId: String,
+    showButtons: Boolean = true,
 ) {
     val uiState by mainViewModel.uiState.collectAsState()
 
@@ -82,7 +80,8 @@ fun AccordionGroup(
                 uiState = uiState,
                 globalItemCount = globalItemCount,
                 partCount = partCount,
-                itemId = itemId
+                itemId = itemId,
+                showButtons = showButtons
             )
         }
     }
@@ -99,7 +98,8 @@ fun Accordion(
     uiState: UIState,
     globalItemCount: Int,
     partCount: Int,
-    itemId: String
+    itemId: String,
+    showButtons: Boolean?
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -127,7 +127,8 @@ fun Accordion(
                                 uiState = uiState,
                                 globalItemIndex = globalItemCount,
                                 partCount,
-                                itemId = itemId
+                                itemId = itemId,
+                                showButtons = showButtons
                             )
                             Divider(color = Gray200, thickness = 1.dp)
                             counter += 1
@@ -162,6 +163,7 @@ fun Accordion(
                                 globalItemIndex = globalItemCount,
                                 partCount = partCount,
                                 itemId,
+                                showButtons,
                             )
                             Divider(color = Gray200, thickness = 1.dp)
                             counter += 1
@@ -218,7 +220,8 @@ fun AccordionRow(
     uiState: UIState,
     globalItemIndex: Int,
     partCount: Int,
-    itemId: String
+    itemId: String,
+    showButtons: Boolean?
 ) {
     val context = LocalContext.current
 
@@ -275,138 +278,144 @@ fun AccordionRow(
                 )
             }
 
-            Row(modifier = Modifier.width(90.dp)) {
+            if (showButtons == true) {
+                Row(modifier = Modifier.width(90.dp)) {
 
-                var isFavorite by remember {
-                    mutableStateOf(
-                        mainViewModel.isTrackFavorite(
-                            model.url.toString(),
-                            context
-                        )
-                    )
-                }
-                val color =
-                    if (isFavorite) (Color(android.graphics.Color.parseColor("#FFD600"))) else (Color(
-                        android.graphics.Color.parseColor("#000000")
-                    ))
-
-                if (!isFavorite) {
-                    Icon(
-                        painter = painterResource(R.drawable.bookmark),
-                        contentDescription = "Fav",
-                        modifier = Modifier
-                            .size(30.dp)
-                            .clickable {
-                                mainViewModel.setTrackToFavorites(
-                                    itemId = itemId, title = model.name.toString(),
-                                    compositionid = itemId, uri = model.url.toString(), context
-                                )
-                                isFavorite = !isFavorite
-                            }
-                            .fillMaxWidth(),
-                        tint = color
-                    )
-                } else {
-                    Icon(
-                        painter = painterResource(R.drawable.bookmark),
-                        contentDescription = "Fav",
-                        modifier = Modifier
-                            .size(30.dp)
-                            .clickable {
-                                mainViewModel.removeTrackFromFavorite(model.url.toString(), context)
-                                isFavorite = !isFavorite
-                            }
-                            .fillMaxWidth(),
-                        tint = color
-                    )
-                }
-
-                var isDownloaded by remember {
-                    mutableStateOf(
-                        DownloadManagerSingleton.getInstance(
-                            context = context
-                        ).downloadIndex.getDownload(
-                            "${itemId}_${model.url}"
-                        )?.state == 3
-                    )
-                }
-
-                if(mainViewModel.isInternetConnected(context)) {
-                    val downloadColor =
-                        if (isDownloaded) (Color(android.graphics.Color.parseColor("#FFD600"))) else (Color(
-                            android.graphics.Color.parseColor("#000000")
-                        ))
-
-                    if (!isDownloaded) {
-                        Icon(
-                            painter = painterResource(R.drawable.download),
-                            contentDescription = "Fav",
-                            modifier = Modifier
-                                .size(30.dp)
-                                .clickable {
-                                    val downloadRequest = DownloadRequest
-                                        .Builder(
-                                            "${itemId}_${model.url.toString()}",
-                                            Uri.parse(model.url)
-                                        )
-                                        .build()
-
-                                    DownloadService.sendAddDownload(
-                                        context,
-                                        PredanieDownloadService::class.java,
-                                        downloadRequest,
-                                        /* foreground = */ false
-                                    )
-                                    mainViewModel.loadDownloadedCompositions(context)
-                                    isDownloaded = !isDownloaded
-                                    Toast
-                                        .makeText(
-                                            context, "Загружается",
-                                            Toast.LENGTH_SHORT
-                                        )
-                                        .show()
-                                }
-                                .fillMaxWidth(),
-                            tint = downloadColor
-                        )
-                    } else {
-                        Icon(
-                            painter = painterResource(R.drawable.download),
-                            contentDescription = "Fav",
-                            modifier = Modifier
-                                .size(30.dp)
-                                .clickable {
-                                    DownloadService.sendRemoveDownload(
-                                        context,
-                                        PredanieDownloadService::class.java,
-                                        "${itemId}_${model.url}",
-                                        /* foreground = */ false
-                                    )
-                                    mainViewModel.loadDownloadedCompositions(context)
-                                    isDownloaded = !isDownloaded
-                                    Toast
-                                        .makeText(
-                                            context, "Удалено из загрузок",
-                                            Toast.LENGTH_SHORT
-                                        )
-                                        .show()
-                                }
-                                .fillMaxWidth(),
-                            tint = downloadColor
+                    var isFavorite by remember {
+                        mutableStateOf(
+                            mainViewModel.isTrackFavorite(
+                                model.url.toString(),
+                                context
+                            )
                         )
                     }
 
-                    Icon(
-                        painter = painterResource(R.drawable.add),
-                        contentDescription = "Добавить в очередь",
-                        modifier = Modifier
-                            .size(30.dp)
-                            .clickable {
-                                mainViewModel.addToQueue(model, context)
-                            }
-                            .fillMaxWidth(),
-                        tint = color
-                    )
+                    val color =
+                        if (isFavorite) (Color(android.graphics.Color.parseColor("#FFD600"))) else (Color(
+                            android.graphics.Color.parseColor("#000000")
+                        ))
+
+                    if (!isFavorite) {
+                        Icon(
+                            painter = painterResource(R.drawable.bookmark),
+                            contentDescription = "Fav",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clickable {
+                                    mainViewModel.setTrackToFavorites(
+                                        itemId = itemId, title = model.name.toString(),
+                                        compositionid = itemId, uri = model.url.toString(), context
+                                    )
+                                    isFavorite = !isFavorite
+                                }
+                                .fillMaxWidth(),
+                            tint = color
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(R.drawable.bookmark),
+                            contentDescription = "Fav",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clickable {
+                                    mainViewModel.removeTrackFromFavorite(
+                                        model.url.toString(),
+                                        context
+                                    )
+                                    isFavorite = !isFavorite
+                                }
+                                .fillMaxWidth(),
+                            tint = color
+                        )
+                    }
+
+                    var isDownloaded by remember {
+                        mutableStateOf(
+                            DownloadManagerSingleton.getInstance(
+                                context = context
+                            ).downloadIndex.getDownload(
+                                "${itemId}_${model.url}"
+                            )?.state == 3
+                        )
+                    }
+
+                    if (mainViewModel.isInternetConnected(context)) {
+                        val downloadColor =
+                            if (isDownloaded) (Color(android.graphics.Color.parseColor("#FFD600"))) else (Color(
+                                android.graphics.Color.parseColor("#000000")
+                            ))
+
+                        if (!isDownloaded) {
+                            Icon(
+                                painter = painterResource(R.drawable.download),
+                                contentDescription = "Fav",
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clickable {
+                                        val downloadRequest = DownloadRequest
+                                            .Builder(
+                                                "${itemId}_${model.url.toString()}",
+                                                Uri.parse(model.url)
+                                            )
+                                            .build()
+
+                                        DownloadService.sendAddDownload(
+                                            context,
+                                            PredanieDownloadService::class.java,
+                                            downloadRequest,
+                                            /* foreground = */ false
+                                        )
+                                        mainViewModel.loadDownloadedCompositions(context)
+                                        isDownloaded = !isDownloaded
+                                        Toast
+                                            .makeText(
+                                                context, "Загружается",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
+                                    }
+                                    .fillMaxWidth(),
+                                tint = downloadColor
+                            )
+                        } else {
+                            Icon(
+                                painter = painterResource(R.drawable.download),
+                                contentDescription = "Fav",
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clickable {
+                                        DownloadService.sendRemoveDownload(
+                                            context,
+                                            PredanieDownloadService::class.java,
+                                            "${itemId}_${model.url}",
+                                            /* foreground = */ false
+                                        )
+                                        mainViewModel.loadDownloadedCompositions(context)
+                                        isDownloaded = !isDownloaded
+                                        Toast
+                                            .makeText(
+                                                context, "Удалено из загрузок",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
+                                    }
+                                    .fillMaxWidth(),
+                                tint = downloadColor
+                            )
+                        }
+
+                        Icon(
+                            painter = painterResource(R.drawable.add),
+                            contentDescription = "Добавить в очередь",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clickable {
+                                    mainViewModel.addToQueue(model, context)
+                                }
+                                .fillMaxWidth(),
+                            tint = color
+                        )
+                    }
                 }
             }
         }

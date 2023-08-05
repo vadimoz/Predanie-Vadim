@@ -10,7 +10,8 @@ data class ResponsePostModel(
     val content: Content,
     val date: String,
     val id: Int,
-    val title: Title
+    val title: Title,
+    val link: String
 )
 
 data class Content(

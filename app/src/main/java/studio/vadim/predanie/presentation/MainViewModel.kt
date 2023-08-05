@@ -13,6 +13,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.exoplayer.offline.Download
+import androidx.media3.exoplayer.offline.DownloadManager
+import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.media3.session.MediaController
 import androidx.paging.Pager
@@ -39,6 +42,7 @@ import studio.vadim.predanie.domain.models.api.items.ResponseItemModel
 import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.domain.usecases.showItems.GetItems
 import studio.vadim.predanie.domain.usecases.showLists.GetLists
+import studio.vadim.predanie.presentation.downloadService.DownloadManagerSingleton
 import studio.vadim.predanie.presentation.downloadService.PredanieDownloadService
 import studio.vadim.predanie.presentation.pagination.BlogPagingSource
 import studio.vadim.predanie.presentation.pagination.CompositionsPagingSource
@@ -49,6 +53,7 @@ import studio.vadim.predanie.presentation.pagination.FavTracksPagingSource
 import studio.vadim.predanie.presentation.pagination.HistoryPagingSource
 import studio.vadim.predanie.presentation.pagination.PlaylistsPagingSource
 import studio.vadim.predanie.presentation.pagination.SpecialPagingSource
+import java.lang.Exception
 
 
 class MainViewModel(
@@ -621,7 +626,7 @@ class MainViewModel(
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-    fun getAllPlaylists(context: Context): List<UserPlaylist>{
+    fun getAllPlaylists(context: Context): List<UserPlaylist> {
         return AppDatabase.getInstance(context).userPlaylistDao().getAll()
     }
 
@@ -685,12 +690,38 @@ class MainViewModel(
         ).show()
     }
 
-    fun cleanQueue(context: Context){
+    fun cleanQueue(context: Context) {
         uiState.value.playerController?.removeMediaItems(0, 100000)
         updateCurrentPlaylistToUi(uiState.value.playerController)
 
         Toast.makeText(
             context, "Очередь воспроизведения очищена!",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun downloadAll(playerList: ArrayList<MediaItem>, itemId: String, context: Context) {
+        playerList.forEach {
+            val downloadRequest = DownloadRequest
+                .Builder(
+                    "${itemId}_${it.mediaMetadata.description.toString()}",
+                    Uri.parse(it.mediaMetadata.description.toString())
+                )
+                .build()
+
+            DownloadService.sendAddDownload(
+                context,
+                PredanieDownloadService::class.java,
+                downloadRequest,
+                /* foreground = */ false
+            )
+        }
+
+        val dm = DownloadManagerSingleton.getInstance(context)
+
+        Toast.makeText(
+            context, "Файлы скачиваются...",
             Toast.LENGTH_SHORT
         ).show()
     }

@@ -90,6 +90,8 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
         LaunchedEffect(Unit) {
             mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
 
+            mainViewModel.loadHistoryCompositions(context)
+
             if (action == "play") {
                 uiState.playerController?.play()
             }
