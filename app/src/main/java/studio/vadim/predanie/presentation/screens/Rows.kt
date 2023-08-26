@@ -166,7 +166,8 @@ fun ListRow(model: VideoData, navController: NavHostController, mainViewModel: M
 
                 }
                 .fillMaxWidth()
-                .size(0.13.dh),
+                .size(0.13.dh)
+                .padding(20.dp),
             contentScale = ContentScale.Crop
         )
         Text(
@@ -551,7 +552,7 @@ fun ListRow(model: Compositions, navController: NavHostController, mainViewModel
             .wrapContentHeight()
             .fillMaxWidth()
             .width(130.dp)
-            .height(300.dp)
+            .height(340.dp)
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)

@@ -413,7 +413,7 @@ fun AccordionRow(
                                     mainViewModel.addToQueue(model, context)
                                 }
                                 .fillMaxWidth(),
-                            tint = color
+                            tint = Color.Black
                         )
                     }
                 }

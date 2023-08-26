@@ -262,7 +262,7 @@ fun ItemScreen(
                                     tint = Color.Black.copy(alpha = 0.5f),
                                 )
                                 Icon(
-                                    painter = painterResource(R.drawable.playlist_add),
+                                    painter = painterResource(R.drawable.restart),
                                     contentDescription = "Play",
                                     modifier = Modifier.size(20.dp),
                                     tint = Color.Black.copy(alpha = 0.5f),
