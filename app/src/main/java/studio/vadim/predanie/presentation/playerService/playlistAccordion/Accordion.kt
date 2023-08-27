@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
@@ -103,9 +105,8 @@ fun PlaylistAccordion(
                     tonalElevation = 1.dp,
                     modifier = Modifier.padding(top = 8.dp)
                 ) {
-                    Column {
-
-                        var counter = 1
+                    LazyColumn {
+                        /*var counter = 1
                         for (row in model.rows) {
                             PlaylistAccordionRow(
                                 row,
@@ -119,6 +120,9 @@ fun PlaylistAccordion(
                             )
                             Divider(color = Gray200, thickness = 1.dp)
                             counter += 1
+                        }*/
+                        items(model.rows.count()) { index ->
+                            Text(model.rows[index].mediaMetadata.title.toString())
                         }
                     }
                 }
@@ -137,8 +141,8 @@ fun PlaylistAccordion(
                     tonalElevation = 1.dp,
                     modifier = Modifier.padding(top = 8.dp)
                 ) {
-                    Column {
-                        var counter = 1
+                    LazyColumn {
+                        /*var counter = 1
                         for (row in model.rows) {
                             PlaylistAccordionRow(
                                 row,
@@ -148,10 +152,22 @@ fun PlaylistAccordion(
                                 mainViewModel = mainViewModel,
                                 uiState = uiState,
                                 globalItemIndex = globalItemCount,
-                                partCount = partCount
+                                partCount
                             )
                             Divider(color = Gray200, thickness = 1.dp)
                             counter += 1
+                        }*/
+                        items(model.rows.count()) { index ->
+                            PlaylistAccordionRow(
+                                model.rows[index],
+                                index+1,
+                                playerList = playerList,
+                                navController = navController,
+                                mainViewModel = mainViewModel,
+                                uiState = uiState,
+                                globalItemIndex = globalItemCount,
+                                partCount
+                            )
                         }
                     }
                 }
@@ -237,6 +253,7 @@ fun PlaylistAccordionRow(
                     .wrapContentWidth()
                     .padding(end = 5.dp), color = Gray600
             )
+
             Text(model.mediaMetadata.title.toString(), Modifier.weight(1f), color = Gray600)
 
             Icon(
@@ -267,7 +284,6 @@ fun PlaylistAccordionRow(
                 //tint = color
             )
 
-
             Icon(
                 painter = painterResource(R.drawable.remove),
                 contentDescription = "Delete from playlist",
@@ -280,35 +296,6 @@ fun PlaylistAccordionRow(
                     .fillMaxWidth(),
                 //tint = color
             )
-
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-            ) {
-                //style = bodyBold
-
-                /*if (model.time != null) {
-                    val seconds: Int = model.time as Int
-                    val S = seconds % 60
-                    var H = seconds / 60
-                    val M = H % 60
-                    H = H / 60
-
-                    Text(
-                        text = "$H:$M:$S",
-                        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
-                        color = Color.Black
-                    )
-                }*/
-
-                /*Surface(color = Green500, shape = RoundedCornerShape(8.dp), tonalElevation = 2.dp) {
-                    Text(
-                        text = "Запустить",
-                        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
-                        color = White
-                    )
-                }*/
-            }
         }
 
         val timeQuery = AppDatabase.getInstance(LocalContext.current).filePositionDao()

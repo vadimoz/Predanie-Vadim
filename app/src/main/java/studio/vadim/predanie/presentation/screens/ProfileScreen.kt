@@ -99,7 +99,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
 
         Column(
             modifier = Modifier
-                .verticalScroll(rememberScrollState())
+                //.verticalScroll(rememberScrollState())
         ) {
 
             if (!mainViewModel.isInternetConnected(context)) {
@@ -126,7 +126,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                 }
             }
 
-            Column(
+            /*Column(
                 Modifier
                     .fillMaxSize()
                     .height(300.dp),
@@ -153,8 +153,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                         it.player = uiState.playerController
                     }
                 )
-
-            }
+            }*/
 
             //Очередь воспроизведения
             Column(
@@ -213,176 +212,68 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                 })
             }
 
-            if (mainViewModel.isInternetConnected(context)) {
-                Column(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .fillMaxWidth()
-                ) {
-                    Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
-                        Text(
-                            modifier = Modifier.padding(top = 8.dp),
-                            text = "§",
-                            fontSize = 25.sp,
-                            color = Color(android.graphics.Color.parseColor("#FFD600"))
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = 5.dp),
-                            text = "Моя история",
-                            fontSize = 35.sp,
-                            color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                        )
-                    }
-                }
-
-                LazyRow() {
-                    if (historyList != null) {
-                        items(historyList.itemCount) { index ->
-                            historyList[index]?.let {
-                                ListRow(model = it, navController)
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (mainViewModel.isInternetConnected(context)) {
-                //Отложенные
-                Column(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .fillMaxWidth()
-                ) {
-                    Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
-                        Text(
-                            modifier = Modifier.padding(top = 8.dp),
-                            text = "§",
-                            fontSize = 25.sp,
-                            color = Color(android.graphics.Color.parseColor("#FFD600"))
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = 5.dp),
-                            text = "Моё избранное",
-                            fontSize = 35.sp,
-                            color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                        )
-
-                    }
-                }
-
-                LazyRow() {
-                    if (favAuthorsList != null) {
-                        items(favAuthorsList.itemCount) { index ->
-                            favAuthorsList[index]?.let {
-                                ListRow(
-                                    model = it,
-                                    navController,
-                                    mainViewModel
-                                )
-                            }
-                        }
-                    }
-                }
-
-                LazyRow() {
-                    if (favCompositionsList != null) {
-                        items(favCompositionsList.itemCount) { index ->
-                            favCompositionsList[index]?.let {
-                                ListRow(
-                                    model = it,
-                                    navController,
-                                    mainViewModel
-                                )
-                            }
-                        }
-                    }
-                }
-
-                LazyRow() {
-                    if (favTracksList != null) {
-                        items(favTracksList.itemCount) { index ->
-                            favTracksList[index]?.let {
-                                ListRow(
-                                    model = it,
-                                    navController,
-                                    mainViewModel
-                                )
-                            }
-                        }
-                    }
-                }
-
-            }
-
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-            ) {
-
-                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
-                    Text(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = "§",
-                        fontSize = 25.sp,
-                        color = Color(android.graphics.Color.parseColor("#FFD600"))
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = "Мои загрузки",
-                        fontSize = 35.sp,
-                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                    )
-                    Icon(
-                        painter = painterResource(R.drawable.trash),
-                        contentDescription = "file",
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                if (mainViewModel.isInternetConnected(context)) {
+                    Column(
                         modifier = Modifier
-                            .size(30.dp)
-                            .clickable {
-                                //Удаляем все загрузки
-                                showDeleteDialog.value = true
-                            },
-                        tint = Color(android.graphics.Color.parseColor("#FFD600")),
-                    )
-                }
-            }
-
-            LazyRow() {
-                if (downloadsList != null) {
-                    items(downloadsList.itemCount) { index ->
-                        downloadsList[index]?.let {
-                            ListRow(model = it, navController, mainViewModel)
+                            .wrapContentHeight()
+                            .fillMaxWidth()
+                    ) {
+                        Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                            Text(
+                                modifier = Modifier.padding(top = 8.dp),
+                                text = "§",
+                                fontSize = 25.sp,
+                                color = Color(android.graphics.Color.parseColor("#FFD600"))
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 5.dp),
+                                text = "Моя история",
+                                fontSize = 35.sp,
+                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                            )
                         }
-                    }
-                }
-            }
-
-            if (mainViewModel.isInternetConnected(context)) {
-                //Плейлисты
-                Column(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .fillMaxWidth()
-                ) {
-                    Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
-                        Text(
-                            modifier = Modifier.padding(top = 8.dp),
-                            text = "§",
-                            fontSize = 25.sp,
-                            color = Color(android.graphics.Color.parseColor("#FFD600"))
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = 5.dp),
-                            text = "Мои плейлисты",
-                            fontSize = 35.sp,
-                            color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                        )
                     }
 
                     LazyRow() {
-                        if (playlistsList != null) {
-                            items(playlistsList.itemCount) { index ->
-                                playlistsList[index]?.let {
+                        if (historyList != null) {
+                            items(historyList.itemCount) { index ->
+                                historyList[index]?.let {
+                                    ListRow(model = it, navController)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (mainViewModel.isInternetConnected(context)) {
+                    //Отложенные
+                    Column(
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .fillMaxWidth()
+                    ) {
+                        Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                            Text(
+                                modifier = Modifier.padding(top = 8.dp),
+                                text = "§",
+                                fontSize = 25.sp,
+                                color = Color(android.graphics.Color.parseColor("#FFD600"))
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 5.dp),
+                                text = "Моё избранное",
+                                fontSize = 35.sp,
+                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                            )
+
+                        }
+                    }
+
+                    LazyRow() {
+                        if (favAuthorsList != null) {
+                            items(favAuthorsList.itemCount) { index ->
+                                favAuthorsList[index]?.let {
                                     ListRow(
                                         model = it,
                                         navController,
@@ -393,159 +284,271 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                         }
                     }
 
-                    var dialogOpen by remember {
-                        mutableStateOf(false)
+                    LazyRow() {
+                        if (favCompositionsList != null) {
+                            items(favCompositionsList.itemCount) { index ->
+                                favCompositionsList[index]?.let {
+                                    ListRow(
+                                        model = it,
+                                        navController,
+                                        mainViewModel
+                                    )
+                                }
+                            }
+                        }
                     }
 
-                    if (dialogOpen) {
-                        Dialog(onDismissRequest = {
-                            dialogOpen = false
-                        }) {
-                            Surface(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentHeight(),
-                                shape = RoundedCornerShape(size = 10.dp)
-                            ) {
-
-                                Column(modifier = Modifier
-                                    .padding(all = 16.dp)
-                                    .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally,) {
-                                    Text(text = "Добавить Очередь воспроизведения в новый плейлист:")
-
-                                    var playlistName by rememberSaveable { mutableStateOf("") }
-                                    TextField(
-                                        value = playlistName,
-                                        onValueChange = {
-                                            playlistName = it
-                                        },
-                                        label = { Text("Название нового плейлиста") }
+                    LazyRow() {
+                        if (favTracksList != null) {
+                            items(favTracksList.itemCount) { index ->
+                                favTracksList[index]?.let {
+                                    ListRow(
+                                        model = it,
+                                        navController,
+                                        mainViewModel
                                     )
+                                }
+                            }
+                        }
+                    }
 
-                                    Button(modifier = Modifier.padding(10.dp), onClick = {
-                                        mainViewModel.setCurrentPlaylistToDb(uiState.playerController, context, playlistName)
-                                        mainViewModel.loadPlaylists(context)
-                                        dialogOpen = false
-                                    }, colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(android.graphics.Color.parseColor("#ffcd00")),
-                                        contentColor = Color.White)){
-                                        Text("Создать", fontSize = 13.sp)
-                                    }
+                }
 
-                                    val currentPlaylists = mainViewModel.getAllPlaylists(context)
+                Column(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth()
+                ) {
 
-                                    if(currentPlaylists.isNotEmpty()) {
-                                        Text(
-                                            modifier = Modifier.padding(10.dp),
-                                            text = "Добавить в существующий плейлист (все треки будут заменены):"
+                    Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                        Text(
+                            modifier = Modifier.padding(top = 8.dp),
+                            text = "§",
+                            fontSize = 25.sp,
+                            color = Color(android.graphics.Color.parseColor("#FFD600"))
+                        )
+                        Text(
+                            modifier = Modifier.padding(start = 5.dp),
+                            text = "Мои загрузки",
+                            fontSize = 35.sp,
+                            color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                        )
+                        Icon(
+                            painter = painterResource(R.drawable.trash),
+                            contentDescription = "file",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clickable {
+                                    //Удаляем все загрузки
+                                    showDeleteDialog.value = true
+                                },
+                            tint = Color(android.graphics.Color.parseColor("#FFD600")),
+                        )
+                    }
+                }
+
+                LazyRow() {
+                    if (downloadsList != null) {
+                        items(downloadsList.itemCount) { index ->
+                            downloadsList[index]?.let {
+                                ListRow(model = it, navController, mainViewModel)
+                            }
+                        }
+                    }
+                }
+
+                if (mainViewModel.isInternetConnected(context)) {
+                    //Плейлисты
+                    Column(
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .fillMaxWidth()
+                    ) {
+                        Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                            Text(
+                                modifier = Modifier.padding(top = 8.dp),
+                                text = "§",
+                                fontSize = 25.sp,
+                                color = Color(android.graphics.Color.parseColor("#FFD600"))
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 5.dp),
+                                text = "Мои плейлисты",
+                                fontSize = 35.sp,
+                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                            )
+                        }
+
+                        LazyRow() {
+                            if (playlistsList != null) {
+                                items(playlistsList.itemCount) { index ->
+                                    playlistsList[index]?.let {
+                                        ListRow(
+                                            model = it,
+                                            navController,
+                                            mainViewModel
                                         )
-                                        Column() {
-                                            currentPlaylists.forEach(){
-                                                Text(modifier = Modifier
-                                                    .padding(20.dp)
-                                                    .clickable {
-                                                        mainViewModel.setCurrentPlaylistToDb(
-                                                            uiState.playerController,
-                                                            context,
-                                                            it.playlistName
-                                                        )
-                                                        mainViewModel.loadPlaylists(context)
-                                                        dialogOpen = false
-                                                    }, text = it.playlistName)
+                                    }
+                                }
+                            }
+                        }
+
+                        var dialogOpen by remember {
+                            mutableStateOf(false)
+                        }
+
+                        if (dialogOpen) {
+                            Dialog(onDismissRequest = {
+                                dialogOpen = false
+                            }) {
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight(),
+                                    shape = RoundedCornerShape(size = 10.dp)
+                                ) {
+
+                                    Column(modifier = Modifier
+                                        .padding(all = 16.dp)
+                                        .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally,) {
+                                        Text(text = "Добавить Очередь воспроизведения в новый плейлист:")
+
+                                        var playlistName by rememberSaveable { mutableStateOf("") }
+                                        TextField(
+                                            value = playlistName,
+                                            onValueChange = {
+                                                playlistName = it
+                                            },
+                                            label = { Text("Название нового плейлиста") }
+                                        )
+
+                                        Button(modifier = Modifier.padding(10.dp), onClick = {
+                                            mainViewModel.setCurrentPlaylistToDb(uiState.playerController, context, playlistName)
+                                            mainViewModel.loadPlaylists(context)
+                                            dialogOpen = false
+                                        }, colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(android.graphics.Color.parseColor("#ffcd00")),
+                                            contentColor = Color.White)){
+                                            Text("Создать", fontSize = 13.sp)
+                                        }
+
+                                        val currentPlaylists = mainViewModel.getAllPlaylists(context)
+
+                                        if(currentPlaylists.isNotEmpty()) {
+                                            Text(
+                                                modifier = Modifier.padding(10.dp),
+                                                text = "Добавить в существующий плейлист (все треки будут заменены):"
+                                            )
+                                            Column() {
+                                                currentPlaylists.forEach(){
+                                                    Text(modifier = Modifier
+                                                        .padding(20.dp)
+                                                        .clickable {
+                                                            mainViewModel.setCurrentPlaylistToDb(
+                                                                uiState.playerController,
+                                                                context,
+                                                                it.playlistName
+                                                            )
+                                                            mainViewModel.loadPlaylists(context)
+                                                            dialogOpen = false
+                                                        }, text = it.playlistName)
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
+
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                            Button(onClick = {
+                                dialogOpen = true
+                            }, colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(android.graphics.Color.parseColor("#ffcd00")),
+                                contentColor = Color.White)){
+                                Text("Сохранить очередь воспроизведения в плейлист", fontSize = 13.sp)
+                            }
+                        }
+                    }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth()
+                ) {
+                    Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                        Text(
+                            modifier = Modifier.padding(top = 8.dp),
+                            text = "§",
+                            fontSize = 25.sp,
+                            color = Color(android.graphics.Color.parseColor("#FFD600"))
+                        )
+                        Text(
+                            modifier = Modifier.padding(start = 5.dp),
+                            text = "Мои настройки",
+                            fontSize = 35.sp,
+                            color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                        )
                     }
 
-                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                        Button(onClick = {
-                            dialogOpen = true
-                        }, colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(android.graphics.Color.parseColor("#ffcd00")),
-                            contentColor = Color.White)){
-                            Text("Сохранить очередь воспроизведения в плейлист", fontSize = 13.sp)
+                    Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                        Checkbox(
+                            checked = uiState.goToNext,
+                            onCheckedChange = {
+                                mainViewModel.setGoToNextSettings(it, context)
+                            }
+                        )
+                        Text(
+                            modifier = Modifier.padding(start = 5.dp),
+                            text = "Пропускать в плеере файлы, которые я уже слушал",
+                            fontSize = 20.sp,
+                            color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                        )
+                    }
+
+                    Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+
+                        var expanded by remember { mutableStateOf(false) }
+                        Box {
+                            IconButton(onClick = { expanded = true }) {
+                                Icon(Icons.Default.MoreVert, contentDescription = "Показать меню")
+                            }
+                            DropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }
+                            ) {
+                                DropdownMenuItem(onClick = {
+                                    mainViewModel.setPercentToFileReady(90, context)
+                                    expanded = false
+                                }, text = {
+                                    Text("90%")
+                                })
+                                DropdownMenuItem(onClick = {
+                                    mainViewModel.setPercentToFileReady(95, context)
+                                    expanded = false
+                                }, text = {
+                                    Text("95%")
+                                })
+                                DropdownMenuItem(onClick = {
+                                    mainViewModel.setPercentToFileReady(100, context)
+                                    expanded = false
+                                }, text = {
+                                    Text("100%")
+                                })
+                            }
                         }
+                        Text(
+                            modifier = Modifier.padding(start = 5.dp),
+                            text = "Помечать файл прослушанным по достижении ${uiState.percentToFileReady}%",
+                            fontSize = 20.sp,
+                            color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                        )
                     }
                 }
             }
 
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-            ) {
-                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
-                    Text(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = "§",
-                        fontSize = 25.sp,
-                        color = Color(android.graphics.Color.parseColor("#FFD600"))
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = "Мои настройки",
-                        fontSize = 35.sp,
-                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                    )
-                }
 
-                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
-                    Checkbox(
-                        checked = uiState.goToNext,
-                        onCheckedChange = {
-                            mainViewModel.setGoToNextSettings(it, context)
-                        }
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = "Пропускать в плеере файлы, которые я уже слушал",
-                        fontSize = 20.sp,
-                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                    )
-                }
-
-                Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
-
-                    var expanded by remember { mutableStateOf(false) }
-                    Box {
-                        IconButton(onClick = { expanded = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Показать меню")
-                        }
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            DropdownMenuItem(onClick = {
-                                mainViewModel.setPercentToFileReady(90, context)
-                                expanded = false
-                            }, text = {
-                                Text("90%")
-                            })
-                            DropdownMenuItem(onClick = {
-                                mainViewModel.setPercentToFileReady(95, context)
-                                expanded = false
-                            }, text = {
-                                Text("95%")
-                            })
-                            DropdownMenuItem(onClick = {
-                                mainViewModel.setPercentToFileReady(100, context)
-                                expanded = false
-                            }, text = {
-                                Text("100%")
-                            })
-                        }
-                    }
-                    Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = "Помечать файл прослушанным по достижении ${uiState.percentToFileReady}%",
-                        fontSize = 20.sp,
-                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
-                    )
-                }
-            }
         }
     }
 }
