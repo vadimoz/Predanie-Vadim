@@ -106,11 +106,10 @@ fun PlaylistAccordion(
                     modifier = Modifier.padding(top = 8.dp)
                 ) {
                     LazyColumn {
-                        /*var counter = 1
-                        for (row in model.rows) {
+                        items(model.rows.count()) { index ->
                             PlaylistAccordionRow(
-                                row,
-                                counter,
+                                model.rows[index],
+                                index+1,
                                 playerList = playerList,
                                 navController = navController,
                                 mainViewModel = mainViewModel,
@@ -118,11 +117,6 @@ fun PlaylistAccordion(
                                 globalItemIndex = globalItemCount,
                                 partCount
                             )
-                            Divider(color = Gray200, thickness = 1.dp)
-                            counter += 1
-                        }*/
-                        items(model.rows.count()) { index ->
-                            Text(model.rows[index].mediaMetadata.title.toString())
                         }
                     }
                 }
@@ -142,21 +136,6 @@ fun PlaylistAccordion(
                     modifier = Modifier.padding(top = 8.dp)
                 ) {
                     LazyColumn {
-                        /*var counter = 1
-                        for (row in model.rows) {
-                            PlaylistAccordionRow(
-                                row,
-                                counter,
-                                playerList = playerList,
-                                navController = navController,
-                                mainViewModel = mainViewModel,
-                                uiState = uiState,
-                                globalItemIndex = globalItemCount,
-                                partCount
-                            )
-                            Divider(color = Gray200, thickness = 1.dp)
-                            counter += 1
-                        }*/
                         items(model.rows.count()) { index ->
                             PlaylistAccordionRow(
                                 model.rows[index],

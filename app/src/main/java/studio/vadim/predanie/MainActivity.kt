@@ -6,14 +6,18 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
@@ -26,16 +30,20 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
+import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -144,7 +152,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
     @Composable
     fun MainScreen() {
-
+        val uiState by mainViewModel.uiState.collectAsState()
         navController = rememberAnimatedNavController()
 
         Scaffold(
@@ -161,17 +169,24 @@ class MainActivity : ComponentActivity() {
         )
         if ((currentRoute(navController) != NavigationItem.Splash.route) && (currentRoute(navController) != NavigationItem.Player.route)) {
             BottomAppBar(modifier = Modifier.padding(top = 400.dp)) {
-                IconButton(onClick = { }) {
-                    Icon(
-                        Icons.Filled.Favorite,
-                        contentDescription = "Избранное"
-                    )
-                }
-                Spacer(Modifier.weight(1f, true))
-                IconButton(onClick = { }) {
-                    Icon(
-                        Icons.Filled.Info,
-                        contentDescription = "Информация о приложении"
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .height(300.dp)
+                        .width(100.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    //verticalArrangement = Arrangement.Center
+                ) {
+
+                    AndroidView(
+                        factory = { context ->
+                            PlayerView(context).apply {
+                                player = uiState.playerController
+                            }
+                        },
+                        update = {
+                            it.player = uiState.playerController
+                        }
                     )
                 }
             }

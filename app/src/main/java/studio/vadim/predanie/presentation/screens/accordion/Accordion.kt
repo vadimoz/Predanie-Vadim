@@ -115,7 +115,6 @@ fun Accordion(
                     modifier = Modifier.padding(top = 8.dp)
                 ) {
                     Column {
-
                         var counter = 1
                         for (row in model.rows) {
                             AccordionRow(

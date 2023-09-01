@@ -266,7 +266,6 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                                 fontSize = 35.sp,
                                 color = Color(android.graphics.Color.parseColor("#2F2F2F"))
                             )
-
                         }
                     }
 
