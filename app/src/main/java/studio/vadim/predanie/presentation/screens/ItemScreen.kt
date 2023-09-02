@@ -124,9 +124,14 @@ fun ItemScreen(
                     val matrix = ColorMatrix()
                     matrix.setToSaturation(0F)
 
+                    var image = uiState.itemInto!!.data?.img_big
+                    if(image == null){
+                        image = "https://predanie.ru/img/no-image/work_200.png"
+                    }
+
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(uiState.itemInto!!.data?.img_big)
+                            .data(image)
                             .memoryCachePolicy(CachePolicy.ENABLED)
                             .diskCachePolicy(CachePolicy.ENABLED)
                             .build(),

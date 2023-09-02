@@ -78,9 +78,14 @@ fun ListRow(
             .width(250.dp)
             .padding(20.dp)
     ) {
+
+        var image = model.Embedded?.wp_featuredmedia?.get(0)?.source_url
+        if(image == null){
+            image = "https://predanie.ru/img/no-image/work_200.png"
+        }
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(model.Embedded?.wp_featuredmedia?.get(0)?.source_url)
+                .data(image)
                 .memoryCachePolicy(CachePolicy.ENABLED)
                 .diskCachePolicy(CachePolicy.ENABLED)
                 .build(),
@@ -129,9 +134,13 @@ fun ListRow(model: VideoData, navController: NavHostController, mainViewModel: M
             .fillMaxWidth()
             .width(0.13.dh)
     ) {
+        var image = model.attributes?.image
+        if(image == null){
+            image = "https://predanie.ru/img/no-image/work_200.png"
+        }
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(model.attributes?.image)
+                .data(image)
                 .memoryCachePolicy(CachePolicy.ENABLED)
                 .diskCachePolicy(CachePolicy.ENABLED)
                 .build(),
@@ -197,9 +206,13 @@ fun ListRow(
             .fillMaxWidth()
             .width(0.13.dh)
     ) {
+        var image = model.image
+        if(image == null){
+            image = "https://predanie.ru/img/no-image/author_300.png"
+        }
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(model.image)
+                .data(image)
                 .memoryCachePolicy(CachePolicy.ENABLED)
                 .diskCachePolicy(CachePolicy.ENABLED)
                 .build(),
@@ -244,9 +257,13 @@ fun ListRow(
             .width(130.dp)
             .height(300.dp)
     ) {
+        var image = model.image
+        if(image == ""){
+            image = "https://predanie.ru/img/no-image/work_200.png"
+        }
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(model.image)
+                .data(image)
                 .memoryCachePolicy(CachePolicy.ENABLED)
                 .diskCachePolicy(CachePolicy.ENABLED)
                 .build(),
@@ -460,9 +477,13 @@ fun ListRow(model: HistoryCompositions, navController: NavHostController) {
             .width(130.dp)
             .height(300.dp)
     ) {
+        var image = model.image
+        if(image == ""){
+            image = "https://predanie.ru/img/no-image/work_200.png"
+        }
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(model.image)
+                .data(image)
                 .memoryCachePolicy(CachePolicy.ENABLED)
                 .diskCachePolicy(CachePolicy.ENABLED)
                 .build(),
@@ -505,9 +526,13 @@ fun ListRow(
             .width(130.dp)
             .height(300.dp)
     ) {
+        var image = model.image
+        if(image == ""){
+            image = "https://predanie.ru/img/no-image/work_200.png"
+        }
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(model.image)
+                .data(image)
                 .memoryCachePolicy(CachePolicy.ENABLED)
                 .diskCachePolicy(CachePolicy.ENABLED)
                 .build(),
@@ -554,9 +579,13 @@ fun ListRow(model: Compositions, navController: NavHostController, mainViewModel
             .width(130.dp)
             .height(340.dp)
     ) {
+        var image = model.img_s
+        if(image == null){
+            image = "https://predanie.ru/img/no-image/work_200.png"
+        }
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(model.img_s)
+                .data(image)
                 .memoryCachePolicy(CachePolicy.ENABLED)
                 .diskCachePolicy(CachePolicy.ENABLED)
                 .build(),
@@ -629,8 +658,12 @@ fun ListAuthorsRow(model: Entities, navController: NavHostController) {
                 navController.navigate("AuthorScreen/${model.id}")
             }
     ) {
+        var image = model.img
+        if(image == null){
+            image = "https://predanie.ru/img/no-image/author_300.png"
+        }
         Image(
-            painter = rememberAsyncImagePainter(model.img),
+            painter = rememberAsyncImagePainter(image),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -668,8 +701,12 @@ fun ListRow(model: Entities, navController: NavHostController, mainViewModel: Ma
                 navController.navigate("ItemScreen/${model.id}")
             }
     ) {
+        var image = model.img_s
+        if(image == null){
+            image = "https://predanie.ru/img/no-image/work_200.png"
+        }
         Image(
-            painter = rememberAsyncImagePainter(model.img_s),
+            painter = rememberAsyncImagePainter(image),
             contentDescription = null,
             modifier = Modifier
                 .size(190.dp)
@@ -732,9 +769,13 @@ fun ListRow(
             .width(130.dp)
             .height(300.dp)
     ) {
+        var image = model.img_s
+        if(image == null){
+            image = "https://predanie.ru/img/no-image/work_200.png"
+        }
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(model.img_s)
+                .data(image)
                 .memoryCachePolicy(CachePolicy.ENABLED)
                 .diskCachePolicy(CachePolicy.ENABLED)
                 .build(),

@@ -15,6 +15,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavHostController
+import studio.vadim.predanie.R
 import studio.vadim.predanie.presentation.MainViewModel
 
 @Composable
@@ -46,6 +47,7 @@ fun PlayerScreen(mainViewModel: MainViewModel, navController: NavHostController)
             factory = { context ->
                 PlayerView(context).apply {
                     player = uiState.playerController
+                    defaultArtwork = getResources().getDrawable(R.drawable.artwork)
                 }
             },
             update = {

@@ -284,6 +284,7 @@ class MainActivity : ComponentActivity() {
                                         setShowPreviousButton(true)
                                         setShowNextButton(true)
                                         setShowRewindButton(true)
+                                        defaultArtwork = getResources().getDrawable(R.drawable.artwork)
                                         setShowFastForwardButton(true)
                                         controllerShowTimeoutMs = 0
                                         showController()

@@ -248,8 +248,6 @@ class MainViewModel(
                         )
                         .build()
                 )
-
-
             }
         }
 
