@@ -10,9 +10,11 @@ import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -43,6 +45,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
+import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -168,26 +171,31 @@ class MainActivity : ComponentActivity() {
             },
         )
         if ((currentRoute(navController) != NavigationItem.Splash.route) && (currentRoute(navController) != NavigationItem.Player.route)) {
-            BottomAppBar(modifier = Modifier.padding(top = 400.dp)) {
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .height(300.dp)
-                        .width(100.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    //verticalArrangement = Arrangement.Center
-                ) {
-
-                    AndroidView(
-                        factory = { context ->
-                            PlayerView(context).apply {
-                                player = uiState.playerController
+            Column(
+                Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceBetween) {
+                Spacer(modifier = Modifier.weight(1f))
+                NavigationBar(modifier = Modifier.height(280.dp).padding(bottom = 80.dp)) {
+                        AndroidView(
+                            factory = { context ->
+                                PlayerView(context).apply {
+                                    player = uiState.playerController
+                                    useController = true
+                                    resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                                    setControllerAutoShow(true)
+                                    controllerHideOnTouch = false
+                                    setShowPreviousButton(true)
+                                    setShowNextButton(true)
+                                    setShowRewindButton(true)
+                                    setShowFastForwardButton(true)
+                                    controllerShowTimeoutMs = 0
+                                    showController()
+                                }
+                            },
+                            update = {
+                                it.player = uiState.playerController
                             }
-                        },
-                        update = {
-                            it.player = uiState.playerController
-                        }
-                    )
+                        )
                 }
             }
         }

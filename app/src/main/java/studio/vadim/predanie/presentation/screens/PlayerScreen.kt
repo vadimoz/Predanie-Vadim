@@ -46,14 +46,6 @@ fun PlayerScreen(mainViewModel: MainViewModel, navController: NavHostController)
             factory = { context ->
                 PlayerView(context).apply {
                     player = uiState.playerController
-                    controllerHideOnTouch = true
-                    setShowPreviousButton(false)
-                    setShowNextButton(false)
-                    setShowRewindButton(false)
-                    setShowFastForwardButton(false)
-                    controllerAutoShow = false
-                    controllerShowTimeoutMs = 0
-                    showController()
                 }
             },
             update = {

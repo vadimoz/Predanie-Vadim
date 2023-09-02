@@ -91,7 +91,13 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
                 actionFactory: MediaNotification.ActionFactory,
                 onNotificationChangedCallback: MediaNotification.Provider.Callback
             ): MediaNotification {
-                createNotification(mediaSession)
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
+                    createNotification(mediaSession)
+                }
+                else  {
+                    createNotificationOldAndroid(mediaSession)
+                }
+
                 return MediaNotification(1, nBuilder.build())
             }
 
@@ -413,6 +419,7 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     fun createNotificationOldAndroid(session: MediaSession) {
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationCompat = NotificationCompat.Builder(this)
             .setSmallIcon(R.drawable.predanie)
             .setContentTitle(session.player.mediaMetadata.title)
@@ -422,6 +429,12 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
             .setStyle(MediaStyleNotificationHelper.MediaStyle(session))
             .build()
         notificationManager.notify(1, notificationCompat)
+        nBuilder = NotificationCompat.Builder(this, "1")
+            .setSmallIcon(R.drawable.predanie)
+            .setContentTitle("")
+            .setContentText("")
+            .setContentIntent(createPendingIntent("https://predanie.ru/player"))
+            .setStyle(MediaStyleNotificationHelper.MediaStyle(session))
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
