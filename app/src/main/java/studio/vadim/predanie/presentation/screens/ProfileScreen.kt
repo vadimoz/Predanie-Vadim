@@ -163,7 +163,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                     .fillMaxWidth()
             ) {
 
-                Icon(
+                /*Icon(
                     painter = painterResource(R.drawable.fullscreen),
                     contentDescription = "Fullscreen",
                     modifier = Modifier
@@ -174,7 +174,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                         }
                         .fillMaxWidth(),
                     tint = Color(android.graphics.Color.parseColor("#000000")),
-                )
+                )*/
 
                 Row(modifier = Modifier.padding(bottom = 5.dp)) {
                     //Выводим очередь воспроизведения
@@ -207,9 +207,10 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                         )
                     }
                 }
+                /*
                 Text(text = "Очистить", fontSize = 12.sp, modifier = Modifier.clickable {
                     mainViewModel.cleanQueue(context)
-                })
+                })*/
             }
 
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {

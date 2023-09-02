@@ -10,16 +10,22 @@ import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
@@ -27,6 +33,7 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -36,7 +43,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -154,9 +166,11 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
     @Composable
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     fun MainScreen() {
         val uiState by mainViewModel.uiState.collectAsState()
         navController = rememberAnimatedNavController()
+        val context = LocalContext.current
 
         Scaffold(
             content = { padding ->
@@ -165,37 +179,122 @@ class MainActivity : ComponentActivity() {
                 }
             },
             bottomBar = {
-                if ((currentRoute(navController) != NavigationItem.Splash.route) && (currentRoute(navController) != NavigationItem.Player.route)) {
+                if ((currentRoute(navController) != NavigationItem.Splash.route) && (currentRoute(
+                        navController
+                    ) != NavigationItem.Player.route)
+                ) {
                     BottomNavigationBar(navController)
                 }
             },
         )
-        if ((currentRoute(navController) != NavigationItem.Splash.route) && (currentRoute(navController) != NavigationItem.Player.route)) {
-            Column(
-                Modifier.fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceBetween) {
-                Spacer(modifier = Modifier.weight(1f))
-                NavigationBar(modifier = Modifier.height(280.dp).padding(bottom = 80.dp)) {
-                        AndroidView(
-                            factory = { context ->
-                                PlayerView(context).apply {
-                                    player = uiState.playerController
-                                    useController = true
-                                    resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-                                    setControllerAutoShow(true)
-                                    controllerHideOnTouch = false
-                                    setShowPreviousButton(true)
-                                    setShowNextButton(true)
-                                    setShowRewindButton(true)
-                                    setShowFastForwardButton(true)
-                                    controllerShowTimeoutMs = 0
-                                    showController()
+        if ((currentRoute(navController) != NavigationItem.Splash.route) && (currentRoute(
+                navController
+            ) != NavigationItem.Player.route)
+        ) {
+            if (uiState.mainPlaylist?.playlistJson?.isNotEmpty() == true) {
+                Column(
+                    Modifier.fillMaxHeight()
+                ) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Row(
+                        horizontalArrangement = Arrangement.End, modifier = Modifier
+                            .fillMaxWidth()
+
+                            .padding(start = 250.dp)
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color(android.graphics.Color.parseColor("#FFD600")),
+                                        Color.LightGray
+                                    )
+                                ), shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp)
+                            )
+                            .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp))
+                            .wrapContentWidth()
+                    ) {
+
+
+
+                        Icon(
+                            painter = painterResource(R.drawable.fullscreen),
+                            contentDescription = "Fav",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clickable {
+                                    navController.navigate("PlayerScreen")
                                 }
-                            },
-                            update = {
-                                it.player = uiState.playerController
-                            }
+                                .fillMaxWidth()
+                                .padding(5.dp),
+                            tint = Color.White
                         )
+                        if (uiState.isPlayerVisible) {
+                            Icon(
+                                painter = painterResource(R.drawable.down),
+                                contentDescription = "Fav",
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clickable {
+                                        mainViewModel.togglePlayer()
+                                    }
+                                    .fillMaxWidth()
+                                    .padding(5.dp),
+                                tint = Color.White
+                            )
+                        } else {
+                            Icon(
+                                painter = painterResource(R.drawable.up),
+                                contentDescription = "Fav",
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clickable {
+                                        mainViewModel.togglePlayer()
+                                    }
+                                    .fillMaxWidth()
+                                    .padding(5.dp),
+                                tint = Color.White
+                            )
+                        }
+                        Icon(
+                            painter = painterResource(R.drawable.delete),
+                            contentDescription = "Fav",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clickable {
+                                    mainViewModel.cleanQueue(context)
+                                }
+                                .fillMaxWidth()
+                                .padding(5.dp),
+                            tint = Color.White
+                        )
+                    }
+                    if(uiState.isPlayerVisible) {
+                        NavigationBar(
+                            modifier = Modifier
+                                .height(280.dp)
+                                .padding(bottom = 80.dp)
+                        ) {
+                            AndroidView(
+                                factory = { context ->
+                                    PlayerView(context).apply {
+                                        player = uiState.playerController
+                                        useController = true
+                                        resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                                        controllerAutoShow = true
+                                        controllerHideOnTouch = true
+                                        setShowPreviousButton(true)
+                                        setShowNextButton(true)
+                                        setShowRewindButton(true)
+                                        setShowFastForwardButton(true)
+                                        controllerShowTimeoutMs = 0
+                                        showController()
+                                    }
+                                },
+                                update = {
+                                    it.player = uiState.playerController
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }

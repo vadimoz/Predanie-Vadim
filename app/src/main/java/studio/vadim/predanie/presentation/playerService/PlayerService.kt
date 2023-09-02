@@ -222,6 +222,7 @@ class PlayerService : MediaSessionService(), MediaSession.Callback {
         })
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun createNotification(session: MediaSession) {
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(

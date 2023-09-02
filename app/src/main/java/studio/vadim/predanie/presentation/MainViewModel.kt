@@ -700,6 +700,14 @@ class MainViewModel(
         ).show()
     }
 
+    fun togglePlayer() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                isPlayerVisible = !uiState.value.isPlayerVisible,
+            )
+        }
+    }
+
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     fun downloadAll(playerList: ArrayList<MediaItem>, itemId: String, context: Context) {
         playerList.forEach {
