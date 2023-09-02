@@ -148,6 +148,7 @@ fun Accordion(
                     border = BorderStroke(1.dp, Gray200),
                     tonalElevation = 1.dp,
                     modifier = Modifier.padding(top = 8.dp)
+                        .padding(start = 15.dp)
                 ) {
                     Column {
                         var counter = 1

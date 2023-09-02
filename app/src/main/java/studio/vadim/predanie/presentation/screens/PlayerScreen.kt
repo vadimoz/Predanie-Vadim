@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavHostController
 import studio.vadim.predanie.R
@@ -48,6 +49,7 @@ fun PlayerScreen(mainViewModel: MainViewModel, navController: NavHostController)
                 PlayerView(context).apply {
                     player = uiState.playerController
                     defaultArtwork = getResources().getDrawable(R.drawable.artwork)
+                    resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
                 }
             },
             update = {
