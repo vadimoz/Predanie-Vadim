@@ -3,11 +3,13 @@ package studio.vadim.predanie.presentation.playerService.playlistAccordion
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,6 +30,7 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.media3.common.MediaItem
 import androidx.navigation.NavHostController
 import studio.vadim.predanie.R
@@ -226,20 +229,20 @@ fun PlaylistAccordionRow(
         ) {
             //style = tags
 
-            Text(
-                "${index.toString()}.",
-                Modifier
-                    .wrapContentWidth()
-                    .padding(end = 5.dp), color = Gray600
-            )
+                Text(
+                    "${index.toString()}.",
+                    Modifier
+                        .wrapContentWidth()
+                        .padding(end = 5.dp), color = Gray600
+                )
 
-            Text(model.mediaMetadata.title.toString(), Modifier.weight(1f), color = Gray600)
+                Text(model.mediaMetadata.title.toString(), Modifier.weight(1f), color = Gray600)
 
             Icon(
                 painter = painterResource(R.drawable.up),
                 contentDescription = "Fav",
                 modifier = Modifier
-                    .size(30.dp)
+                    .size(25.dp)
                     .clickable {
                         if (index - 1 != 0) {
                             uiState.playerController?.moveMediaItem(index - 1, index - 2)
@@ -254,7 +257,7 @@ fun PlaylistAccordionRow(
                 painter = painterResource(R.drawable.down),
                 contentDescription = "Fav",
                 modifier = Modifier
-                    .size(30.dp)
+                    .size(25.dp)
                     .clickable {
                         uiState.playerController?.moveMediaItem(index - 1, index)
                         mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
@@ -267,7 +270,7 @@ fun PlaylistAccordionRow(
                 painter = painterResource(R.drawable.remove),
                 contentDescription = "Delete from playlist",
                 modifier = Modifier
-                    .size(30.dp)
+                    .size(25.dp)
                     .clickable {
                         uiState.playerController?.removeMediaItem(index - 1)
                         mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
@@ -275,6 +278,21 @@ fun PlaylistAccordionRow(
                     .fillMaxWidth(),
                 //tint = color
             )
+        }
+
+        Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp, end = 10.dp, top = 0.dp)) {
+            Text("Открыть произведение", fontSize = 10.sp, modifier = Modifier.clickable {
+                navController.navigate("ItemScreen/${model.mediaMetadata.compilation}")
+            })
+            if(model.mediaMetadata.artist != null) {
+                Text(" / ", fontSize = 10.sp)
+                Text(
+                    model.mediaMetadata.artist.toString(),
+                    fontSize = 10.sp,
+                    maxLines = 1,
+                    modifier = Modifier.width(150.dp)
+                )
+            }
         }
 
         val timeQuery = AppDatabase.getInstance(LocalContext.current).filePositionDao()

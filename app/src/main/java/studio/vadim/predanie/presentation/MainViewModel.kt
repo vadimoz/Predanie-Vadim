@@ -240,6 +240,8 @@ class MainViewModel(
                             MediaMetadata.Builder()
                                 .setArtworkUri(Uri.parse(data.img_medium))
                                 .setTitle(it.name)
+                                .setArtist(data.author_name)//
+                                .setAlbumArtist(data.author_id.toString())//
                                 .setDescription(it.url)
                                 .setDisplayTitle(it.name)
                                 .setTrackNumber(it.id?.toInt()) //file id
@@ -264,6 +266,8 @@ class MainViewModel(
                             .setDisplayTitle(it.name)
                             .setArtworkUri(Uri.parse(data.img_big.toString()))
                             .setDescription(it.url)
+                            .setArtist(data.author_name)//
+                            .setAlbumArtist(data.author_id.toString())//
                             .setCompilation(data.id.toString())
                             .setTrackNumber(it.id?.toInt())
                             .setTitle(it.name)

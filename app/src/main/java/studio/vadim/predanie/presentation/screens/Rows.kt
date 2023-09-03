@@ -3,7 +3,6 @@ package studio.vadim.predanie.presentation.screens
 import android.content.Context
 import android.net.Uri
 import android.text.Html
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -18,8 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -80,7 +81,7 @@ fun ListRow(
     ) {
 
         var image = model.Embedded?.wp_featuredmedia?.get(0)?.source_url
-        if(image == null){
+        if (image == null) {
             image = "https://predanie.ru/img/no-image/work_200.png"
         }
         AsyncImage(
@@ -135,7 +136,7 @@ fun ListRow(model: VideoData, navController: NavHostController, mainViewModel: M
             .width(0.13.dh)
     ) {
         var image = model.attributes?.image
-        if(image == null){
+        if (image == null) {
             image = "https://predanie.ru/img/no-image/work_200.png"
         }
         AsyncImage(
@@ -207,7 +208,7 @@ fun ListRow(
             .width(0.13.dh)
     ) {
         var image = model.image
-        if(image == null){
+        if (image == null) {
             image = "https://predanie.ru/img/no-image/author_300.png"
         }
         AsyncImage(
@@ -258,7 +259,7 @@ fun ListRow(
             .height(300.dp)
     ) {
         var image = model.image
-        if(image == ""){
+        if (image == "") {
             image = "https://predanie.ru/img/no-image/work_200.png"
         }
         AsyncImage(
@@ -308,10 +309,20 @@ fun ListRow(model: UserPlaylist, navController: NavHostController, mainViewModel
     val context = LocalContext.current
 
     val showDeletePlaylistDialog = remember { mutableStateOf(false) }
+    val showPlayPlaylistDialog = remember { mutableStateOf(false) }
     val deletePlaylist = remember { mutableStateOf("") }
+    val playPlaylist = remember { mutableStateOf("") }
+    val playPlaylistJson = remember { mutableStateOf(ArrayList<MediaItem>()) }
 
     if (showDeletePlaylistDialog.value) {
         PlaylistAlertDialog(showDeletePlaylistDialog, deletePlaylist, mainViewModel, context)
+    }
+
+    if (showPlayPlaylistDialog.value) {
+        ShowPlaylistAlertDialog(
+            showPlayPlaylistDialog, playPlaylist, mainViewModel, model = playPlaylistJson,
+            context = context
+        )
     }
 
     Column(
@@ -328,10 +339,14 @@ fun ListRow(model: UserPlaylist, navController: NavHostController, mainViewModel
                 .size(55.dp)
                 .combinedClickable(
                     onClick = {
-                        uiState.playerController?.removeMediaItems(0, 100000)
+                        showPlayPlaylistDialog.value = true
+                        playPlaylist.value = model.playlistName
+                        playPlaylistJson.value = model.playlistJson
+
+                        /*uiState.playerController?.removeMediaItems(0, 100000)
                         uiState.playerController?.addMediaItems(model.playlistJson)
                         uiState.playerController?.prepare()
-                        uiState.playerController?.play()
+                        uiState.playerController?.play()*/
 
                         mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
                     },
@@ -478,7 +493,7 @@ fun ListRow(model: HistoryCompositions, navController: NavHostController) {
             .height(300.dp)
     ) {
         var image = model.image
-        if(image == ""){
+        if (image == "") {
             image = "https://predanie.ru/img/no-image/work_200.png"
         }
         AsyncImage(
@@ -527,7 +542,7 @@ fun ListRow(
             .height(300.dp)
     ) {
         var image = model.image
-        if(image == ""){
+        if (image == "") {
             image = "https://predanie.ru/img/no-image/work_200.png"
         }
         AsyncImage(
@@ -580,7 +595,7 @@ fun ListRow(model: Compositions, navController: NavHostController, mainViewModel
             .height(340.dp)
     ) {
         var image = model.img_s
-        if(image == null){
+        if (image == null) {
             image = "https://predanie.ru/img/no-image/work_200.png"
         }
         AsyncImage(
@@ -659,7 +674,7 @@ fun ListAuthorsRow(model: Entities, navController: NavHostController) {
             }
     ) {
         var image = model.img
-        if(image == null){
+        if (image == null) {
             image = "https://predanie.ru/img/no-image/author_300.png"
         }
         Image(
@@ -702,7 +717,7 @@ fun ListRow(model: Entities, navController: NavHostController, mainViewModel: Ma
             }
     ) {
         var image = model.img_s
-        if(image == null){
+        if (image == null) {
             image = "https://predanie.ru/img/no-image/work_200.png"
         }
         Image(
@@ -770,7 +785,7 @@ fun ListRow(
             .height(300.dp)
     ) {
         var image = model.img_s
-        if(image == null){
+        if (image == null) {
             image = "https://predanie.ru/img/no-image/work_200.png"
         }
         AsyncImage(
@@ -860,6 +875,50 @@ fun PlaylistAlertDialog(
         },
         title = { Text(text = "Удалить плейлист?") },
         text = { Text(text = "") }
+    )
+}
+
+@Composable
+fun ShowPlaylistAlertDialog(
+    showDialog: MutableState<Boolean>,
+    deleteItem: MutableState<String>,
+    mainViewModel: MainViewModel,
+    context: Context,
+    model: MutableState<ArrayList<MediaItem>>
+) {
+    val uiState by mainViewModel.uiState.collectAsState()
+
+    AlertDialog(
+        onDismissRequest = {
+            showDialog.value = false
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                //Воспроизвожу плейлист
+                showDialog.value = false
+
+                uiState.playerController?.removeMediaItems(0, 100000)
+                uiState.playerController?.addMediaItems(model.value)
+                uiState.playerController?.prepare()
+                uiState.playerController?.play()
+
+                mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
+            })
+            { Text(text = "Воспроизвести") }
+        },
+        dismissButton = {
+            TextButton(onClick = { showDialog.value = false })
+            { Text(text = "Отменить") }
+        },
+        title = { Text(text = "Воспроизвести плейлист?") },
+        text = {
+            Column(modifier = Modifier
+                .verticalScroll(rememberScrollState())) {
+                model.value.forEach {
+                    Text(text = it.mediaMetadata.title.toString(), fontSize = 12.sp, maxLines = 1)
+                }
+            }
+        }
     )
 }
 

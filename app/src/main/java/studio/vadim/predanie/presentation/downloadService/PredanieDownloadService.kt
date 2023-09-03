@@ -124,6 +124,8 @@ class PredanieDownloadService : DownloadService(
                                     .setTitle(it.name)
                                     .setDisplayTitle(it.name)
                                     .setDescription(it.url)
+                                    .setArtist(data.author_name)//
+                                    .setAlbumArtist(data.author_id.toString())//
                                     .setTrackNumber(it.id?.toInt()) //file id
                                     .setCompilation(data.id.toString())
                                     .build()
@@ -153,6 +155,8 @@ class PredanieDownloadService : DownloadService(
                                 .setDescription(it.url)
                                 .setArtworkUri(Uri.parse(data.img_big.toString()))
                                 .setCompilation(data.id.toString())
+                                .setArtist(data.author_name)//
+                                .setAlbumArtist(data.author_id.toString())//
                                 .setTrackNumber(it.id?.toInt())
                                 .setTitle(it.name)
                                 .build()

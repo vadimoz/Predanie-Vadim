@@ -1,7 +1,6 @@
 package studio.vadim.predanie.data.room
 
 import android.net.Uri
-import android.util.Log
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.room.TypeConverter
@@ -20,6 +19,7 @@ class Converters {
                     id = it.mediaId,
                     uri = it.localConfiguration?.uri.toString(),
                     author = it.mediaMetadata.artist.toString(),
+                    authorId = it.mediaMetadata.albumArtist.toString(),
                     title = it.mediaMetadata.title.toString(),
                     fileid = it.mediaMetadata.trackNumber.toString(),
                     compositionid = it.mediaMetadata.compilation.toString(),
@@ -48,6 +48,8 @@ class Converters {
                             .setTrackNumber(it.fileid.toIntOrNull())
                             .setCompilation(it.compositionid)
                             .setTitle(it.title)
+                            .setAlbumArtist(it.authorId)
+                            .setArtist(it.author)
                             .setDescription(it.urlFromDescription)
                             .setArtworkUri(Uri.parse(it.artworkUri))
                             .build()

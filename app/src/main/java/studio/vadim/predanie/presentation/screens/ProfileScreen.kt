@@ -58,7 +58,6 @@ import studio.vadim.predanie.presentation.MainViewModel
 import studio.vadim.predanie.presentation.playerService.playlistAccordion.PlaylistAccordionGroup
 import studio.vadim.predanie.presentation.playerService.playlistAccordion.PlaylistAccordionModel
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @SuppressLint("ServiceCast", "UnrememberedMutableState")
