@@ -167,7 +167,7 @@ class ApiImpl : ApiConnection {
                     }
                 }.body()
             } catch (e: Throwable) {
-                delay(10000L)
+                delay(100000L)
             }
         }
     }

@@ -61,6 +61,7 @@ import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.slaviboy.composeunits.dh
+import io.appmetrica.analytics.AppMetrica
 import studio.vadim.predanie.R
 import studio.vadim.predanie.domain.models.api.items.Tracks
 import studio.vadim.predanie.presentation.MainViewModel
@@ -109,6 +110,11 @@ fun ItemScreen(
 
     if (itemId != null) {
         mainViewModel.getItemInfo(itemId.toInt())
+
+        //Событие статистики
+        val eventParameters: MutableMap<String, Any> = HashMap()
+        eventParameters["name"] = uiState.itemInto!!.data?.name.toString()
+        AppMetrica.reportEvent("Item", eventParameters)
 
         LazyColumn(
             Modifier
@@ -236,6 +242,11 @@ fun ItemScreen(
                                                 uiState.playerController?.setMediaItems(playerList)
 
                                                 navController.navigate("ProfileScreen/play")
+
+                                                //Событие статистики
+                                                val eventParametersPlay: MutableMap<String, Any> = HashMap()
+                                                eventParametersPlay["name"] = uiState.itemInto?.data!!.name.toString()
+                                                AppMetrica.reportEvent("PlayAll", eventParametersPlay)
                                             },
                                         tint = Color.Black.copy(alpha = 0.5f),
                                     )

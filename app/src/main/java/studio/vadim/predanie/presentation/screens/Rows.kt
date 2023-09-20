@@ -48,6 +48,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.slaviboy.composeunits.dh
+import io.appmetrica.analytics.AppMetrica
 import studio.vadim.predanie.R
 import studio.vadim.predanie.data.room.DownloadedCompositions
 import studio.vadim.predanie.data.room.FavoriteAuthors
@@ -62,6 +63,7 @@ import studio.vadim.predanie.domain.models.api.lists.Entities
 import studio.vadim.predanie.domain.models.api.lists.ResponceBlogListModel
 import studio.vadim.predanie.domain.models.api.lists.VideoData
 import studio.vadim.predanie.presentation.MainViewModel
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -133,19 +135,59 @@ fun ListRow(model: VideoData, navController: NavHostController, mainViewModel: M
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
-            .width(0.13.dh)
+            .width(300.dp)
     ) {
         var image = model.attributes?.image
         if (image == null) {
             image = "https://predanie.ru/img/no-image/work_200.png"
         }
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(image)
-                .memoryCachePolicy(CachePolicy.ENABLED)
-                .diskCachePolicy(CachePolicy.ENABLED)
-                .build(),
-            contentDescription = null,
+        Box() {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(image)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .build(),
+                contentDescription = null,
+                modifier = Modifier
+                    .clickable {
+                        val mediaItems = arrayListOf<MediaItem>()
+
+                        mediaItems.add(
+                            MediaItem
+                                .Builder()
+                                .setUri(model.attributes?.url)
+                                .setMediaId(model.attributes?.url.toString())
+                                .setMediaMetadata(
+                                    MediaMetadata
+                                        .Builder()
+                                        .setArtworkUri(Uri.parse(model.attributes?.image ?: ""))
+                                        .setTitle(model.attributes?.title)
+                                        .setDisplayTitle(model.attributes?.title)
+                                        .build()
+                                )
+                                .build()
+                        )
+                        uiState.playerController?.removeMediaItems(0, 100000)
+                        uiState.playerController?.addMediaItems(mediaItems)
+                        uiState.playerController?.prepare()
+                        uiState.playerController?.play()
+
+                        mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
+
+                        navController.navigate("ProfileScreen/play")
+
+                        //Событие статистики
+                        val eventParameters: MutableMap<String, Any> = HashMap()
+                        eventParameters["name"] = model.attributes?.title.toString()
+                        AppMetrica.reportEvent("VideoClick", eventParameters)
+                    }
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                contentScale = ContentScale.Crop
+            )
+        }
+        Text(
             modifier = Modifier
                 .clickable {
                     val mediaItems = arrayListOf<MediaItem>()
@@ -174,16 +216,10 @@ fun ListRow(model: VideoData, navController: NavHostController, mainViewModel: M
 
                     navController.navigate("ProfileScreen/play")
 
-                }
-                .fillMaxWidth()
-                .size(0.13.dh)
-                .padding(20.dp),
-            contentScale = ContentScale.Crop
-        )
-        Text(
-            modifier = Modifier
-                .clickable {
-                    navController.navigate("ProfileScreen/play")
+                    //Событие статистики
+                    val eventParameters: MutableMap<String, Any> = HashMap()
+                    eventParameters["name"] = model.attributes?.title.toString()
+                    AppMetrica.reportEvent("VideoClick", eventParameters)
                 }
                 .padding(5.dp),
 

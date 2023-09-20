@@ -98,7 +98,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
 
         Column(
             modifier = Modifier
-                //.verticalScroll(rememberScrollState())
+            //.verticalScroll(rememberScrollState())
         ) {
 
             if (!mainViewModel.isInternetConnected(context)) {
@@ -219,7 +219,13 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             .wrapContentHeight()
                             .fillMaxWidth()
                     ) {
-                        Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                        Row(
+                            modifier = Modifier.padding(
+                                top = 20.dp,
+                                start = 20.dp,
+                                bottom = 20.dp
+                            )
+                        ) {
                             Text(
                                 modifier = Modifier.padding(top = 8.dp),
                                 text = "§",
@@ -253,7 +259,13 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             .wrapContentHeight()
                             .fillMaxWidth()
                     ) {
-                        Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                        Row(
+                            modifier = Modifier.padding(
+                                top = 20.dp,
+                                start = 20.dp,
+                                bottom = 20.dp
+                            )
+                        ) {
                             Text(
                                 modifier = Modifier.padding(top = 8.dp),
                                 text = "§",
@@ -332,17 +344,21 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             fontSize = 35.sp,
                             color = Color(android.graphics.Color.parseColor("#2F2F2F"))
                         )
-                        Icon(
-                            painter = painterResource(R.drawable.trash),
-                            contentDescription = "file",
-                            modifier = Modifier
-                                .size(30.dp)
-                                .clickable {
-                                    //Удаляем все загрузки
-                                    showDeleteDialog.value = true
-                                },
-                            tint = Color(android.graphics.Color.parseColor("#FFD600")),
-                        )
+                        if (downloadsList != null) {
+                            if (downloadsList.itemCount != 0) {
+                                Icon(
+                                    painter = painterResource(R.drawable.trash),
+                                    contentDescription = "file",
+                                    modifier = Modifier
+                                        .size(30.dp)
+                                        .clickable {
+                                            //Удаляем все загрузки
+                                            showDeleteDialog.value = true
+                                        },
+                                    tint = Color(android.graphics.Color.parseColor("#FFD600")),
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -356,6 +372,16 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                     }
                 }
 
+                if (downloadsList != null) {
+                    if (downloadsList.itemCount == 0) {
+                        Text(
+                            "Здесь появятся Ваши загрузки",
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(25.dp)
+                        )
+                    }
+                }
+
                 if (mainViewModel.isInternetConnected(context)) {
                     //Плейлисты
                     Column(
@@ -363,7 +389,13 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             .wrapContentHeight()
                             .fillMaxWidth()
                     ) {
-                        Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                        Row(
+                            modifier = Modifier.padding(
+                                top = 20.dp,
+                                start = 20.dp,
+                                bottom = 20.dp
+                            )
+                        ) {
                             Text(
                                 modifier = Modifier.padding(top = 8.dp),
                                 text = "§",
@@ -407,9 +439,12 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                                     shape = RoundedCornerShape(size = 10.dp)
                                 ) {
 
-                                    Column(modifier = Modifier
-                                        .padding(all = 16.dp)
-                                        .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally,) {
+                                    Column(
+                                        modifier = Modifier
+                                            .padding(all = 16.dp)
+                                            .verticalScroll(rememberScrollState()),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                    ) {
                                         Text(text = "Добавить Очередь воспроизведения в новый плейлист:")
 
                                         var playlistName by rememberSaveable { mutableStateOf("") }
@@ -421,36 +456,50 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                                             label = { Text("Название нового плейлиста") }
                                         )
 
-                                        Button(modifier = Modifier.padding(10.dp), onClick = {
-                                            mainViewModel.setCurrentPlaylistToDb(uiState.playerController, context, playlistName)
-                                            mainViewModel.loadPlaylists(context)
-                                            dialogOpen = false
-                                        }, colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color(android.graphics.Color.parseColor("#ffcd00")),
-                                            contentColor = Color.White)){
+                                        Button(
+                                            modifier = Modifier.padding(10.dp), onClick = {
+                                                mainViewModel.setCurrentPlaylistToDb(
+                                                    uiState.playerController,
+                                                    context,
+                                                    playlistName
+                                                )
+                                                mainViewModel.loadPlaylists(context)
+                                                dialogOpen = false
+                                            }, colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color(
+                                                    android.graphics.Color.parseColor(
+                                                        "#ffcd00"
+                                                    )
+                                                ),
+                                                contentColor = Color.White
+                                            )
+                                        ) {
                                             Text("Создать", fontSize = 13.sp)
                                         }
 
-                                        val currentPlaylists = mainViewModel.getAllPlaylists(context)
+                                        val currentPlaylists =
+                                            mainViewModel.getAllPlaylists(context)
 
-                                        if(currentPlaylists.isNotEmpty()) {
+                                        if (currentPlaylists.isNotEmpty()) {
                                             Text(
                                                 modifier = Modifier.padding(10.dp),
                                                 text = "Добавить в существующий плейлист (все треки будут заменены):"
                                             )
                                             Column() {
-                                                currentPlaylists.forEach(){
-                                                    Text(modifier = Modifier
-                                                        .padding(20.dp)
-                                                        .clickable {
-                                                            mainViewModel.setCurrentPlaylistToDb(
-                                                                uiState.playerController,
-                                                                context,
-                                                                it.playlistName
-                                                            )
-                                                            mainViewModel.loadPlaylists(context)
-                                                            dialogOpen = false
-                                                        }, text = it.playlistName)
+                                                currentPlaylists.forEach() {
+                                                    Text(
+                                                        modifier = Modifier
+                                                            .padding(20.dp)
+                                                            .clickable {
+                                                                mainViewModel.setCurrentPlaylistToDb(
+                                                                    uiState.playerController,
+                                                                    context,
+                                                                    it.playlistName
+                                                                )
+                                                                mainViewModel.loadPlaylists(context)
+                                                                dialogOpen = false
+                                                            }, text = it.playlistName
+                                                    )
                                                 }
                                             }
                                         }
@@ -459,13 +508,22 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             }
                         }
 
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                            Button(onClick = {
-                                dialogOpen = true
-                            }, colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(android.graphics.Color.parseColor("#ffcd00")),
-                                contentColor = Color.White)){
-                                Text("Сохранить очередь воспроизведения в плейлист", fontSize = 13.sp)
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Button(
+                                onClick = {
+                                    dialogOpen = true
+                                }, colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(android.graphics.Color.parseColor("#ffcd00")),
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Text(
+                                    "Сохранить очередь воспроизведения в плейлист",
+                                    fontSize = 13.sp
+                                )
                             }
                         }
                     }

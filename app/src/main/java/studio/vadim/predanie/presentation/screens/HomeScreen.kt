@@ -175,38 +175,50 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                     }
 
                     //Спецпроект - видео
-                    Column(
-                        modifier = Modifier
-                            .wrapContentHeight()
-                            .fillMaxWidth()
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)
-                        ) {
-                            Text(
-                                modifier = Modifier.padding(top = 8.dp),
-                                text = "§",
-                                fontSize = 25.sp,
-                                color = Color(android.graphics.Color.parseColor("#FFD600"))
-                            )
+                    if (specialList != null) {
+                        if(specialList.itemCount > 0) {
+                            Column(
+                                modifier = Modifier
+                                    .wrapContentHeight()
+                                    .fillMaxWidth()
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(
+                                        top = 20.dp,
+                                        start = 20.dp,
+                                        bottom = 20.dp
+                                    )
+                                ) {
+                                    Text(
+                                        modifier = Modifier.padding(top = 8.dp),
+                                        text = "§",
+                                        fontSize = 25.sp,
+                                        color = Color(android.graphics.Color.parseColor("#FFD600"))
+                                    )
+                                    Text(
+                                        modifier = Modifier.padding(start = 5.dp),
+                                        text = "Спецпроект - видео",
+                                        fontSize = 35.sp,
+                                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                                    )
+                                }
+                            }
                             Text(
                                 modifier = Modifier.padding(start = 5.dp),
-                                text = "Спецпроект - видео",
-                                fontSize = 35.sp,
-                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                                text = "",
+                                fontSize = 15.sp,
+                                color = Color(android.graphics.Color.parseColor("#000000"))
                             )
-                        }
-                    }
-                    Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = "Библейское обучение, совместный проект",
-                        fontSize = 15.sp,
-                        color = Color(android.graphics.Color.parseColor("#000000"))
-                    )
-                    LazyRow() {
-                        if (specialList != null) {
-                            items(specialList.itemCount) { index ->
-                                specialList[index]?.let { ListRow(model = it, navController, mainViewModel = mainViewModel) }
+                            LazyRow() {
+                                items(specialList.itemCount) { index ->
+                                    specialList[index]?.let {
+                                        ListRow(
+                                            model = it,
+                                            navController,
+                                            mainViewModel = mainViewModel
+                                        )
+                                    }
+                                }
                             }
                         }
                     }

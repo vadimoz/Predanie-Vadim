@@ -50,6 +50,7 @@ import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.slaviboy.composeunits.dh
+import io.appmetrica.analytics.AppMetrica
 import studio.vadim.predanie.R
 import studio.vadim.predanie.presentation.MainViewModel
 
@@ -90,6 +91,11 @@ fun AuthorScreen(
 
     if (authorId != null) {
         mainViewModel.getAuthorInfo(authorId.toInt())
+
+        //Событие статистики
+        val eventParameters: MutableMap<String, Any> = HashMap()
+        eventParameters["name"] = uiState.authorInto.data?.name.toString()
+        AppMetrica.reportEvent("Author", eventParameters)
 
         Column(
             Modifier

@@ -114,4 +114,5 @@ dependencies {
     implementation("androidx.room:room-guava:2.5.2")
 
     implementation("org.jetbrains.kotlin:kotlin-serialization:1.8.21")
+    implementation 'io.appmetrica.analytics:analytics:6.0.0'
 }

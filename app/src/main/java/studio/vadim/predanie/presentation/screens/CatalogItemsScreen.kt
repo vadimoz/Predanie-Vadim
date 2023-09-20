@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
+import io.appmetrica.analytics.AppMetrica
 import studio.vadim.predanie.presentation.MainViewModel
 
 @Composable
@@ -36,6 +37,10 @@ fun CatalogItemsScreen(
         mainViewModel.getCatalogItemsList(catalogId)
     }
 
+    //Событие статистики
+    val eventParametersPlay: MutableMap<String, Any> = HashMap()
+    eventParametersPlay["name"] = catalogName.toString()
+    AppMetrica.reportEvent("CatalogShow", eventParametersPlay)
 
     Box(
         modifier = Modifier.fillMaxSize(),

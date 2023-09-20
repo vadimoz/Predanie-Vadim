@@ -33,6 +33,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.navigation.NavHostController
+import io.appmetrica.analytics.AppMetrica
 import studio.vadim.predanie.R
 import studio.vadim.predanie.data.room.AppDatabase
 import studio.vadim.predanie.domain.models.api.items.Tracks
@@ -248,6 +249,12 @@ fun AccordionRow(
                 mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
 
                 navController.navigate("ProfileScreen/play")
+
+                //Событие статистики
+                val eventParametersPlay: MutableMap<String, Any> = HashMap()
+                eventParametersPlay["Composition"] = model.composition.toString()
+                eventParametersPlay["FileName"] = model.name.toString()
+                AppMetrica.reportEvent("PlayFile", eventParametersPlay)
             },
     ) {
         Row(
@@ -307,6 +314,11 @@ fun AccordionRow(
                                         compositionid = itemId, uri = model.url.toString(), context
                                     )
                                     isFavorite = !isFavorite
+
+                                    //Событие статистики
+                                    val eventParametersPlay: MutableMap<String, Any> = HashMap()
+                                    eventParametersPlay["name"] = model.name.toString()
+                                    AppMetrica.reportEvent("SetFavorite", eventParametersPlay)
                                 }
                                 .fillMaxWidth(),
                             tint = color
