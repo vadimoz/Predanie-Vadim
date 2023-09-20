@@ -721,6 +721,14 @@ class MainViewModel(
         }
     }
 
+    fun playerVisible() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                isPlayerVisible = true
+            )
+        }
+    }
+
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     fun downloadAll(playerList: ArrayList<MediaItem>, itemId: String, context: Context) {
         playerList.forEach {

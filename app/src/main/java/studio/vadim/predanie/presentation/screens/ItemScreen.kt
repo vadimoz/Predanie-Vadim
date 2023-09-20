@@ -246,6 +246,8 @@ fun ItemScreen(
 
                                                 navController.navigate("ProfileScreen/play")
 
+                                                mainViewModel.playerVisible()
+
                                                 //Событие статистики
                                                 val eventParametersPlay: MutableMap<String, Any> = HashMap()
                                                 eventParametersPlay["name"] = uiState.itemInto?.data!!.name.toString()

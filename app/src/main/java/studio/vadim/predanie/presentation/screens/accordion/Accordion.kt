@@ -250,6 +250,8 @@ fun AccordionRow(
 
                 navController.navigate("ProfileScreen/play")
 
+                mainViewModel.playerVisible()
+
                 //Событие статистики
                 val eventParametersPlay: MutableMap<String, Any> = HashMap()
                 eventParametersPlay["Composition"] = model.composition.toString()

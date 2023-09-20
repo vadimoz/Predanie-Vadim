@@ -43,6 +43,6 @@ data class UIState(
     var mainPlaylist: MainPlaylist? = null,
     //settings
     var goToNext: Boolean = false,
-    var isPlayerVisible: Boolean = true,
+    var isPlayerVisible: Boolean = false,
     var percentToFileReady: Int = 95
 )
