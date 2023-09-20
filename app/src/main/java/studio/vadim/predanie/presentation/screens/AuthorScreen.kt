@@ -23,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -89,13 +90,15 @@ fun AuthorScreen(
         }
     }
 
-    if (authorId != null) {
-        mainViewModel.getAuthorInfo(authorId.toInt())
-
+    LaunchedEffect(authorId) {
         //Событие статистики
         val eventParameters: MutableMap<String, Any> = HashMap()
         eventParameters["name"] = uiState.authorInto.data?.name.toString()
         AppMetrica.reportEvent("Author", eventParameters)
+    }
+
+    if (authorId != null) {
+        mainViewModel.getAuthorInfo(authorId.toInt())
 
         Column(
             Modifier

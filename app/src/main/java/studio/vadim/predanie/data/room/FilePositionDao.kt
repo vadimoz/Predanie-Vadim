@@ -27,4 +27,7 @@ interface FilePositionDao {
             updatePosition(filePosition.fileid, filePosition.position, filePosition.compositionid, filePosition.lastPlayTimestamp, filePosition.finished)
         }
     }
+
+    @Query("DELETE FROM FilePosition WHERE compositionid = :compositionid")
+    fun deleteByComposition(compositionid: Int)
 }

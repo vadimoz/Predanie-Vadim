@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -37,6 +38,7 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import io.appmetrica.analytics.AppMetrica
 import studio.vadim.predanie.R
 import studio.vadim.predanie.presentation.MainViewModel
 
@@ -51,6 +53,13 @@ fun PostScreen(mainViewModel: MainViewModel, navController: NavHostController, p
         onDispose {
             mainViewModel.cleanPostState()
         }
+    }
+
+    LaunchedEffect(postId) {
+        //Событие статистики
+        val eventParametersPlay: MutableMap<String, Any> = HashMap()
+        eventParametersPlay["name"] = uiState.postInfo?.title?.rendered.toString()
+        AppMetrica.reportEvent("BlogPost", eventParametersPlay)
     }
 
     if (postId != null) {

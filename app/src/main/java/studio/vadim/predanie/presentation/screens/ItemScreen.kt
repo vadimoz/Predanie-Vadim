@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -102,6 +103,13 @@ fun ItemScreen(
         Font(R.raw.ptsans),
     )
 
+    LaunchedEffect(itemId) {
+        //Событие статистики
+        val eventParameters: MutableMap<String, Any> = HashMap()
+        eventParameters["name"] = uiState.itemInto!!.data?.name.toString()
+        AppMetrica.reportEvent("Item", eventParameters)
+    }
+
     DisposableEffect(itemId) {
         onDispose {
             mainViewModel.cleanItemState()
@@ -110,11 +118,6 @@ fun ItemScreen(
 
     if (itemId != null) {
         mainViewModel.getItemInfo(itemId.toInt())
-
-        //Событие статистики
-        val eventParameters: MutableMap<String, Any> = HashMap()
-        eventParameters["name"] = uiState.itemInto!!.data?.name.toString()
-        AppMetrica.reportEvent("Item", eventParameters)
 
         LazyColumn(
             Modifier
@@ -284,8 +287,14 @@ fun ItemScreen(
                                     )
                                     Icon(
                                         painter = painterResource(R.drawable.restart),
-                                        contentDescription = "Play",
-                                        modifier = Modifier.size(20.dp),
+                                        contentDescription = "restart",
+                                        modifier = Modifier.size(20.dp)
+                                            .clickable {
+                                                uiState.itemInto!!.data?.id?.let { it1 ->
+                                                    mainViewModel.deleteCompositionPositions(
+                                                        it1, context)
+                                                }
+                                            },
                                         tint = Color.Black.copy(alpha = 0.5f),
                                     )
                                     if (!isFavorite) {

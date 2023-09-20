@@ -550,7 +550,7 @@ class MainViewModel(
                 currentState.copy(
 
                     //Беру значения, если нет, то ставлю дефолтные
-                    goToNext = settingsPrefs.getBoolean("goToNext", true),
+                    goToNext = settingsPrefs.getBoolean("goToNext", false),
                     percentToFileReady = settingsPrefs.getInt("percentToFileReady", 95)
                 )
             }
@@ -664,6 +664,17 @@ class MainViewModel(
 
         AppDatabase.getInstance(context).userPlaylistDao()
             .insertPlaylist(UserPlaylist(playlistName = playlistName, playlistJson = playlistArray))
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun deleteCompositionPositions(compositionId: Int, context: Context){
+        AppDatabase.getInstance(context).filePositionDao()
+            .deleteByComposition(compositionId)
+
+        Toast.makeText(
+            context, "Позиции прослушивания очищены!",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     fun addToQueue(model: Tracks, context: Context) {

@@ -35,17 +35,18 @@ fun CatalogItemsScreen(
 
     LaunchedEffect(catalogId) {
         mainViewModel.getCatalogItemsList(catalogId)
-    }
 
-    //Событие статистики
-    val eventParametersPlay: MutableMap<String, Any> = HashMap()
-    eventParametersPlay["name"] = catalogName.toString()
-    AppMetrica.reportEvent("CatalogShow", eventParametersPlay)
+        //Событие статистики
+        val eventParametersPlay: MutableMap<String, Any> = HashMap()
+        eventParametersPlay["name"] = catalogName.toString()
+        AppMetrica.reportEvent("CatalogShow", eventParametersPlay)
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()

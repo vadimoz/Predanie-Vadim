@@ -42,7 +42,7 @@ data class UIState(
     val special: Flow<PagingData<VideoData>>? = null,
     var mainPlaylist: MainPlaylist? = null,
     //settings
-    var goToNext: Boolean = true,
+    var goToNext: Boolean = false,
     var isPlayerVisible: Boolean = true,
     var percentToFileReady: Int = 95
 )
