@@ -6,15 +6,15 @@ plugins {
 }
 
 android {
-    namespace 'studio.vadim.predanie'
+    namespace 'fund.predanie.medialib'
     compileSdk 33
 
     defaultConfig {
-        applicationId "studio.vadim.predanie"
+        applicationId "fund.predanie.medialib"
         minSdk 24
         targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        versionCode 30
+        versionName "3.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
