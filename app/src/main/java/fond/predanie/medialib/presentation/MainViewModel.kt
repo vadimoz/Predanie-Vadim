@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
+import android.preference.PreferenceManager
 import android.text.TextUtils
 import android.util.Log
 import android.widget.Toast
@@ -20,13 +21,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.room.Room
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import fund.predanie.medialib.data.room.AppDatabase
 import fund.predanie.medialib.data.room.FavoriteAuthors
 import fund.predanie.medialib.data.room.FavoriteCompositions
@@ -51,6 +45,13 @@ import fund.predanie.medialib.presentation.pagination.FavTracksPagingSource
 import fund.predanie.medialib.presentation.pagination.HistoryPagingSource
 import fund.predanie.medialib.presentation.pagination.PlaylistsPagingSource
 import fund.predanie.medialib.presentation.pagination.SpecialPagingSource
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 
 class MainViewModel(
@@ -543,14 +544,37 @@ class MainViewModel(
             val settingsPrefs: SharedPreferences = context.getSharedPreferences(
                 "settings", Context.MODE_PRIVATE
             )
-            _uiState.update { currentState ->
-                currentState.copy(
 
-                    //Беру значения, если нет, то ставлю дефолтные
-                    goToNext = settingsPrefs.getBoolean("goToNext", false),
-                    percentToFileReady = settingsPrefs.getInt("percentToFileReady", 95)
-                )
+            val prefs: SharedPreferences = context.getSharedPreferences(
+                "firsttime", Context.MODE_PRIVATE
+            )
+
+            if (!prefs.getBoolean("firstTime", false)) {
+                // <---- run one time code here
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        goToNext = true,
+                        percentToFileReady = settingsPrefs.getInt("percentToFileReady", 95)
+                    )
+                }
+
+                settingsPrefs.edit().putBoolean("goToNext", true).commit()
+
+                // mark first time has ran.
+                val editor = prefs.edit()
+                editor.putBoolean("firstTime", true)
+                editor.commit()
+
+            } else {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        //Беру значения, если нет, то ставлю дефолтные
+                        goToNext = settingsPrefs.getBoolean("goToNext", true),
+                        percentToFileReady = settingsPrefs.getInt("percentToFileReady", 95)
+                    )
+                }
             }
+
         }
     }
 

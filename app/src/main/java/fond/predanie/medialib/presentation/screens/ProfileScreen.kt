@@ -555,7 +555,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                         )
                         Text(
                             modifier = Modifier.padding(start = 5.dp),
-                            text = "Пропускать в плеере файлы, которые я уже слушал",
+                            text = "Пропускать в плеере треки, которые я уже слушал",
                             fontSize = 20.sp,
                             color = Color(android.graphics.Color.parseColor("#2F2F2F"))
                         )
@@ -594,7 +594,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                         }
                         Text(
                             modifier = Modifier.padding(start = 5.dp),
-                            text = "Помечать файл прослушанным по достижении ${uiState.percentToFileReady}%",
+                            text = "Помечать трек прослушанным по достижении ${uiState.percentToFileReady}%",
                             fontSize = 20.sp,
                             color = Color(android.graphics.Color.parseColor("#2F2F2F"))
                         )

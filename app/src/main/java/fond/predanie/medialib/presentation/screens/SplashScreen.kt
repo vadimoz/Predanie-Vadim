@@ -64,20 +64,6 @@ fun SplashScreen(mainViewModel: MainViewModel, navController: NavHostController)
                 .size(500.dp)
         )
 
-        val context = LocalContext.current
-        val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse("https://vadim.studio/")) }
-
-        Image(
-            painterResource(R.drawable.vadim), "Logo",
-            modifier = Modifier
-                .width(180.dp)
-                .align(Alignment.BottomCenter)
-                .padding(20.dp)
-                .clickable {
-                    context.startActivity(intent)
-                }
-        )
-
         if (logoAnimationState.isAtEnd && logoAnimationState.isPlaying) {
             navController.navigate(NavigationItem.Home.route) {
                 popUpTo(NavigationItem.Splash.route){

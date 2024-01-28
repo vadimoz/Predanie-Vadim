@@ -67,7 +67,7 @@ import fund.predanie.medialib.presentation.screens.FundScreen
 import fund.predanie.medialib.presentation.screens.HomeScreen
 import fund.predanie.medialib.presentation.screens.ItemScreen
 import fund.predanie.medialib.presentation.screens.OfflineItemScreen
-import fund.predanie.medialib.presentation.screens.PlayerScreen
+import fond.predanie.medialib.presentation.screens.PlayerScreen
 import fund.predanie.medialib.presentation.screens.PostScreen
 import fund.predanie.medialib.presentation.screens.ProfileScreen
 import fund.predanie.medialib.presentation.screens.QuickScreen
@@ -199,15 +199,13 @@ class MainActivity : ComponentActivity() {
                             .wrapContentWidth()
                     ) {
 
-
-
                         Icon(
                             painter = painterResource(R.drawable.fullscreen),
                             contentDescription = "Fav",
                             modifier = Modifier
                                 .size(30.dp)
                                 .clickable {
-                                    navController.navigate("PlayerScreen")
+                                    navController.navigate("VideoPlayerScreen")
                                 }
                                 .fillMaxWidth()
                                 .padding(5.dp),
@@ -294,6 +292,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @OptIn(ExperimentalAnimationApi::class)
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     @Composable
     fun Navigation(navController: NavHostController) {
         var startDestination: String = ""
@@ -301,11 +300,11 @@ class MainActivity : ComponentActivity() {
         //Если клик по нотификейшн-плееру - ставим дефолт скриин - плеер (Мое), если нет интернета - открываем страничку
         //Мое, если все ок, то сплэш
         startDestination = if (getIntent().getStringExtra("player") == "true") {
-            NavigationItem.QuickSplash.route
+            NavigationItem.Home.route
         } else if (!mainViewModel.isInternetConnected(this)) {
             NavigationItem.Profile.route
         } else {
-            NavigationItem.Splash.route
+            NavigationItem.Home.route
         }
 
         AnimatedNavHost(navController, startDestination = startDestination) {
@@ -319,13 +318,21 @@ class MainActivity : ComponentActivity() {
             ) {
                 FundScreen()
             }
-            composable(
+            /*composable(
                 NavigationItem.Player.route,
                 deepLinks = listOf(navDeepLink {
                     uriPattern = "https://predanie.ru/player"
                 }),
             ) {
-                PlayerScreen(mainViewModel = mainViewModel, navController)
+                VideoPlayerScreen(mainViewModel = mainViewModel, navController)
+            }*/
+            composable(
+                NavigationItem.Player.route,
+                deepLinks = listOf(navDeepLink {
+                    uriPattern = "https://predanie.ru/VideoPlayer"
+                }),
+            ) {
+                PlayerScreen(mainViewModel = mainViewModel, navController, action = null)
             }
             composable(
                 NavigationItem.Post.route,

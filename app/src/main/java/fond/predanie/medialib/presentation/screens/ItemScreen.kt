@@ -102,6 +102,10 @@ fun ItemScreen(
     )
 
     LaunchedEffect(itemId) {
+        if (itemId != null) {
+            mainViewModel.getItemInfo(itemId.toInt())
+        }
+
         //Событие статистики
         val eventParameters: MutableMap<String, Any> = HashMap()
         eventParameters["name"] = uiState.itemInto!!.data?.name.toString()
@@ -115,8 +119,6 @@ fun ItemScreen(
     }
 
     if (itemId != null) {
-        mainViewModel.getItemInfo(itemId.toInt())
-
         LazyColumn(
             Modifier
                 .fillMaxWidth()
@@ -242,7 +244,7 @@ fun ItemScreen(
                                                     )
                                                 uiState.playerController?.setMediaItems(playerList)
 
-                                                navController.navigate("ProfileScreen/play")
+                                                navController.navigate("PlayerScreen")
 
                                                 mainViewModel.playerVisible()
 
