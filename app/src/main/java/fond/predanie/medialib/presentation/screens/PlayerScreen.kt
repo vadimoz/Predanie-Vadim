@@ -66,7 +66,8 @@ fun PlayerScreen(mainViewModel: MainViewModel, navController: NavHostController,
     Column(
         Modifier
             .fillMaxSize()
-            .height(300.dp),
+            .height(100.dp)
+            .width(100.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         //verticalArrangement = Arrangement.Center
     ) {

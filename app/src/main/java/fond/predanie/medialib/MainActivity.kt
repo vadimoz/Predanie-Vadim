@@ -7,15 +7,19 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,10 +35,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -81,7 +88,6 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var controllerFuture: ListenableFuture<MediaController>
     private lateinit var playerController: MediaController
-
     private lateinit var navController: NavHostController
 
 
@@ -162,6 +168,12 @@ class MainActivity : ComponentActivity() {
             content = { padding ->
                 Box(modifier = Modifier.padding(padding)) {
                     Navigation(navController = navController)
+                    BottomPlayerBar(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter),
+                        playerState = uiState.playerController,
+                        //onBarClick = { navController.navigate(Destination.songScreen) }
+                    )
                 }
             },
             bottomBar = {
@@ -173,113 +185,58 @@ class MainActivity : ComponentActivity() {
                 }
             },
         )
-        if ((currentRoute(navController) != NavigationItem.Splash.route) && (currentRoute(
-                navController
-            ) != NavigationItem.Player.route)
+    }
+    @Composable
+    fun BottomPlayerBar(
+        modifier: Modifier = Modifier,
+        //onEvent: (HomeEvent) -> Unit,
+        playerState: MediaController?,
+        //onBarClick: () -> Unit
+    ) {
+
+        var offsetX by remember { mutableFloatStateOf(0f) }
+
+        AnimatedVisibility(
+            visible = playerState != PlayerState.STOPPED,
+            modifier = modifier
         ) {
-            if (uiState.mainPlaylist?.playlistJson?.isNotEmpty() == true) {
-                Column(
-                    Modifier.fillMaxHeight()
-                ) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Row(
-                        horizontalArrangement = Arrangement.End, modifier = Modifier
-                            .fillMaxWidth()
+            if (song != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .pointerInput(Unit) {
+                            detectDragGestures(
+                                onDragEnd = {
+                                    when {
+                                        offsetX > 0 -> {
+                                            onEvent(HomeEvent.SkipToPreviousSong)
+                                        }
 
-                            .padding(start = 250.dp)
-                            .background(
-                                brush = Brush.verticalGradient(
-                                    colors = listOf(
-                                        Color(android.graphics.Color.parseColor("#FFD600")),
-                                        Color.LightGray
-                                    )
-                                ), shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp)
-                            )
-                            .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp))
-                            .wrapContentWidth()
-                    ) {
-
-                        Icon(
-                            painter = painterResource(R.drawable.fullscreen),
-                            contentDescription = "Fav",
-                            modifier = Modifier
-                                .size(30.dp)
-                                .clickable {
-                                    navController.navigate("VideoPlayerScreen")
-                                }
-                                .fillMaxWidth()
-                                .padding(5.dp),
-                            tint = Color.White
-                        )
-                        if (uiState.isPlayerVisible) {
-                            Icon(
-                                painter = painterResource(R.drawable.down),
-                                contentDescription = "Fav",
-                                modifier = Modifier
-                                    .size(30.dp)
-                                    .clickable {
-                                        mainViewModel.togglePlayer()
-                                    }
-                                    .fillMaxWidth()
-                                    .padding(5.dp),
-                                tint = Color.White
-                            )
-                        } else {
-                            Icon(
-                                painter = painterResource(R.drawable.up),
-                                contentDescription = "Fav",
-                                modifier = Modifier
-                                    .size(30.dp)
-                                    .clickable {
-                                        mainViewModel.togglePlayer()
-                                    }
-                                    .fillMaxWidth()
-                                    .padding(5.dp),
-                                tint = Color.White
-                            )
-                        }
-                        Icon(
-                            painter = painterResource(R.drawable.delete),
-                            contentDescription = "Fav",
-                            modifier = Modifier
-                                .size(30.dp)
-                                .clickable {
-                                    mainViewModel.cleanQueue(context)
-                                }
-                                .fillMaxWidth()
-                                .padding(5.dp),
-                            tint = Color.White
-                        )
-                    }
-                    if(uiState.isPlayerVisible) {
-                        NavigationBar(
-                            modifier = Modifier
-                                .height(280.dp)
-                                .padding(bottom = 80.dp)
-                        ) {
-                            AndroidView(
-                                factory = { context ->
-                                    PlayerView(context).apply {
-                                        player = uiState.playerController
-                                        useController = true
-                                        resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-                                        controllerAutoShow = true
-                                        controllerHideOnTouch = true
-                                        setShowPreviousButton(true)
-                                        setShowNextButton(true)
-                                        setShowRewindButton(true)
-                                        defaultArtwork = getResources().getDrawable(R.drawable.artwork)
-                                        setShowFastForwardButton(true)
-                                        controllerShowTimeoutMs = 0
-                                        showController()
+                                        offsetX < 0 -> {
+                                            onEvent(HomeEvent.SkipToNextSong)
+                                        }
                                     }
                                 },
-                                update = {
-                                    it.player = uiState.playerController
+                                onDrag = { change, dragAmount ->
+                                    change.consume()
+                                    val (x, _) = dragAmount
+                                    offsetX = x
                                 }
                             )
+
                         }
-                    }
+                        .background(
+                            if (!isSystemInDarkTheme()) {
+                                Color.LightGray
+                            } else Color.DarkGray
+                        ),
+                ) {
+                    HomeBottomBarItem(
+                        song = song,
+                        onEvent = onEvent,
+                        playerState = playerState,
+                        onBarClick = onBarClick
+                    )
                 }
             }
         }
