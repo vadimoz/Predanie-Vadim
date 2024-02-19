@@ -9,9 +9,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,10 +24,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -41,9 +45,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -57,6 +64,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navDeepLink
+import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -193,51 +201,135 @@ class MainActivity : ComponentActivity() {
         playerState: MediaController?,
         //onBarClick: () -> Unit
     ) {
-
-        var offsetX by remember { mutableFloatStateOf(0f) }
-
         AnimatedVisibility(
-            visible = playerState != PlayerState.STOPPED,
+            visible = true,
             modifier = modifier
         ) {
-            if (song != null) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .pointerInput(Unit) {
-                            detectDragGestures(
-                                onDragEnd = {
-                                    when {
-                                        offsetX > 0 -> {
-                                            onEvent(HomeEvent.SkipToPreviousSong)
-                                        }
+            if (playerState != null) {
+                if (playerState.isPlaying != null) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            /*.pointerInput(Unit) {
+                                detectDragGestures(
+                                    onDragEnd = {
+                                        when {
+                                            offsetX > 0 -> {
+                                                onEvent(HomeEvent.SkipToPreviousSong)
+                                            }
 
-                                        offsetX < 0 -> {
-                                            onEvent(HomeEvent.SkipToNextSong)
+                                            offsetX < 0 -> {
+                                                onEvent(HomeEvent.SkipToNextSong)
+                                            }
                                         }
+                                    },
+                                    onDrag = { change, dragAmount ->
+                                        change.consume()
+                                        val (x, _) = dragAmount
+                                        offsetX = x
                                     }
-                                },
-                                onDrag = { change, dragAmount ->
-                                    change.consume()
-                                    val (x, _) = dragAmount
-                                    offsetX = x
-                                }
-                            )
+                                )
+                            }*/
+                            .background(
+                                if (!isSystemInDarkTheme()) {
+                                    Color.LightGray
+                                } else Color.DarkGray
+                            ),
+                    ) {
+                        HomeBottomBarItem(
+                            /*song = song,
+                            onEvent = onEvent,
+                            playerState = playerState,
+                            onBarClick = onBarClick*/
+                        )
+                    }
+                }
+            }
+        }
+    }
 
-                        }
-                        .background(
-                            if (!isSystemInDarkTheme()) {
-                                Color.LightGray
-                            } else Color.DarkGray
-                        ),
+    @Composable
+    fun HomeBottomBarItem(
+    ) {
+        Box(
+            modifier = Modifier
+                .height(64.dp)
+                //.clickable(onClick = { onBarClick() })
+
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter("https://predanie.ru/assets/img/logo.png"),
+                    contentDescription = "song",//song.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .offset(16.dp)
+                )
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .padding(vertical = 8.dp, horizontal = 32.dp),
                 ) {
-                    HomeBottomBarItem(
-                        song = song,
-                        onEvent = onEvent,
-                        playerState = playerState,
-                        onBarClick = onBarClick
+                    Text(
+                        "song",//song.title,
+                        //style = MaterialTheme.typography.body2,
+                        //color = MaterialTheme.colors.onBackground,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+
+                    Text(
+                        "song",//song.title,
+                        //style = MaterialTheme.typography.body2,
+                        //color = MaterialTheme.colors.onBackground,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .graphicsLayer {
+                                alpha = 0.60f
+                            }
+
                     )
                 }
+                /*val painter = rememberAsyncImagePainter(
+                    if (playerState == PlayerState.PLAYING) {
+                        R.drawable.ic_round_pause
+                    } else {
+                        R.drawable.ic_round_play_arrow
+                    }
+                )*/
+
+                /*Image(
+                    painter = painter,
+                    contentDescription = "Music",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .size(48.dp)
+                        .clickable(
+                            interactionSource = remember {
+                                MutableInteractionSource()
+                            },
+                            indication = rememberRipple(
+                                bounded = false,
+                                radius = 24.dp
+                            )
+                        ) {
+                            if (playerState == PlayerState.PLAYING) {
+                                onEvent(HomeEvent.PauseSong)
+                            } else {
+                                onEvent(HomeEvent.ResumeSong)
+                            }
+                        },
+                )*/
+
             }
         }
     }
