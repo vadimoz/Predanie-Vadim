@@ -203,10 +203,10 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                         )
                     }
                 }
-                /*
+
                 Text(text = "Очистить", fontSize = 12.sp, modifier = Modifier.clickable {
                     mainViewModel.cleanQueue(context)
-                })*/
+                })
             }
 
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {

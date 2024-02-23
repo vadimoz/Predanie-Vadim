@@ -11,25 +11,17 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -39,27 +31,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
-import androidx.media3.ui.AspectRatioFrameLayout
-import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -71,7 +57,7 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import com.slaviboy.composeunits.initSize
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import fond.predanie.medialib.presentation.screens.PlayerScreen
 import fund.predanie.medialib.presentation.MainViewModel
 import fund.predanie.medialib.presentation.navigation.NavigationItem
 import fund.predanie.medialib.presentation.playerService.PlayerService
@@ -82,13 +68,13 @@ import fund.predanie.medialib.presentation.screens.FundScreen
 import fund.predanie.medialib.presentation.screens.HomeScreen
 import fund.predanie.medialib.presentation.screens.ItemScreen
 import fund.predanie.medialib.presentation.screens.OfflineItemScreen
-import fond.predanie.medialib.presentation.screens.PlayerScreen
 import fund.predanie.medialib.presentation.screens.PostScreen
 import fund.predanie.medialib.presentation.screens.ProfileScreen
 import fund.predanie.medialib.presentation.screens.QuickScreen
 import fund.predanie.medialib.presentation.screens.SearchScreen
 import fund.predanie.medialib.presentation.screens.SplashScreen
 import fund.predanie.medialib.presentation.theme.PredanieTheme
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -126,6 +112,7 @@ class MainActivity : ComponentActivity() {
         playerController.addMediaItems(currentPlaylistFromDB.playlistJson)
         playerController.prepare()
         playerController.pause()
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -172,6 +159,8 @@ class MainActivity : ComponentActivity() {
         navController = rememberAnimatedNavController()
         val context = LocalContext.current
 
+
+
         Scaffold(
             content = { padding ->
                 Box(modifier = Modifier.padding(padding)) {
@@ -180,7 +169,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier
                             .align(Alignment.BottomCenter),
                         playerState = uiState.playerController,
-                        //onBarClick = { navController.navigate(Destination.songScreen) }
+                        //onBarClick = { navController.navigate(NavigationItem.Profile) }
                     )
                 }
             },
@@ -194,56 +183,82 @@ class MainActivity : ComponentActivity() {
             },
         )
     }
+
     @Composable
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     fun BottomPlayerBar(
         modifier: Modifier = Modifier,
         //onEvent: (HomeEvent) -> Unit,
         playerState: MediaController?,
         //onBarClick: () -> Unit
     ) {
+        val uiState by mainViewModel.uiState.collectAsState()
+
+        uiState.playerController!!.addListener(object : Player.Listener { // player listener
+            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                when (playbackState) { // check player play back state
+                    Player.STATE_READY -> {
+                        //aspectRatioFrameLayout.setAspectRatio(16f / 9f)
+                        mainViewModel.playerVisible()
+                    }
+                    Player.STATE_ENDED -> {
+                        //your logic
+                    }
+                    Player.STATE_BUFFERING ->{
+                        //your logic
+                    }
+                    Player.STATE_IDLE -> {
+                        //your logic
+                    }
+                    else -> {
+                        //playerView.hideController()
+                    }
+                }
+            }
+        })
+
         AnimatedVisibility(
             visible = true,
             modifier = modifier
         ) {
-            if (playerState != null) {
-                if (playerState.isPlaying != null) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            /*.pointerInput(Unit) {
-                                detectDragGestures(
-                                    onDragEnd = {
-                                        when {
-                                            offsetX > 0 -> {
-                                                onEvent(HomeEvent.SkipToPreviousSong)
-                                            }
-
-                                            offsetX < 0 -> {
-                                                onEvent(HomeEvent.SkipToNextSong)
-                                            }
+            if (uiState.isPlayerVisible == true) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        /*.pointerInput(Unit) {
+                            detectDragGestures(
+                                onDragEnd = {
+                                    when {
+                                        offsetX > 0 -> {
+                                            onEvent(HomeEvent.SkipToPreviousSong)
                                         }
-                                    },
-                                    onDrag = { change, dragAmount ->
-                                        change.consume()
-                                        val (x, _) = dragAmount
-                                        offsetX = x
+
+                                        offsetX < 0 -> {
+                                            onEvent(HomeEvent.SkipToNextSong)
+                                        }
                                     }
-                                )
-                            }*/
-                            .background(
-                                if (!isSystemInDarkTheme()) {
-                                    Color.LightGray
-                                } else Color.DarkGray
-                            ),
-                    ) {
-                        HomeBottomBarItem(
-                            /*song = song,
-                            onEvent = onEvent,
-                            playerState = playerState,
-                            onBarClick = onBarClick*/
-                        )
-                    }
+                                },
+                                onDrag = { change, dragAmount ->
+                                    change.consume()
+                                    val (x, _) = dragAmount
+                                    offsetX = x
+                                }
+                            )
+                        }*/
+                        .background(
+                            if (!isSystemInDarkTheme()) {
+                                Color.LightGray
+                            } else Color.DarkGray
+                        ),
+                ) {
+                    HomeBottomBarItem(
+                        /*song = song,
+                        onEvent = onEvent,
+                        playerState = playerState,
+                        onBarClick = onBarClick*/
+                    )
                 }
+
             }
         }
     }
@@ -254,7 +269,7 @@ class MainActivity : ComponentActivity() {
         Box(
             modifier = Modifier
                 .height(64.dp)
-                //.clickable(onClick = { onBarClick() })
+            //.clickable(onClick = { onBarClick() })
 
         ) {
             Row(

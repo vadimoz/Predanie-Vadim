@@ -244,7 +244,7 @@ fun ItemScreen(
                                                     )
                                                 uiState.playerController?.setMediaItems(playerList)
 
-                                                navController.navigate("PlayerScreen")
+                                                //navController.navigate("PlayerScreen")
 
                                                 mainViewModel.playerVisible()
 
