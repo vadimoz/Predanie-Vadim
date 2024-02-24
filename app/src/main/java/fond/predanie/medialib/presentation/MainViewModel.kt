@@ -732,6 +732,12 @@ class MainViewModel(
             context, "Очередь воспроизведения очищена!",
             Toast.LENGTH_SHORT
         ).show()
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                isPlayerVisible = false,
+            )
+        }
     }
 
     fun togglePlayer() {

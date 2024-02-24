@@ -193,35 +193,12 @@ class MainActivity : ComponentActivity() {
         //onBarClick: () -> Unit
     ) {
         val uiState by mainViewModel.uiState.collectAsState()
-
-        uiState.playerController!!.addListener(object : Player.Listener { // player listener
-            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                when (playbackState) { // check player play back state
-                    Player.STATE_READY -> {
-                        //aspectRatioFrameLayout.setAspectRatio(16f / 9f)
-                        mainViewModel.playerVisible()
-                    }
-                    Player.STATE_ENDED -> {
-                        //your logic
-                    }
-                    Player.STATE_BUFFERING ->{
-                        //your logic
-                    }
-                    Player.STATE_IDLE -> {
-                        //your logic
-                    }
-                    else -> {
-                        //playerView.hideController()
-                    }
-                }
-            }
-        })
-
         AnimatedVisibility(
             visible = true,
             modifier = modifier
         ) {
-            if (uiState.isPlayerVisible == true) {
+
+            if (uiState.isPlayerVisible || uiState.mainPlaylist?.playlistJson?.isNotEmpty() == true) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
