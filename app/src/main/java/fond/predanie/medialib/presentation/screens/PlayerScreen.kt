@@ -2,12 +2,14 @@ package fond.predanie.medialib.presentation.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -65,32 +67,26 @@ fun PlayerScreen(mainViewModel: MainViewModel, navController: NavHostController,
 
     Column(
         Modifier
-            .fillMaxSize()
-            .height(100.dp)
-            .width(100.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .fillMaxSize(),
         //verticalArrangement = Arrangement.Center
     ) {
 
-        AndroidView(
-            factory = { context ->
-                PlayerView(context).apply {
-                    uiState.playerController
-                    controllerHideOnTouch = true
-                    setShowPreviousButton(false)
-                    setShowNextButton(false)
-                    setShowRewindButton(false)
-                    setShowVrButton(false)
-                    setShowFastForwardButton(false)
-                    controllerAutoShow = false
-                    controllerShowTimeoutMs = 0
+        Box(modifier = Modifier                            .weight(1f)
+            .aspectRatio(1f)
+        ) {
+            AndroidView(
+                factory = { context ->
+                    PlayerView(context).apply {
+                        uiState.playerController
+                        controllerHideOnTouch = false
+                    }
+                },
+                update = {
+                    it.player = uiState.playerController
                 }
-            },
-            update = {
-                it.player = uiState.playerController
-            }
-        )
-        Spacer(modifier = Modifier.height(54.dp))
+            )
+        }
+        Spacer(modifier = Modifier.height(1.dp))
         /*Column(
             modifier = Modifier
                 .fillMaxWidth()
