@@ -175,12 +175,12 @@ class MainActivity : ComponentActivity() {
                 }
             },
             bottomBar = {
-                if ((currentRoute(navController) != NavigationItem.Splash.route) && (currentRoute(
+                /*if ((currentRoute(navController) != NavigationItem.Splash.route) && (currentRoute(
                         navController
                     ) != NavigationItem.Player.route)
-                ) {
-                    BottomNavigationBar(navController)
-                }
+                ) {*/
+                BottomNavigationBar(navController)
+                //}
             },
         )
     }
