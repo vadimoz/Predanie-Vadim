@@ -7,8 +7,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -88,7 +90,10 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                         }
                     }
 
-                    LazyRow() {
+                    LazyRow(
+                        modifier = Modifier
+                            .defaultMinSize(minHeight = 130.dp),
+                    ) {
                         items(newItems.itemCount) { index ->
                             newItems[index]?.let { ListRow(model = it, navController, mainViewModel) }
                         }
@@ -116,7 +121,9 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
 
                         }
                     }
-                    LazyRow() {
+                    LazyRow(
+                        modifier = Modifier
+                            .defaultMinSize(minHeight = 130.dp),) {
                         items(favoritesList.itemCount) { index ->
                             favoritesList[index]?.let { ListRow(model = it, navController, mainViewModel) }
                         }
@@ -144,7 +151,9 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
 
                         }
                     }
-                    LazyRow() {
+                    LazyRow(
+                        modifier = Modifier
+                            .defaultMinSize(minHeight = 130.dp),) {
                         items(audioPopularList.itemCount) { index ->
                             audioPopularList[index]?.let { ListRow(model = it, navController, mainViewModel) }
                         }

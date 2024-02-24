@@ -44,5 +44,6 @@ data class UIState(
     //settings
     var goToNext: Boolean = true,
     var isPlayerVisible: Boolean = false,
-    var percentToFileReady: Int = 95
+    var percentToFileReady: Int = 95,
+    var mainScreenLoaded: Boolean = false
 )
