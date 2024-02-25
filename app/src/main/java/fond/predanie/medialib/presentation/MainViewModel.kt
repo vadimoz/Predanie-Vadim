@@ -115,7 +115,6 @@ class MainViewModel(
         }
     }
 
-
     fun getPostInfo(postId: String) {
         viewModelScope.launch {
             _uiState.update { currentState ->

@@ -45,5 +45,9 @@ data class UIState(
     var goToNext: Boolean = true,
     var isPlayerVisible: Boolean = false,
     var percentToFileReady: Int = 95,
-    var mainScreenLoaded: Boolean = false
+    var mainScreenLoaded: Boolean = false,
+
+    var currentSongTitle: String = "",
+    var currentSongAuthor: String = "",
+    var currentSongPosition: String = ""
 )

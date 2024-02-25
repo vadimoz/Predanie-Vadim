@@ -1,28 +1,29 @@
 package fond.predanie.medialib.presentation.screens
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.ExperimentalFoundationApi
+import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowForward
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,177 +32,291 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.media3.ui.PlayerView
+import androidx.compose.ui.unit.sp
+import androidx.media3.common.MediaItem
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
+import fond.predanie.medialib.presentation.playerService.playlistAccordion.PlaylistAccordionGroup
+import fond.predanie.medialib.presentation.playerService.playlistAccordion.PlaylistAccordionModel
 import fund.predanie.medialib.R
 import fund.predanie.medialib.presentation.MainViewModel
-import kotlinx.coroutines.delay
 
-@SuppressLint("RememberReturnType")
-@OptIn(ExperimentalFoundationApi::class)
-@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
-fun PlayerScreen(mainViewModel: MainViewModel, navController: NavHostController, action: String?) {
+fun PlayerScreen(mainViewModel: MainViewModel, navController: NavHostController, action: Nothing?) {
     val context = LocalContext.current
     val uiState by mainViewModel.uiState.collectAsState()
     val playlistsList = uiState.playlistsList?.collectAsLazyPagingItems()
 
-    val player = uiState.playerController
-
-    var currentPosition = remember {
-        mutableStateOf(0)
-    }
-
-    /*LaunchedEffect(key1 = player?.currentPosition, key2 = player?.isPlaying) {
-        delay(1000)
-        currentPosition = player?.currentPosition
-    }*/
-
-    Column(
-        Modifier
-            .fillMaxSize(),
-        //verticalArrangement = Arrangement.Center
-    ) {
-
-        Box(modifier = Modifier                            .weight(1f)
-            .aspectRatio(1f)
-        ) {
-            AndroidView(
-                factory = { context ->
-                    PlayerView(context).apply {
-                        uiState.playerController
-                        controllerHideOnTouch = false
-                    }
-                },
-                update = {
-                    it.player = uiState.playerController
-                }
-            )
-        }
-        Spacer(modifier = Modifier.height(1.dp))
-        /*Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
-        ) {
-
-            TrackSlider(
-                value = sliderPosition.longValue.toFloat(),
-                onValueChange = {
-                    sliderPosition.longValue = it.toLong()
-                },
-                onValueChangeFinished = {
-                    currentPosition.longValue = sliderPosition.longValue
-                    player.seekTo(sliderPosition.longValue)
-                },
-                songDuration = totalDuration.longValue.toFloat()
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-
-                Text(
-                    text = (currentPosition.longValue).convertToText(),
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(8.dp),
-                    color = Color.Black,
-                    style = TextStyle(fontWeight = FontWeight.Bold)
-                )
-
-                val remainTime = totalDuration.longValue - currentPosition.longValue
-                Text(
-                    text = if (remainTime >= 0) remainTime.convertToText() else "",
-                    modifier = Modifier
-                        .padding(8.dp),
-                    color = Color.Black,
-                    style = TextStyle(fontWeight = FontWeight.Bold)
-                )
-            }
-        }
-*/
-        Spacer(modifier = Modifier.height(24.dp))
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ControlButton(icon = androidx.media3.ui.R.drawable.exo_icon_previous, size = 40.dp, onClick = {
-                player?.seekToPreviousMediaItem()
-            })
-            Spacer(modifier = Modifier.width(20.dp))
-            ControlButton(
-                icon = if (player?.isPlaying == true) androidx.media3.ui.R.drawable.exo_icon_pause else R.drawable.playall,
-                size = 100.dp,
-                onClick = {
-                    if (player?.isPlaying == true) {
-                        player.pause()
-                    } else {
-                        player?.play()
-                    }
-                })
-            Spacer(modifier = Modifier.width(20.dp))
-            ControlButton(icon = androidx.media3.ui.R.drawable.exo_icon_next, size = 40.dp, onClick = {
-                player?.seekToNextMediaItem()
-            })
-        }
-    }
+    SongScreenBody(mainViewModel, navController)
 }
 
-/***
- * Player control button
- */
 @Composable
-fun ControlButton(icon: Int, size: Dp, onClick: () -> Unit) {
+fun SongScreenBody(mainViewModel: MainViewModel, navController: NavHostController) {
+
+    val endAnchor = LocalConfiguration.current.screenHeightDp * LocalDensity.current.density
+    val anchors = mapOf(
+        0f to 0, endAnchor to 1
+    )
+
+    val backgroundColor = Color.White
+
+    val dominantColor by remember { mutableStateOf(Color.Transparent) }
+
+    val context = LocalContext.current
+
+    /*val imagePainter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(context).data(uiState.playerController?.mediaMetadata?.artworkUri).crossfade(true).build()
+    )*/
+
+    val iconResId = R.drawable.playall
+        //if (uiState.playerController.playerState == PlayerState.PLAYING) R.drawable.ic_round_pause else R.drawable.ic_round_play_arrow
+
     Box(
         modifier = Modifier
-            .size(size)
-            .clip(CircleShape)
-            .clickable {
-                onClick()
-            }, contentAlignment = Alignment.Center
+            .fillMaxSize()
+            .background(backgroundColor)
+            /*.swipeable(
+                state = swipeableState,
+                anchors = anchors,
+                thresholds = { _, _ -> FractionalThreshold(0.34f) },
+                orientation = Orientation.Vertical
+            )*/
     ) {
-        Icon(
-            modifier = Modifier.size(size / 1.5f),
-            painter = painterResource(id = icon),
-            tint = Color.Black,
-            contentDescription = null
-        )
+        /*if (swipeableState.currentValue >= 1) {
+            LaunchedEffect(key1 = Unit) {
+                onNavigateUp()
+            }
+        }*/
+        SongScreenContent(mainViewModel, navController)
     }
 }
 
-/**
- * Tracks and visualizes the song playing actions.
- */
 @Composable
-fun TrackSlider(
-    value: Float,
-    onValueChange: (newValue: Float) -> Unit,
-    onValueChangeFinished: () -> Unit,
-    songDuration: Float
+fun SongScreenContent(
+    mainViewModel: MainViewModel,
+    navController: NavHostController
 ) {
-    Slider(
-        value = value,
-        onValueChange = {
-            onValueChange(it)
-        },
-        onValueChangeFinished = {
+    val uiState by mainViewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
-            onValueChangeFinished()
-
-        },
-        valueRange = 0f..songDuration,
-        colors = SliderDefaults.colors(
-            thumbColor = Color.Black,
-            activeTrackColor = Color.DarkGray,
-            inactiveTrackColor = Color.Gray,
+    /*val gradientColors = if (isSystemInDarkTheme()) {
+        listOf(
+            dominantColor, MaterialTheme.colors.background
         )
-    )
+    } else {
+        listOf(
+            MaterialTheme.colors.background, MaterialTheme.colors.background
+        )
+    }
+
+    val sliderColors = if (isSystemInDarkTheme()) {
+        SliderDefaults.colors(
+            thumbColor = MaterialTheme.colors.onBackground,
+            activeTrackColor = MaterialTheme.colors.onBackground,
+            inactiveTrackColor = MaterialTheme.colors.onBackground.copy(
+                alpha = ProgressIndicatorDefaults.IndicatorBackgroundOpacity
+            ),
+        )
+    } else SliderDefaults.colors(
+        thumbColor = dominantColor,
+        activeTrackColor = dominantColor,
+        inactiveTrackColor = dominantColor.copy(
+            alpha = ProgressIndicatorDefaults.IndicatorBackgroundOpacity
+        ),
+    )*/
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+            Box(
+                modifier = Modifier
+                    /*.background(
+                        Brush.verticalGradient(
+                            //colors = gradientColors,
+                            endY = LocalConfiguration.current.screenHeightDp.toFloat() * LocalDensity.current.density
+                        )
+                    )*/
+                    .fillMaxSize()
+                    .systemBarsPadding()
+            ) {
+                Column {
+                    IconButton(
+                        onClick = {Log.d("Player", "Nvigate")}
+                    ) {
+                        Image(
+                            imageVector = Icons.Rounded.KeyboardArrowDown,
+                            contentDescription = "Close",
+                            colorFilter = ColorFilter.tint(LocalContentColor.current)
+                        )
+                    }
+                    Column(
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    ) {
+                        /*Box(
+                            modifier = Modifier
+                                .padding(vertical = 32.dp)
+                                .clip(MaterialTheme.shapes.medium)
+                                .weight(1f, fill = false)
+                                .aspectRatio(1f)
+
+                        ) {
+                            AnimatedVinyl(painter = imagePainter, isSongPlaying = isSongPlaying)
+                        }*/
+
+                        Text(
+                            text = uiState.playerController?.mediaMetadata?.title.toString(),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+
+                        Text(
+                            text = uiState.playerController?.mediaMetadata?.artist.toString(),
+                            //style = MaterialTheme.typography.subtitle1,
+                            //color = MaterialTheme.colors.onBackground,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.graphicsLayer {
+                                alpha = 0.60f
+                            })
+
+                        /*Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 24.dp)
+                        ) {
+
+                            Slider(
+                                value = currentTime.toFloat(),
+                                modifier = Modifier.fillMaxWidth(),
+                                valueRange = 0f..totalTime.toFloat(),
+                                colors = sliderColors,
+                                onValueChange = onSliderChange,
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                                    Text(
+                                        currentTime.toTime(),
+                                        style = MaterialTheme.typography.body2
+                                    )
+                                }
+                                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                                    Text(
+                                        totalTime.toTime(), style = MaterialTheme.typography.body2
+                                    )
+                                }
+                            }
+                        }*/
+
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.ArrowBack,
+                                contentDescription = "Skip Previous",
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .clickable(onClick = { uiState.playerController?.previous() })
+                                    .padding(12.dp)
+                                    .size(32.dp)
+                            )
+                            Icon(
+                                imageVector = Icons.Rounded.Refresh,
+                                contentDescription = "Replay 10 seconds",
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    //.clickable(onClick = onRewind)
+                                    .padding(12.dp)
+                                    .size(32.dp)
+                            )
+                            Icon(
+                                painter = painterResource(R.drawable.playall),
+                                contentDescription = "Play",
+                                //tint = MaterialTheme.colors.background,
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    //.background(MaterialTheme.colors.onBackground)
+                                    .clickable(onClick = { uiState.playerController?.play() })
+                                    .size(64.dp)
+                                    .padding(8.dp)
+                            )
+                            Icon(
+                                imageVector = Icons.Rounded.Refresh,
+                                contentDescription = "Forward 10 seconds",
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    //.clickable(onClick = onForward)
+                                    .padding(12.dp)
+                                    .size(32.dp)
+                            )
+                            Icon(
+                                imageVector = Icons.Rounded.ArrowForward,
+                                contentDescription = "Skip Next",
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    //.clickable(onClick = playNextSong)
+                                    .padding(12.dp)
+                                    .size(32.dp)
+                            )
+
+                        }
+                        val currentPlaylistFromDB = uiState.mainPlaylist
+
+                        Row(modifier = Modifier.padding(bottom = 5.dp)) {
+                            //Выводим очередь воспроизведения
+
+                            val rows = mutableListOf<MediaItem>()
+
+                            if (currentPlaylistFromDB != null) {
+                                for (item in currentPlaylistFromDB.playlistJson) {
+                                    rows.add(item)
+                                }
+                            }
+
+                            val parts = PlaylistAccordionModel(
+                                header = "Очередь воспроизведения",
+                                rows
+                            )
+
+                            val group = listOf(parts)
+
+                            if (currentPlaylistFromDB != null) {
+                                PlaylistAccordionGroup(
+                                    modifier = Modifier.padding(top = 8.dp),
+                                    group = group,
+                                    exp = false,
+                                    playerList = currentPlaylistFromDB.playlistJson,
+                                    navController = navController,
+                                    mainViewModel = mainViewModel,
+                                    globalItemCount = currentPlaylistFromDB.playlistJson.count(),
+                                    partCount = currentPlaylistFromDB.playlistJson.count()
+                                )
+                            }
+                        }
+
+                        Text(text = "Очистить", fontSize = 12.sp, modifier = Modifier.clickable {
+                            mainViewModel.cleanQueue(context)
+                        })
+                    }
+                }
+
+            }
+
+
+    }
 }
