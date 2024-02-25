@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -81,18 +82,18 @@ fun SongScreenBody(mainViewModel: MainViewModel, navController: NavHostControlle
     )*/
 
     val iconResId = R.drawable.playall
-        //if (uiState.playerController.playerState == PlayerState.PLAYING) R.drawable.ic_round_pause else R.drawable.ic_round_play_arrow
+    //if (uiState.playerController.playerState == PlayerState.PLAYING) R.drawable.ic_round_pause else R.drawable.ic_round_play_arrow
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            /*.swipeable(
-                state = swipeableState,
-                anchors = anchors,
-                thresholds = { _, _ -> FractionalThreshold(0.34f) },
-                orientation = Orientation.Vertical
-            )*/
+        /*.swipeable(
+            state = swipeableState,
+            anchors = anchors,
+            thresholds = { _, _ -> FractionalThreshold(0.34f) },
+            orientation = Orientation.Vertical
+        )*/
     ) {
         /*if (swipeableState.currentValue >= 1) {
             LaunchedEffect(key1 = Unit) {
@@ -140,205 +141,188 @@ fun SongScreenContent(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-            Box(
-                modifier = Modifier
-                    /*.background(
-                        Brush.verticalGradient(
-                            //colors = gradientColors,
-                            endY = LocalConfiguration.current.screenHeightDp.toFloat() * LocalDensity.current.density
-                        )
-                    )*/
-                    .fillMaxSize()
-                    .systemBarsPadding()
-            ) {
-                Column {
-                    IconButton(
-                        onClick = {Log.d("Player", "Nvigate")}
-                    ) {
-                        Image(
-                            imageVector = Icons.Rounded.KeyboardArrowDown,
-                            contentDescription = "Close",
-                            colorFilter = ColorFilter.tint(LocalContentColor.current)
-                        )
-                    }
-                    Column(
-                        modifier = Modifier.padding(horizontal = 24.dp)
-                    ) {
-                        /*Box(
-                            modifier = Modifier
-                                .padding(vertical = 32.dp)
-                                .clip(MaterialTheme.shapes.medium)
-                                .weight(1f, fill = false)
-                                .aspectRatio(1f)
-
-                        ) {
-                            AnimatedVinyl(painter = imagePainter, isSongPlaying = isSongPlaying)
-                        }*/
-
-                        Text(
-                            text = uiState.playerController?.mediaMetadata?.title.toString(),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-
-                        Text(
-                            text = uiState.playerController?.mediaMetadata?.artist.toString(),
-                            //style = MaterialTheme.typography.subtitle1,
-                            //color = MaterialTheme.colors.onBackground,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.graphicsLayer {
-                                alpha = 0.60f
-                            })
-
-                        /*Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 24.dp)
-                        ) {
-
-                            Slider(
-                                value = currentTime.toFloat(),
-                                modifier = Modifier.fillMaxWidth(),
-                                valueRange = 0f..totalTime.toFloat(),
-                                colors = sliderColors,
-                                onValueChange = onSliderChange,
-                            )
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                                    Text(
-                                        currentTime.toTime(),
-                                        style = MaterialTheme.typography.body2
-                                    )
-                                }
-                                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                                    Text(
-                                        totalTime.toTime(), style = MaterialTheme.typography.body2
-                                    )
-                                }
-                            }
-                        }*/
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            CompositionLocalProvider() {
-                                Text(
-                                    uiState.currentSongPosition,
-                                    //style = MaterialTheme.typography.body2
-                                )
-                            }
-                            CompositionLocalProvider() {
-                                Text(
-                                    uiState.playerController?.currentPosition.toString(),
-                                    //style = MaterialTheme.typography.body2
-                                )
-                            }
-                        }
-
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceAround,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.ArrowBack,
-                                contentDescription = "Skip Previous",
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .clickable(onClick = { uiState.playerController?.previous() })
-                                    .padding(12.dp)
-                                    .size(32.dp)
-                            )
-                            Icon(
-                                imageVector = Icons.Rounded.Refresh,
-                                contentDescription = "Replay 10 seconds",
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    //.clickable(onClick = onRewind)
-                                    .padding(12.dp)
-                                    .size(32.dp)
-                            )
-                            Icon(
-                                painter = painterResource(R.drawable.playall),
-                                contentDescription = "Play",
-                                //tint = MaterialTheme.colors.background,
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    //.background(MaterialTheme.colors.onBackground)
-                                    .clickable(onClick = { uiState.playerController?.play() })
-                                    .size(64.dp)
-                                    .padding(8.dp)
-                            )
-                            Icon(
-                                imageVector = Icons.Rounded.Refresh,
-                                contentDescription = "Forward 10 seconds",
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    //.clickable(onClick = onForward)
-                                    .padding(12.dp)
-                                    .size(32.dp)
-                            )
-                            Icon(
-                                imageVector = Icons.Rounded.ArrowForward,
-                                contentDescription = "Skip Next",
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    //.clickable(onClick = playNextSong)
-                                    .padding(12.dp)
-                                    .size(32.dp)
-                            )
-
-                        }
-                        val currentPlaylistFromDB = uiState.mainPlaylist
-
-                        Row(modifier = Modifier.padding(bottom = 5.dp)) {
-                            //Выводим очередь воспроизведения
-
-                            val rows = mutableListOf<MediaItem>()
-
-                            if (currentPlaylistFromDB != null) {
-                                for (item in currentPlaylistFromDB.playlistJson) {
-                                    rows.add(item)
-                                }
-                            }
-
-                            val parts = PlaylistAccordionModel(
-                                header = "Очередь воспроизведения",
-                                rows
-                            )
-
-                            val group = listOf(parts)
-
-                            if (currentPlaylistFromDB != null) {
-                                PlaylistAccordionGroup(
-                                    modifier = Modifier.padding(top = 8.dp),
-                                    group = group,
-                                    exp = false,
-                                    playerList = currentPlaylistFromDB.playlistJson,
-                                    navController = navController,
-                                    mainViewModel = mainViewModel,
-                                    globalItemCount = currentPlaylistFromDB.playlistJson.count(),
-                                    partCount = currentPlaylistFromDB.playlistJson.count()
-                                )
-                            }
-                        }
-
-                        Text(text = "Очистить", fontSize = 12.sp, modifier = Modifier.clickable {
-                            mainViewModel.cleanQueue(context)
-                        })
-                    }
+        Box(
+            modifier = Modifier
+                /*.background(
+                    Brush.verticalGradient(
+                        //colors = gradientColors,
+                        endY = LocalConfiguration.current.screenHeightDp.toFloat() * LocalDensity.current.density
+                    )
+                )*/
+                .fillMaxSize()
+                .systemBarsPadding()
+        ) {
+            Column {
+                IconButton(
+                    onClick = { Log.d("Player", "Nvigate") }
+                ) {
+                    Image(
+                        imageVector = Icons.Rounded.KeyboardArrowDown,
+                        contentDescription = "Close",
+                        colorFilter = ColorFilter.tint(LocalContentColor.current)
+                    )
                 }
+                Column(
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                ) {
+                    /*Box(
+                        modifier = Modifier
+                            .padding(vertical = 32.dp)
+                            .clip(MaterialTheme.shapes.medium)
+                            .weight(1f, fill = false)
+                            .aspectRatio(1f)
 
+                    ) {
+                        AnimatedVinyl(painter = imagePainter, isSongPlaying = isSongPlaying)
+                    }*/
+
+                    Text(
+                        text = uiState.playerController?.mediaMetadata?.title.toString(),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Text(
+                        text = uiState.playerController?.mediaMetadata?.artist.toString(),
+                        //style = MaterialTheme.typography.subtitle1,
+                        //color = MaterialTheme.colors.onBackground,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.graphicsLayer {
+                            alpha = 0.60f
+                        })
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp)
+                    ) {
+
+                        Slider(
+                            value = uiState.currentSongPosition.toFloat(),
+                            modifier = Modifier.fillMaxWidth(),
+                            valueRange = 0f..3000000.toFloat(),
+                            //colors = sliderColors,
+                            onValueChange = { Log.d("VALUE", "SLIDER") },
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CompositionLocalProvider() {
+                            Text(
+                                uiState.currentSongPosition,
+                                //style = MaterialTheme.typography.body2
+                            )
+                        }
+                        CompositionLocalProvider() {
+                            Text(
+                                uiState.playerController?.currentPosition.toString(),
+                                //style = MaterialTheme.typography.body2
+                            )
+                        }
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowBack,
+                            contentDescription = "Skip Previous",
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .clickable(onClick = { uiState.playerController?.previous() })
+                                .padding(12.dp)
+                                .size(32.dp)
+                        )
+                        Icon(
+                            imageVector = Icons.Rounded.Refresh,
+                            contentDescription = "Replay 10 seconds",
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                //.clickable(onClick = onRewind)
+                                .padding(12.dp)
+                                .size(32.dp)
+                        )
+                        Icon(
+                            painter = painterResource(R.drawable.playall),
+                            contentDescription = "Play",
+                            //tint = MaterialTheme.colors.background,
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                //.background(MaterialTheme.colors.onBackground)
+                                .clickable(onClick = { uiState.playerController?.play() })
+                                .size(64.dp)
+                                .padding(8.dp)
+                        )
+                        Icon(
+                            imageVector = Icons.Rounded.Refresh,
+                            contentDescription = "Forward 10 seconds",
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                //.clickable(onClick = onForward)
+                                .padding(12.dp)
+                                .size(32.dp)
+                        )
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowForward,
+                            contentDescription = "Skip Next",
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                //.clickable(onClick = playNextSong)
+                                .padding(12.dp)
+                                .size(32.dp)
+                        )
+
+                    }
+                    val currentPlaylistFromDB = uiState.mainPlaylist
+
+                    Row(modifier = Modifier.padding(bottom = 5.dp)) {
+                        //Выводим очередь воспроизведения
+
+                        val rows = mutableListOf<MediaItem>()
+
+                        if (currentPlaylistFromDB != null) {
+                            for (item in currentPlaylistFromDB.playlistJson) {
+                                rows.add(item)
+                            }
+                        }
+
+                        val parts = PlaylistAccordionModel(
+                            header = "Очередь воспроизведения",
+                            rows
+                        )
+
+                        val group = listOf(parts)
+
+                        if (currentPlaylistFromDB != null) {
+                            PlaylistAccordionGroup(
+                                modifier = Modifier.padding(top = 8.dp),
+                                group = group,
+                                exp = false,
+                                playerList = currentPlaylistFromDB.playlistJson,
+                                navController = navController,
+                                mainViewModel = mainViewModel,
+                                globalItemCount = currentPlaylistFromDB.playlistJson.count(),
+                                partCount = currentPlaylistFromDB.playlistJson.count()
+                            )
+                        }
+                    }
+
+                    Text(text = "Очистить", fontSize = 12.sp, modifier = Modifier.clickable {
+                        mainViewModel.cleanQueue(context)
+                    })
+                }
             }
+
+        }
 
 
     }
