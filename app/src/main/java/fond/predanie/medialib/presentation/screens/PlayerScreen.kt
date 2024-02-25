@@ -201,7 +201,7 @@ fun SongScreenContent(
                         Slider(
                             value = uiState.currentSongPosition.toFloat(),
                             modifier = Modifier.fillMaxWidth(),
-                            valueRange = 0f..3000000.toFloat(),
+                            valueRange = 0f..(uiState.playerController?.duration?.toFloat() ?: 0.toFloat()),
                             //colors = sliderColors,
                             onValueChange = { Log.d("VALUE", "SLIDER") },
                         )
