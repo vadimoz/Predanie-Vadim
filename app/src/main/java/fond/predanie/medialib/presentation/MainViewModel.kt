@@ -780,4 +780,12 @@ class MainViewModel(
             Toast.LENGTH_SHORT
         ).show()
     }
+
+    fun updatePlayerInfo() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                currentSongTitle = uiState.value.playerController?.mediaMetadata?.title.toString(),
+            )
+        }
+    }
 }

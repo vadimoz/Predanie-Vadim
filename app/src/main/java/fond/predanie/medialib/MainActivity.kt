@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
@@ -44,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import androidx.navigation.NavController
@@ -112,6 +114,23 @@ class MainActivity : ComponentActivity() {
         playerController.addMediaItems(currentPlaylistFromDB.playlistJson)
         playerController.prepare()
         playerController.pause()
+
+        playerController.addListener(
+            object : Player.Listener {
+                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                    if (isPlaying) {
+                        //обновляем в плеере тайтл и автора
+                        mainViewModel.updatePlayerInfo()
+
+                    } else {
+                        // Not playing because playback is paused, ended, suppressed, or the player
+                        // is buffering, stopped or failed. Check player.playWhenReady,
+                        // player.playbackState, player.playbackSuppressionReason and
+                        // player.playerError for details.
+                    }
+                }
+            }
+        )
 
     }
 
