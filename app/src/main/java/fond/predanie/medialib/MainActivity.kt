@@ -143,6 +143,7 @@ class MainActivity : ComponentActivity() {
         mainViewModel.loadFavorites(this)
         mainViewModel.loadSettingsFromStore(this)
         mainViewModel.loadPlaylists(this)
+        mainViewModel.updatePlaybackPosition(1000)
 
         initSize()
         setContent {

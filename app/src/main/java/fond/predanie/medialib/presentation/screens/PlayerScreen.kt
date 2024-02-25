@@ -1,5 +1,7 @@
 package fond.predanie.medialib.presentation.screens
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,8 +24,10 @@ import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -218,6 +222,25 @@ fun SongScreenContent(
                                 }
                             }
                         }*/
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CompositionLocalProvider() {
+                                Text(
+                                    uiState.currentSongPosition,
+                                    //style = MaterialTheme.typography.body2
+                                )
+                            }
+                            CompositionLocalProvider() {
+                                Text(
+                                    uiState.playerController?.currentPosition.toString(),
+                                    //style = MaterialTheme.typography.body2
+                                )
+                            }
+                        }
 
                         Row(
                             horizontalArrangement = Arrangement.SpaceAround,

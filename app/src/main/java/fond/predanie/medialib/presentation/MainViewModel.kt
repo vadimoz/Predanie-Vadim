@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.preference.PreferenceManager
 import android.text.TextUtils
 import android.util.Log
@@ -687,7 +689,7 @@ class MainViewModel(
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-    fun deleteCompositionPositions(compositionId: Int, context: Context){
+    fun deleteCompositionPositions(compositionId: Int, context: Context) {
         AppDatabase.getInstance(context).filePositionDao()
             .deleteByComposition(compositionId)
 
@@ -788,4 +790,20 @@ class MainViewModel(
             )
         }
     }
+
+    val handler = Handler(Looper.getMainLooper())
+    fun updatePlaybackPosition(delayMs: Long): Boolean =
+        handler.postDelayed(
+            {
+                // Update UI based on currentPosition
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        currentSongPosition = uiState.value.playerController?.currentPosition.toString()
+                    )
+                }
+                updatePlaybackPosition(delayMs)
+            },
+            delayMs
+        )
+
 }
