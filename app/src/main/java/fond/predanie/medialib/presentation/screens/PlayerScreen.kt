@@ -244,6 +244,50 @@ fun SongScreenContent(
                                 .size(32.dp)
                         )
                         Icon(
+                            painter = painterResource(R.drawable.playall),
+                            contentDescription = "Play",
+                            //tint = MaterialTheme.colors.background,
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                //.background(MaterialTheme.colors.onBackground)
+                                .clickable(onClick = {
+                                    if (uiState.playerController?.isPlaying == true) {
+                                        uiState.playerController?.stop()
+                                    } else {
+                                        uiState.playerController?.play()
+                                    }
+                                })
+                                .size(64.dp)
+                                .padding(8.dp)
+                        )
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowForward,
+                            contentDescription = "Skip Next",
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                //.clickable(onClick = playNextSong)
+                                .padding(12.dp)
+                                .size(32.dp)
+                        )
+
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowBack,
+                            contentDescription = "Skip Previous",
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .clickable(onClick = { uiState.playerController?.previous() })
+                                .padding(12.dp)
+                                .size(32.dp)
+                        )
+                        Icon(
                             imageVector = Icons.Rounded.Refresh,
                             contentDescription = "Replay 10 seconds",
                             modifier = Modifier
@@ -259,27 +303,37 @@ fun SongScreenContent(
                             modifier = Modifier
                                 .clip(CircleShape)
                                 //.background(MaterialTheme.colors.onBackground)
-                                .clickable(onClick = { uiState.playerController?.play() })
+                                .clickable(onClick = { uiState.playerController?.setPlaybackSpeed(
+                                    2.0F
+                                ) })
                                 .size(64.dp)
                                 .padding(8.dp)
                         )
                         Icon(
-                            imageVector = Icons.Rounded.Refresh,
-                            contentDescription = "Forward 10 seconds",
+                            painter = painterResource(R.drawable.playall),
+                            contentDescription = "Play",
+                            //tint = MaterialTheme.colors.background,
                             modifier = Modifier
                                 .clip(CircleShape)
-                                //.clickable(onClick = onForward)
-                                .padding(12.dp)
-                                .size(32.dp)
+                                //.background(MaterialTheme.colors.onBackground)
+                                .clickable(onClick = { uiState.playerController?.setPlaybackSpeed(
+                                    2.0F
+                                ) })
+                                .size(64.dp)
+                                .padding(8.dp)
                         )
                         Icon(
-                            imageVector = Icons.Rounded.ArrowForward,
-                            contentDescription = "Skip Next",
+                            painter = painterResource(R.drawable.playall),
+                            contentDescription = "Play",
+                            //tint = MaterialTheme.colors.background,
                             modifier = Modifier
                                 .clip(CircleShape)
-                                //.clickable(onClick = playNextSong)
-                                .padding(12.dp)
-                                .size(32.dp)
+                                //.background(MaterialTheme.colors.onBackground)
+                                .clickable(onClick = { uiState.playerController?.setPlaybackSpeed(
+                                    2.0F
+                                ) })
+                                .size(64.dp)
+                                .padding(8.dp)
                         )
 
                     }
