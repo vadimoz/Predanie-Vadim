@@ -202,7 +202,9 @@ fun SongScreenContent(
                             value = uiState.currentSongPosition.toFloat(),
                             modifier = Modifier.fillMaxWidth(),
                             valueRange = 0f..(uiState.playerController?.duration?.toFloat() ?: 0.toFloat()),
-                            onValueChange = { Log.d("VALUE", "SLIDER") },
+                            onValueChange = { newPosition ->
+                                uiState.playerController?.seekTo(newPosition.toLong())
+                            },
                         )
                     }
 
