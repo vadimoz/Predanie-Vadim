@@ -29,6 +29,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -141,6 +142,11 @@ fun SongScreenContent(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+
+        LaunchedEffect(Unit) {
+            mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
+        }
+
         Box(
             modifier = Modifier
                 /*.background(
@@ -345,15 +351,14 @@ fun SongScreenContent(
                         )
 
                     }
-                    val currentPlaylistFromDB = uiState.mainPlaylist
 
                     Row(modifier = Modifier.padding(bottom = 5.dp)) {
                         //Выводим очередь воспроизведения
 
                         val rows = mutableListOf<MediaItem>()
 
-                        if (currentPlaylistFromDB != null) {
-                            for (item in currentPlaylistFromDB.playlistJson) {
+                        if (uiState.mainPlaylist != null) {
+                            for (item in uiState.mainPlaylist!!.playlistJson) {
                                 rows.add(item)
                             }
                         }
@@ -365,16 +370,16 @@ fun SongScreenContent(
 
                         val group = listOf(parts)
 
-                        if (currentPlaylistFromDB != null) {
+                        if (uiState.mainPlaylist != null) {
                             PlaylistAccordionGroup(
                                 modifier = Modifier.padding(top = 8.dp),
                                 group = group,
                                 exp = false,
-                                playerList = currentPlaylistFromDB.playlistJson,
+                                playerList = uiState.mainPlaylist!!.playlistJson,
                                 navController = navController,
                                 mainViewModel = mainViewModel,
-                                globalItemCount = currentPlaylistFromDB.playlistJson.count(),
-                                partCount = currentPlaylistFromDB.playlistJson.count()
+                                globalItemCount = uiState.mainPlaylist!!.playlistJson.count(),
+                                partCount = uiState.mainPlaylist!!.playlistJson.count()
                             )
                         }
                     }
