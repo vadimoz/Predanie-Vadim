@@ -198,10 +198,18 @@ fun SongScreenContent(
                             .padding(vertical = 24.dp)
                     ) {
 
+                        var lenght = uiState.playerController?.duration?.toFloat()
+
+                        if (lenght != null) {
+                            if(lenght < 0){
+                                lenght = 1F
+                            }
+                        }
+
                         Slider(
                             value = uiState.currentSongPosition.toFloat(),
                             modifier = Modifier.fillMaxWidth(),
-                            valueRange = 0f..(uiState.playerController?.duration?.toFloat() ?: 0.toFloat()),
+                            valueRange = 0f..lenght!!,
                             onValueChange = { newPosition ->
                                 uiState.playerController?.seekTo(newPosition.toLong())
                             },
@@ -265,7 +273,7 @@ fun SongScreenContent(
                             contentDescription = "Skip Next",
                             modifier = Modifier
                                 .clip(CircleShape)
-                                //.clickable(onClick = playNextSong)
+                                .clickable(onClick = { uiState.playerController?.next() })
                                 .padding(12.dp)
                                 .size(32.dp)
                         )
