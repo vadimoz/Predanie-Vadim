@@ -61,6 +61,14 @@ fun PlayerScreen(mainViewModel: MainViewModel, navController: NavHostController,
     val uiState by mainViewModel.uiState.collectAsState()
     val playlistsList = uiState.playlistsList?.collectAsLazyPagingItems()
 
+    if(!uiState.isPlayerVisible){
+        navController.navigate("MainScreen") {
+            popUpTo("PlayerScreen") {
+                inclusive = true
+            }
+        }
+    }
+
     SongScreenBody(mainViewModel, navController)
 }
 
