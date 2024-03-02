@@ -633,6 +633,14 @@ class MainViewModel(
             repeat(player.mediaItemCount) {
                 playlistArray.add(player.getMediaItemAt(it))
             }
+
+            if(playlistArray.isEmpty() == true){
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isPlayerVisible = false,
+                    )
+                }
+            }
         }
 
         _uiState.update { currentState ->
