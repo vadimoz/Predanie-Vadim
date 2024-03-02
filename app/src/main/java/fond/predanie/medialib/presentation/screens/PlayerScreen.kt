@@ -211,17 +211,17 @@ fun SongScreenContent(
                 ) {
                     Text(
                         text = uiState.playerController?.mediaMetadata?.title.toString(),
-                        maxLines = 1,
-                        fontSize = 30.sp,
+                        maxLines = 3,
+                        fontSize = 25.sp,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(10.dp)
+                        modifier = Modifier.padding(5.dp)
                     )
 
                     Text(
                         text = uiState.playerController?.mediaMetadata?.artist.toString(),
                         //style = MaterialTheme.typography.subtitle1,
                         //color = MaterialTheme.colors.onBackground,
-                        maxLines = 1,
+                        maxLines = 2,
                         fontSize = 20.sp,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.graphicsLayer {
@@ -311,7 +311,7 @@ fun SongScreenContent(
                                 .padding(1.dp)
                         )
                         Icon(
-                            imageVector = Icons.Rounded.ArrowForward,
+                            painter = rememberAsyncImagePainter(androidx.media3.ui.R.drawable.exo_styled_controls_next),
                             contentDescription = "Skip Next",
                             modifier = Modifier
                                 .clip(CircleShape)
