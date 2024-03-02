@@ -47,6 +47,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
@@ -117,6 +118,7 @@ class MainActivity : ComponentActivity() {
         val currentPlaylistFromDB = mainViewModel.getPlaylistFromDB("Main", this)
 
         playerController.addMediaItems(currentPlaylistFromDB.playlistJson)
+        playerController.seekTo(currentPlaylistFromDB.playlistFile, C.INDEX_UNSET.toLong())
         playerController.prepare()
         playerController.pause()
 

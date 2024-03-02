@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -328,50 +329,41 @@ fun SongScreenContent(
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.ArrowBack,
-                            contentDescription = "Skip Previous",
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .clickable(onClick = { uiState.playerController?.previous() })
-                                .padding(12.dp)
-                                .size(32.dp)
-                        )
-                        Icon(
-                            imageVector = Icons.Rounded.Refresh,
-                            contentDescription = "Replay 10 seconds",
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                //.clickable(onClick = onRewind)
-                                .padding(12.dp)
-                                .size(32.dp)
-                        )
-                        Icon(
-                            painter = painterResource(R.drawable.playall),
-                            contentDescription = "Play",
-                            //tint = MaterialTheme.colors.background,
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                //.background(MaterialTheme.colors.onBackground)
-                                .clickable(onClick = { uiState.playerController?.setPlaybackSpeed(
-                                    2.0F
-                                ) })
-                                .size(64.dp)
-                                .padding(8.dp)
-                        )
-                        Icon(
-                            painter = painterResource(R.drawable.playall),
-                            contentDescription = "Play",
-                            //tint = MaterialTheme.colors.background,
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                //.background(MaterialTheme.colors.onBackground)
-                                .clickable(onClick = { uiState.playerController?.setPlaybackSpeed(
-                                    2.0F
-                                ) })
-                                .size(64.dp)
-                                .padding(8.dp)
-                        )
+                        Text("x1",
+                            modifier = Modifier.width(50.dp)
+                                .clickable() {
+                                    uiState.playerController?.setPlaybackSpeed(
+                                        1.0F
+                                    )
+                            })
+                        Text("x1.2",
+                            modifier = Modifier.width(50.dp)
+                            .clickable() {
+                                uiState.playerController?.setPlaybackSpeed(
+                                    1.2F
+                                )
+                            })
+                        Text("x1.5",
+                            modifier = Modifier.width(50.dp)
+                                .clickable() {
+                                    uiState.playerController?.setPlaybackSpeed(
+                                        1.5F
+                                    )
+                                })
+                        Text("x1.8",
+                            modifier = Modifier.width(50.dp)
+                                .clickable() {
+                                    uiState.playerController?.setPlaybackSpeed(
+                                        1.8F
+                                    )
+                                })
+                        Text("x2",
+                            modifier = Modifier.width(50.dp)
+                                .clickable() {
+                                    uiState.playerController?.setPlaybackSpeed(
+                                        2F
+                                    )
+                                })
                         Icon(
                             imageVector = Icons.Rounded.List,
                             contentDescription = "Skip Previous",
