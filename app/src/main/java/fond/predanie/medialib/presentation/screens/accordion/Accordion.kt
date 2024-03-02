@@ -248,7 +248,8 @@ fun AccordionRow(
 
                 mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
 
-                navController.navigate("ProfileScreen/play")
+                uiState.playerController?.play()
+                navController.navigate("PlayerScreen")
 
                 mainViewModel.playerVisible()
 

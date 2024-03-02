@@ -15,4 +15,5 @@ sealed class NavigationItem(var route: String, var icon: Int, var title: String)
     object Fund : NavigationItem("FundScreen", R.drawable.predanie, "Фонд")
     object Player : NavigationItem("PlayerScreen", R.drawable.predanie, "Плеер")
     object OfflineItem : NavigationItem("OfflineItemScreen/{itemId}", R.drawable.predanie, "Плеер")
+    object Playlist : NavigationItem("PlaylistScreen", R.drawable.predanie, "Плейлист")
 }

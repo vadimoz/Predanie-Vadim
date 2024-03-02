@@ -5,7 +5,6 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
@@ -13,6 +12,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -33,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,6 +63,7 @@ import com.google.common.util.concurrent.MoreExecutors
 import com.slaviboy.composeunits.initSize
 import fond.predanie.medialib.presentation.screens.PlayerScreen
 import fund.predanie.medialib.presentation.MainViewModel
+import fund.predanie.medialib.presentation.UIState
 import fund.predanie.medialib.presentation.navigation.NavigationItem
 import fund.predanie.medialib.presentation.playerService.PlayerService
 import fund.predanie.medialib.presentation.screens.AuthorScreen
@@ -70,12 +73,14 @@ import fund.predanie.medialib.presentation.screens.FundScreen
 import fund.predanie.medialib.presentation.screens.HomeScreen
 import fund.predanie.medialib.presentation.screens.ItemScreen
 import fund.predanie.medialib.presentation.screens.OfflineItemScreen
+import fund.predanie.medialib.presentation.screens.PlaylistScreen
 import fund.predanie.medialib.presentation.screens.PostScreen
 import fund.predanie.medialib.presentation.screens.ProfileScreen
 import fund.predanie.medialib.presentation.screens.QuickScreen
 import fund.predanie.medialib.presentation.screens.SearchScreen
 import fund.predanie.medialib.presentation.screens.SplashScreen
 import fund.predanie.medialib.presentation.theme.PredanieTheme
+import io.appmetrica.analytics.impl.u
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -244,7 +249,7 @@ class MainActivity : ComponentActivity() {
                         }*/
                         .background(
                             if (!isSystemInDarkTheme()) {
-                                Color.LightGray
+                                Color.DarkGray
                             } else Color.DarkGray
                         ),
                 ) {
@@ -253,6 +258,7 @@ class MainActivity : ComponentActivity() {
                         onEvent = onEvent,
                         playerState = playerState,
                         onBarClick = onBarClick*/
+                        uiState
                     )
                 }
 
@@ -261,8 +267,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun HomeBottomBarItem(
-    ) {
+    fun HomeBottomBarItem(uiState: UIState) {
         Box(
             modifier = Modifier
                 .height(64.dp)
@@ -275,7 +280,7 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Image(
-                    painter = rememberAsyncImagePainter("https://predanie.ru/assets/img/logo.png"),
+                    painter = rememberAsyncImagePainter(uiState.playerController?.mediaMetadata?.artworkUri),
                     contentDescription = "song",//song.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -290,19 +295,21 @@ class MainActivity : ComponentActivity() {
                         .padding(vertical = 8.dp, horizontal = 32.dp),
                 ) {
                     Text(
-                        "song",//song.title,
+                        uiState.playerController?.mediaMetadata?.title.toString(),
                         //style = MaterialTheme.typography.body2,
                         //color = MaterialTheme.colors.onBackground,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
+                        color = Color.White
                     )
 
                     Text(
-                        "song",//song.title,
+                        uiState.playerController?.mediaMetadata?.artist.toString(),
                         //style = MaterialTheme.typography.body2,
                         //color = MaterialTheme.colors.onBackground,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
+                        color = Color.White,
                         modifier = Modifier
                             .graphicsLayer {
                                 alpha = 0.60f
@@ -310,15 +317,15 @@ class MainActivity : ComponentActivity() {
 
                     )
                 }
-                /*val painter = rememberAsyncImagePainter(
-                    if (playerState == PlayerState.PLAYING) {
-                        R.drawable.ic_round_pause
+                val painter = rememberAsyncImagePainter(
+                    if (uiState.playerController?.isPlaying == true) {
+                        androidx.media3.ui.R.drawable.exo_icon_pause
                     } else {
-                        R.drawable.ic_round_play_arrow
+                        androidx.media3.ui.R.drawable.exo_icon_play
                     }
-                )*/
+                )
 
-                /*Image(
+                Image(
                     painter = painter,
                     contentDescription = "Music",
                     contentScale = ContentScale.Crop,
@@ -334,13 +341,13 @@ class MainActivity : ComponentActivity() {
                                 radius = 24.dp
                             )
                         ) {
-                            if (playerState == PlayerState.PLAYING) {
-                                onEvent(HomeEvent.PauseSong)
+                            if (uiState.playerController?.isPlaying == true) {
+                                uiState.playerController?.pause()
                             } else {
-                                onEvent(HomeEvent.ResumeSong)
+                                uiState.playerController?.play()
                             }
                         },
-                )*/
+                )
 
             }
         }
@@ -406,6 +413,11 @@ class MainActivity : ComponentActivity() {
             ) { navBackStackEntry ->
                 val play = navBackStackEntry.arguments?.getString("play")
                 ProfileScreen(mainViewModel = mainViewModel, navController, action = play)
+            }
+            composable(
+                NavigationItem.Playlist.route,
+            ) { navBackStackEntry ->
+                PlaylistScreen(mainViewModel = mainViewModel, navController)
             }
             composable(
                 NavigationItem.Home.route,
