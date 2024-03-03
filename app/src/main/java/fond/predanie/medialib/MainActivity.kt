@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -271,6 +272,9 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun HomeBottomBarItem(uiState: UIState) {
+
+        val context = LocalContext.current
+
         Box(
             modifier = Modifier
                 .height(64.dp)
@@ -354,6 +358,20 @@ class MainActivity : ComponentActivity() {
                         },
                 )
 
+                val playerStop = rememberAsyncImagePainter(R.drawable.close
+                )
+
+                Image(
+                    painter = playerStop,
+                    contentDescription = "Music",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .size(48.dp)
+                        .clickable() {
+                            mainViewModel.cleanQueue(context)
+                        },
+                )
             }
         }
     }

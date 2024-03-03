@@ -195,7 +195,7 @@ fun ItemScreen(
                                             end = 20.dp,
                                             bottom = 10.dp
                                         ),
-                                        color = textColor,
+                                        color = backgroundColor,
                                         shape = RoundedCornerShape(8.dp),
                                         tonalElevation = 2.dp
                                     ) {
