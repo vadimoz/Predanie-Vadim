@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -71,13 +70,14 @@ import fond.predanie.medialib.presentation.playerService.playlistAccordion.Playl
 import fund.predanie.medialib.R
 import fund.predanie.medialib.presentation.MainViewModel
 import io.appmetrica.analytics.impl.x
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @Composable
 fun PlayerScreen(mainViewModel: MainViewModel, navController: NavHostController, action: Nothing?) {
     val context = LocalContext.current
     val uiState by mainViewModel.uiState.collectAsState()
     val playlistsList = uiState.playlistsList?.collectAsLazyPagingItems()
-
     SongScreenBody(mainViewModel, navController)
 }
 
@@ -162,6 +162,10 @@ fun SongScreenContent(
 
         LaunchedEffect(Unit) {
             mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
+
+            if(uiState.playerController?.mediaMetadata?.title.toString() == "null"){
+                navController.navigate("MainScreen")
+            }
         }
 
         Box(
@@ -186,7 +190,7 @@ fun SongScreenContent(
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier
-                    .height(300.dp)
+                    .fillMaxWidth()
             )
             Column (
                 Modifier
@@ -218,6 +222,7 @@ fun SongScreenContent(
                         fontSize = 25.sp,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(5.dp)
+                        .height(80.dp)
                     )
 
                     Text(
@@ -234,7 +239,7 @@ fun SongScreenContent(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 4.dp)
+                            .padding(vertical = 24.dp)
                     ) {
 
                         var lenght = uiState.playerController?.duration?.toFloat()
@@ -261,16 +266,26 @@ fun SongScreenContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         CompositionLocalProvider() {
+                            val duration = uiState.currentSongPosition.toLong().toDuration(DurationUnit.MILLISECONDS)
+                            val durationString = duration.toComponents { hours, minutes, seconds, _ ->
+                                "%02d:%02d:%02d".format(hours, minutes, seconds)
+                            }
                             Text(
-                                uiState.currentSongPosition,
+                                durationString,
                                 //style = MaterialTheme.typography.body2
                             )
                         }
                         CompositionLocalProvider() {
-                            Text(
-                                uiState.playerController?.duration.toString(),
-                                //style = MaterialTheme.typography.body2
-                            )
+                            val duration = uiState.playerController?.duration?.toDuration(DurationUnit.MILLISECONDS)
+                            val durationString = duration?.toComponents { hours, minutes, seconds, _ ->
+                                "%02d:%02d:%02d".format(hours, minutes, seconds)
+                            }
+                            if (durationString != null) {
+                                Text(
+                                    durationString,
+                                    //style = MaterialTheme.typography.body2
+                                )
+                            }
                         }
                     }
 

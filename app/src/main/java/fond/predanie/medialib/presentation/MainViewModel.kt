@@ -640,6 +640,12 @@ class MainViewModel(
                         isPlayerVisible = false,
                     )
                 }
+            } else {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isPlayerVisible = true,
+                    )
+                }
             }
         }
 

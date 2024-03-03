@@ -119,6 +119,7 @@ class MainActivity : ComponentActivity() {
 
         playerController.addMediaItems(currentPlaylistFromDB.playlistJson)
         playerController.seekTo(currentPlaylistFromDB.playlistFile, C.INDEX_UNSET.toLong())
+        mainViewModel.updateCurrentPlaylistToUi(playerController)
         playerController.prepare()
         playerController.pause()
 
@@ -225,7 +226,7 @@ class MainActivity : ComponentActivity() {
             modifier = modifier
         ) {
 
-            if (uiState.isPlayerVisible || uiState.mainPlaylist?.playlistJson?.isNotEmpty() == true) {
+            if (uiState.isPlayerVisible && uiState.playerController?.mediaMetadata?.title.toString() != "null") {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -296,28 +297,30 @@ class MainActivity : ComponentActivity() {
                         .fillMaxHeight()
                         .padding(vertical = 8.dp, horizontal = 32.dp),
                 ) {
-                    Text(
-                        uiState.playerController?.mediaMetadata?.title.toString(),
-                        //style = MaterialTheme.typography.body2,
-                        //color = MaterialTheme.colors.onBackground,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = Color.White
-                    )
+                    if(uiState.playerController?.mediaMetadata?.title.toString() != "null") {
+                        Text(
+                            uiState.playerController?.mediaMetadata?.title.toString(),
+                            //style = MaterialTheme.typography.body2,
+                            //color = MaterialTheme.colors.onBackground,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = Color.White
+                        )
 
-                    Text(
-                        uiState.playerController?.mediaMetadata?.artist.toString(),
-                        //style = MaterialTheme.typography.body2,
-                        //color = MaterialTheme.colors.onBackground,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = Color.White,
-                        modifier = Modifier
-                            .graphicsLayer {
-                                alpha = 0.60f
-                            }
+                        Text(
+                            uiState.playerController?.mediaMetadata?.artist.toString(),
+                            //style = MaterialTheme.typography.body2,
+                            //color = MaterialTheme.colors.onBackground,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = Color.White,
+                            modifier = Modifier
+                                .graphicsLayer {
+                                    alpha = 0.60f
+                                }
 
-                    )
+                        )
+                    }
                 }
                 val painter = rememberAsyncImagePainter(
                     if (uiState.playerController?.isPlaying == true) {
