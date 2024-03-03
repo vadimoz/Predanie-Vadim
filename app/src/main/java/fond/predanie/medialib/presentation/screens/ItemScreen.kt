@@ -119,10 +119,15 @@ fun ItemScreen(
     }
 
     if (itemId != null) {
+        var paddingWithPlayer = 0
+        if(uiState.playerController?.isPlaying == true) {
+            paddingWithPlayer = 70
+        }
         LazyColumn(
             Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
+                .padding(bottom = paddingWithPlayer.dp)
         ) {
             item {
                 Box(
