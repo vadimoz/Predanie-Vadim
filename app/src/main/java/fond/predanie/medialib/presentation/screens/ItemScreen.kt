@@ -6,6 +6,7 @@ import android.text.Html.fromHtml
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -101,6 +102,17 @@ fun ItemScreen(
         Font(R.raw.ptsans),
     )
 
+    var textColor: Color? = null
+    var backgroundColor: Color? = null
+
+    if (isSystemInDarkTheme()){
+        textColor = Color.White
+        backgroundColor = Color.Black
+    } else {
+        textColor = Color(android.graphics.Color.parseColor("#2F2F2F"))
+        backgroundColor = Color.White
+    }
+
     LaunchedEffect(itemId) {
         if (itemId != null) {
             mainViewModel.getItemInfo(itemId.toInt())
@@ -163,7 +175,7 @@ fun ItemScreen(
                             .align(Alignment.TopCenter)
                             .background(
                                 brush = Brush.linearGradient(
-                                    colors = listOf(Color.Transparent, Color.White),
+                                    colors = listOf(Color.Transparent, backgroundColor),
                                     start = Offset(0f, 0f), // top left corner
                                     end = Offset(1f, boxSize) // bottom right corner
                                 )
@@ -183,13 +195,13 @@ fun ItemScreen(
                                             end = 20.dp,
                                             bottom = 10.dp
                                         ),
-                                        color = Color.White,
+                                        color = textColor,
                                         shape = RoundedCornerShape(8.dp),
                                         tonalElevation = 2.dp
                                     ) {
                                         Text(
                                             text = it1,
-                                            color = Color.Black,
+                                            color = textColor,
                                             fontSize = 12.sp,
                                             style = TextStyle(fontFamily = ptsans),
                                             modifier = Modifier
@@ -213,13 +225,13 @@ fun ItemScreen(
                                         end = 20.dp,
                                         bottom = 0.dp
                                     ),
-                                    color = Color.White,
+                                    color = backgroundColor,
                                     shape = RoundedCornerShape(8.dp),
                                     tonalElevation = 2.dp
                                 ) {
                                     Text(
                                         text = it,
-                                        color = Color.DarkGray,
+                                        color = textColor,
                                         fontSize = 36.sp,
                                         style = TextStyle(fontFamily = ptsans),
                                         modifier = Modifier.padding(
@@ -258,7 +270,7 @@ fun ItemScreen(
                                                 eventParametersPlay["name"] = uiState.itemInto?.data!!.name.toString()
                                                 AppMetrica.reportEvent("PlayAll", eventParametersPlay)
                                             },
-                                        tint = Color.Black.copy(alpha = 0.5f),
+                                        tint = textColor,
                                     )
                                 }
 
@@ -290,7 +302,8 @@ fun ItemScreen(
                                                     null
                                                 )
                                             },
-                                        tint = Color.Black.copy(alpha = 0.5f),
+                                        tint = textColor
+                                        // Color.Black.copy(alpha = 0.5f),
                                     )
                                     Icon(
                                         painter = painterResource(R.drawable.restart),
@@ -302,7 +315,7 @@ fun ItemScreen(
                                                         it1, context)
                                                 }
                                             },
-                                        tint = Color.Black.copy(alpha = 0.5f),
+                                        tint = textColor,
                                     )
                                     if (!isFavorite) {
                                         Icon(
@@ -320,7 +333,7 @@ fun ItemScreen(
                                                     mainViewModel.loadFavorites(context = context)
                                                 }
                                                 .fillMaxWidth(),
-                                            tint = Color.Black.copy(alpha = 0.5f),
+                                            tint = textColor,
                                         )
                                     } else {
                                         Icon(
@@ -336,7 +349,7 @@ fun ItemScreen(
                                                     mainViewModel.loadFavorites(context = context)
                                                 }
                                                 .fillMaxWidth(),
-                                            tint = Color(android.graphics.Color.parseColor("#FFD600")),
+                                            tint = textColor,
                                         )
                                     }
                                     val showDownloadDialog = remember { mutableStateOf(false) }
@@ -360,7 +373,7 @@ fun ItemScreen(
                                                 //Загружаем все файлы
                                                 showDownloadDialog.value = true
                                             },
-                                        tint = Color.Black.copy(alpha = 0.5f),
+                                        tint = textColor,
                                     )
                                 }
                             }
@@ -419,7 +432,8 @@ fun ItemScreen(
                                             }
                                         },
                                         style = style,
-                                        textAlign = textAlign
+                                        textAlign = textAlign,
+                                        color = textColor
                                     )
                                 }
 

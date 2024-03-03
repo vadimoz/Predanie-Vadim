@@ -516,8 +516,16 @@ class MainActivity : ComponentActivity() {
                 NavigationItem.Profile,
             )
         }
+
+        var navigationColor: Color? = null
+        if (isSystemInDarkTheme()){
+            navigationColor = Color.Gray
+        } else {
+            navigationColor = Color.White
+        }
+
         NavigationBar(
-            contentColor = Color.White, containerColor = Color.White
+            contentColor = Color.White, containerColor = navigationColor
         ) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route

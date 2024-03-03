@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -70,6 +71,17 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
     val favTracksList = uiState.favTracksList?.collectAsLazyPagingItems()
     val playlistsList = uiState.playlistsList?.collectAsLazyPagingItems()
 
+    var textColor: Color? = null
+    var backgroundColor: Color? = null
+
+    if (isSystemInDarkTheme()){
+        textColor = Color.White
+        backgroundColor = Color.Black
+    } else {
+        textColor = Color(android.graphics.Color.parseColor("#2F2F2F"))
+        backgroundColor = Color.White
+    }
+
     val currentPlaylistFromDB = uiState.mainPlaylist
 
     val showDeleteDialog = remember { mutableStateOf(false) }
@@ -115,7 +127,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             modifier = Modifier.padding(start = 5.dp),
                             text = "Offline режим",
                             fontSize = 35.sp,
-                            color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                            color = textColor
                         )
 
                     }
@@ -227,13 +239,13 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                                 modifier = Modifier.padding(top = 8.dp),
                                 text = "§",
                                 fontSize = 25.sp,
-                                color = Color(android.graphics.Color.parseColor("#FFD600"))
+                                color = textColor
                             )
                             Text(
                                 modifier = Modifier.padding(start = 5.dp),
                                 text = "Моя история",
                                 fontSize = 35.sp,
-                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                                color = textColor
                             )
                         }
                     }
@@ -273,7 +285,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                                 modifier = Modifier.padding(start = 5.dp),
                                 text = "Моё избранное",
                                 fontSize = 35.sp,
-                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                                color = textColor
                             )
                         }
                     }
@@ -339,7 +351,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             modifier = Modifier.padding(start = 5.dp),
                             text = "Мои загрузки",
                             fontSize = 35.sp,
-                            color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                            color = textColor
                         )
                         if (downloadsList != null) {
                             if (downloadsList.itemCount != 0) {
@@ -352,7 +364,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                                             //Удаляем все загрузки
                                             showDeleteDialog.value = true
                                         },
-                                    tint = Color(android.graphics.Color.parseColor("#FFD600")),
+                                    tint = textColor,
                                 )
                             }
                         }
@@ -374,7 +386,8 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                         Text(
                             "Здесь появятся Ваши загрузки",
                             fontSize = 12.sp,
-                            modifier = Modifier.padding(25.dp)
+                            modifier = Modifier.padding(25.dp),
+                            color = textColor
                         )
                     }
                 }
@@ -403,7 +416,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                                 modifier = Modifier.padding(start = 5.dp),
                                 text = "Мои плейлисты",
                                 fontSize = 35.sp,
-                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                                color = textColor
                             )
                         }
 
@@ -485,6 +498,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                                             Column() {
                                                 currentPlaylists.forEach() {
                                                     Text(
+                                                        color = textColor,
                                                         modifier = Modifier
                                                             .padding(20.dp)
                                                             .clickable {
@@ -495,6 +509,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                                                                 )
                                                                 mainViewModel.loadPlaylists(context)
                                                                 dialogOpen = false
+                                                                uiState.playerController?.play()
                                                             }, text = it.playlistName
                                                     )
                                                 }
@@ -542,11 +557,11 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             modifier = Modifier.padding(start = 5.dp),
                             text = "Мои настройки",
                             fontSize = 35.sp,
-                            color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                            color = textColor
                         )
                     }
 
-                    Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
+                    /*Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
                         Checkbox(
                             checked = uiState.goToNext,
                             onCheckedChange = {
@@ -559,7 +574,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             fontSize = 20.sp,
                             color = Color(android.graphics.Color.parseColor("#2F2F2F"))
                         )
-                    }
+                    }*/
 
                     Row(modifier = Modifier.padding(top = 20.dp, start = 20.dp, bottom = 20.dp)) {
 
@@ -596,7 +611,7 @@ fun ProfileScreen(mainViewModel: MainViewModel, navController: NavHostController
                             modifier = Modifier.padding(start = 5.dp),
                             text = "Помечать трек прослушанным по достижении ${uiState.percentToFileReady}%",
                             fontSize = 20.sp,
-                            color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                            color = textColor
                         )
                     }
                 }

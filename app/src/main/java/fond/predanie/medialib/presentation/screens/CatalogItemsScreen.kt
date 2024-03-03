@@ -1,5 +1,6 @@
 package fund.predanie.medialib.presentation.screens
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +34,17 @@ fun CatalogItemsScreen(
     val uiState by mainViewModel.uiState.collectAsState()
     val catalogItemsList = uiState.catalogItemsList?.collectAsLazyPagingItems()
 
+    var textColor: Color? = null
+    var backgroundColor: Color? = null
+
+    if (isSystemInDarkTheme()){
+        textColor = Color.White
+        backgroundColor = Color.Black
+    } else {
+        textColor = Color(android.graphics.Color.parseColor("#2F2F2F"))
+        backgroundColor = Color.White
+    }
+
     LaunchedEffect(catalogId) {
         mainViewModel.getCatalogItemsList(catalogId)
 
@@ -64,7 +76,7 @@ fun CatalogItemsScreen(
                     modifier = Modifier.padding(start = 5.dp),
                     text = catalogName.toString(),
                     fontSize = 35.sp,
-                    color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                    color = textColor
                 )
             }
 

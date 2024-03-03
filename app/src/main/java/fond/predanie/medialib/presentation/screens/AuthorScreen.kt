@@ -6,6 +6,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -83,6 +84,17 @@ fun AuthorScreen(
 
     val isFavorite = mainViewModel.isAuthorFavorite(authorId.toString(), context)
 
+    var textColor: Color? = null
+    var backgroundColor: Color? = null
+
+    if (isSystemInDarkTheme()){
+        textColor = Color.White
+        backgroundColor = Color.Black
+    } else {
+        textColor = Color(android.graphics.Color.parseColor("#2F2F2F"))
+        backgroundColor = Color.White
+    }
+
     Log.d("NAVV", navController.backQueue.first().destination.route.toString())
     DisposableEffect(authorId) {
         onDispose {
@@ -110,7 +122,7 @@ fun AuthorScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .background(color = Color.White)
+                    .background(color = backgroundColor)
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -147,13 +159,13 @@ fun AuthorScreen(
                                         bottom = 0.dp,
                                         top = 10.dp
                                     ),
-                                    color = Color.White,
+                                    color = backgroundColor,
                                     shape = RoundedCornerShape(6.dp),
                                     tonalElevation = 2.dp
                                 ) {
                                     Text(
                                         text = uiState.authorInto.data?.name.toString(),
-                                        color = Color.DarkGray,
+                                        color = textColor,
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 36.sp,
                                         textAlign = TextAlign.Center,
@@ -180,7 +192,7 @@ fun AuthorScreen(
                                         mainViewModel.loadFavorites(context = context)
                                     }
                                     .fillMaxWidth(),
-                                tint = Color.Black.copy(alpha = 0.5f),
+                                tint = textColor,
                             )
                         } else {
                             Icon(
@@ -252,7 +264,8 @@ fun AuthorScreen(
                                         }
                                     },
                                     style = style,
-                                    textAlign = textAlign
+                                    textAlign = textAlign,
+                                    color = textColor
                                 )
                             }
 

@@ -6,10 +6,12 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -130,34 +132,22 @@ fun SongScreenContent(
     val uiState by mainViewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    /*val gradientColors = if (isSystemInDarkTheme()) {
-        listOf(
-            dominantColor, MaterialTheme.colors.background
-        )
-    } else {
-        listOf(
-            MaterialTheme.colors.background, MaterialTheme.colors.background
-        )
-    }
 
-    val sliderColors = if (isSystemInDarkTheme()) {
-        SliderDefaults.colors(
-            thumbColor = MaterialTheme.colors.onBackground,
-            activeTrackColor = MaterialTheme.colors.onBackground,
-            inactiveTrackColor = MaterialTheme.colors.onBackground.copy(
-                alpha = ProgressIndicatorDefaults.IndicatorBackgroundOpacity
-            ),
-        )
-    } else SliderDefaults.colors(
-        thumbColor = dominantColor,
-        activeTrackColor = dominantColor,
-        inactiveTrackColor = dominantColor.copy(
-            alpha = ProgressIndicatorDefaults.IndicatorBackgroundOpacity
-        ),
-    )*/
+    var backgroundColor: Color? = null
+    var textColor: Color? = null
+
+    if (isSystemInDarkTheme()){
+        backgroundColor = Color.Black
+        textColor = Color.Gray
+    } else {
+        textColor = Color.Black
+        backgroundColor = Color.White
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()
+
+            .background(color = backgroundColor)
     ) {
 
         LaunchedEffect(Unit) {
@@ -178,20 +168,23 @@ fun SongScreenContent(
                 )*/
                 .fillMaxSize()
                 .systemBarsPadding()
+
+                .background(color = backgroundColor)
         ) {
             val boxSize = with(LocalDensity.current) { 0.01.dh.toPx() }
-
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(uiState.playerController?.mediaMetadata?.artworkUri.toString())
-                    .memoryCachePolicy(CachePolicy.ENABLED)
-                    .diskCachePolicy(CachePolicy.ENABLED)
-                    .build(),
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
+            if (!isSystemInDarkTheme()) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(uiState.playerController?.mediaMetadata?.artworkUri.toString())
+                        .memoryCachePolicy(CachePolicy.ENABLED)
+                        .diskCachePolicy(CachePolicy.ENABLED)
+                        .build(),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
             Column (
                 Modifier
                 .padding(top = 0.3.dh)
@@ -203,26 +196,22 @@ fun SongScreenContent(
                         end = Offset(1f, boxSize) // bottom right corner
                     )
                 )
+
+                    .background(color = backgroundColor)
                 ) {
-                /*IconButton(
-                    onClick = { Log.d("Player", "Nvigate") }
-                ) {
-                    Image(
-                        imageVector = Icons.Rounded.KeyboardArrowDown,
-                        contentDescription = "Close",
-                        colorFilter = ColorFilter.tint(LocalContentColor.current)
-                    )
-                }*/
+
                 Column(
                     modifier = Modifier.padding(horizontal = 24.dp)
+                        .background(color = backgroundColor)
                 ) {
                     Text(
                         text = uiState.playerController?.mediaMetadata?.title.toString(),
-                        maxLines = 3,
+                        maxLines = 2,
                         fontSize = 25.sp,
                         overflow = TextOverflow.Ellipsis,
+                        color = textColor,
                         modifier = Modifier.padding(5.dp)
-                        .height(80.dp)
+                        .wrapContentHeight()
                     )
 
                     Text(
@@ -231,6 +220,7 @@ fun SongScreenContent(
                         //color = MaterialTheme.colors.onBackground,
                         maxLines = 2,
                         fontSize = 20.sp,
+                        color = textColor,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.graphicsLayer {
                             alpha = 0.60f
@@ -239,7 +229,6 @@ fun SongScreenContent(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 24.dp)
                     ) {
 
                         var lenght = uiState.playerController?.duration?.toFloat()
@@ -272,6 +261,7 @@ fun SongScreenContent(
                             }
                             Text(
                                 durationString,
+                                color = textColor,
                                 //style = MaterialTheme.typography.body2
                             )
                         }
@@ -283,6 +273,7 @@ fun SongScreenContent(
                             if (durationString != null) {
                                 Text(
                                     durationString,
+                                    color = textColor,
                                     //style = MaterialTheme.typography.body2
                                 )
                             }
@@ -337,14 +328,15 @@ fun SongScreenContent(
                                 .padding(12.dp)
                                 .size(32.dp)
                         )
-
                     }
                     Row(
                         horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp),
+                            .padding(vertical = 8.dp)
+
+                        .fillMaxHeight()
                     ) {
                         Text("x1",
                             modifier = Modifier.width(50.dp)

@@ -1,6 +1,7 @@
 package fund.predanie.medialib.presentation.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,10 +43,21 @@ fun SearchScreen(
 
     val uiState by mainViewModel.uiState.collectAsState()
 
+    var textColor: Color? = null
+    var backgroundColor: Color? = null
+
+    if (isSystemInDarkTheme()){
+        textColor = Color.White
+        backgroundColor = Color.Black
+    } else {
+        textColor = Color(android.graphics.Color.parseColor("#2F2F2F"))
+        backgroundColor = Color.White
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(id = R.color.white))
+            .background(backgroundColor)
             .wrapContentSize(Alignment.TopCenter)
             .verticalScroll(rememberScrollState())
     ) {
@@ -93,7 +105,7 @@ fun SearchScreen(
                 modifier = Modifier.padding(start = 5.dp),
                 text = "Авторы",
                 fontSize = 35.sp,
-                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                color = textColor
             )
 
         }
@@ -115,7 +127,7 @@ fun SearchScreen(
                 modifier = Modifier.padding(start = 5.dp),
                 text = "Произведения",
                 fontSize = 35.sp,
-                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                color = textColor
             )
         }
 

@@ -4,7 +4,9 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -226,10 +228,22 @@ fun AccordionRow(
 ) {
     val context = LocalContext.current
 
+    var textColor: Color? = null
+    var backgroundColor: Color? = null
+
+    if (isSystemInDarkTheme()){
+        textColor = Color.White
+        backgroundColor = Color.Black
+    } else {
+        textColor = Color(android.graphics.Color.parseColor("#2F2F2F"))
+        backgroundColor = Color.White
+    }
+
     Column(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
+            .background(backgroundColor)
             .clickable {
                 val itemPosition = AppDatabase
                     .getInstance(context)
@@ -272,7 +286,7 @@ fun AccordionRow(
                     .wrapContentWidth()
                     .padding(end = 5.dp), color = Gray600
             )
-            Text(model.name.toString(), Modifier.weight(1f), color = Gray600)
+            Text(model.name.toString(), Modifier.weight(1f), color = textColor)
 
             if (model.time != null) {
                 val seconds: Int = model.time as Int
@@ -284,7 +298,7 @@ fun AccordionRow(
                 Text(
                     text = "$H:$M:$S",
                     modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
-                    color = Color.Black
+                    color = textColor
                 )
             }
 
@@ -301,9 +315,7 @@ fun AccordionRow(
                     }
 
                     val color =
-                        if (isFavorite) (Color(android.graphics.Color.parseColor("#FFD600"))) else (Color(
-                            android.graphics.Color.parseColor("#000000")
-                        ))
+                        if (isFavorite) (Color(android.graphics.Color.parseColor("#FFD600"))) else (textColor)
 
                     if (!isFavorite) {
                         Icon(
@@ -356,9 +368,8 @@ fun AccordionRow(
 
                     if (mainViewModel.isInternetConnected(context)) {
                         val downloadColor =
-                            if (isDownloaded) (Color(android.graphics.Color.parseColor("#FFD600"))) else (Color(
-                                android.graphics.Color.parseColor("#000000")
-                            ))
+                            if (isDownloaded) (Color(android.graphics.Color.parseColor("#FFD600"))) else (textColor
+                            )
 
                         if (!isDownloaded) {
                             Icon(
@@ -415,7 +426,7 @@ fun AccordionRow(
                                             .show()
                                     }
                                     .fillMaxWidth(),
-                                tint = downloadColor
+                                tint = textColor
                             )
                         }
 
@@ -428,7 +439,7 @@ fun AccordionRow(
                                     mainViewModel.addToQueue(model, context)
                                 }
                                 .fillMaxWidth(),
-                            tint = Color.Black
+                            tint = textColor
                         )
                     }
                 }

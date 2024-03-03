@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,6 +50,13 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val specialList = uiState.special?.collectAsLazyPagingItems()
     val blogList = uiState.blogList.collectAsLazyPagingItems()
 
+    var textColor: Color? = null
+
+    if (isSystemInDarkTheme()){
+        textColor = Color.White
+    } else {
+        textColor = Color(android.graphics.Color.parseColor("#2F2F2F"))
+    }
 
     LazyColumn() {
         item {
@@ -85,7 +93,7 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                 modifier = Modifier.padding(start = 5.dp),
                                 text = "Новинки медиатеки",
                                 fontSize = 35.sp,
-                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                                color = textColor
                             )
                         }
                     }
@@ -116,7 +124,7 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                 modifier = Modifier.padding(start = 5.dp),
                                 text = "Рекомендуем",
                                 fontSize = 35.sp,
-                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                                color = textColor
                             )
 
                         }
@@ -146,7 +154,7 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                 modifier = Modifier.padding(start = 5.dp),
                                 text = "Популярные аудио",
                                 fontSize = 35.sp,
-                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                                color = textColor
                             )
                         }
                     }
@@ -177,7 +185,7 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                 modifier = Modifier.padding(start = 5.dp),
                                 text = "Популярная музыка",
                                 fontSize = 35.sp,
-                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                                color = textColor
                             )
 
                         }
@@ -189,7 +197,7 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                     }
 
                     //Спецпроект - видео
-                    if (specialList != null) {
+                    /*if (specialList != null) {
                         if(specialList.itemCount > 0) {
                             Column(
                                 modifier = Modifier
@@ -213,7 +221,7 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                         modifier = Modifier.padding(start = 5.dp),
                                         text = "Спецпроект - видео",
                                         fontSize = 35.sp,
-                                        color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                                        color = textColor
                                     )
                                 }
                             }
@@ -236,7 +244,7 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                             }
                         }
                     }
-
+*/
                     Column(modifier = Modifier
                         .fillMaxWidth()
                         .padding(40.dp)
@@ -274,7 +282,7 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController) {
                                 modifier = Modifier.padding(start = 5.dp),
                                 text = "Живое Предание",
                                 fontSize = 35.sp,
-                                color = Color(android.graphics.Color.parseColor("#2F2F2F"))
+                                color = textColor
                             )
                         }
                     }

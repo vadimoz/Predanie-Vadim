@@ -2,7 +2,9 @@ package fond.predanie.medialib.presentation.playerService.playlistAccordion
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -62,6 +64,8 @@ fun PlaylistAccordionGroup(
     partCount: Int,
 ) {
     val uiState by mainViewModel.uiState.collectAsState()
+
+
 
     val context = LocalContext.current
 
@@ -164,8 +168,19 @@ private fun PlaylistAccordionHeader(
 ) {
     val degrees = if (isExpanded) 180f else 0f
 
+    var textColor: Color? = null
+    var backgroundColor: Color? = null
+
+    if (isSystemInDarkTheme()){
+        textColor = Color.White
+        backgroundColor = Color.Black
+    } else {
+        textColor = Color(android.graphics.Color.parseColor("#2F2F2F"))
+        backgroundColor = Color.White
+    }
+
     Surface(
-        color = White,
+        color = backgroundColor,
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, Gray200),
         tonalElevation = 8.dp,
@@ -173,11 +188,12 @@ private fun PlaylistAccordionHeader(
         Row(
             modifier = Modifier
                 .clickable { onTapped() }
-                .padding(16.dp),
+                .padding(16.dp)
+                .background(backgroundColor),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // style = accordionHeaderStyle,
-            Text(title, Modifier.weight(1f), color = Gray600)
+            Text(title, Modifier.weight(1f), color = textColor)
             Surface(shape = CircleShape, color = Color.DarkGray) {
                 Icon(
                     painter = painterResource(R.drawable.double_arrow),
@@ -204,10 +220,23 @@ fun PlaylistAccordionRow(
 ) {
     val itemPosition = AppDatabase.getInstance(LocalContext.current).filePositionDao()
         .getPositionByFileId(model.mediaId)?.position
+
+    var textColor: Color? = null
+    var backgroundColor: Color? = null
+
+    if (isSystemInDarkTheme()){
+        textColor = Color.White
+        backgroundColor = Color.Black
+    } else {
+        textColor = Color(android.graphics.Color.parseColor("#2F2F2F"))
+        backgroundColor = Color.White
+    }
+
     Column(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
+            .background(backgroundColor)
             .clickable {
                 if (itemPosition != null) {
                     uiState.playerController?.seekTo(
@@ -231,10 +260,10 @@ fun PlaylistAccordionRow(
                     "${index.toString()}.",
                     Modifier
                         .wrapContentWidth()
-                        .padding(end = 5.dp), color = Gray600
+                        .padding(end = 5.dp), color = textColor
                 )
 
-                Text(model.mediaMetadata.title.toString(), Modifier.weight(1f), color = Gray600)
+                Text(model.mediaMetadata.title.toString(), Modifier.weight(1f), color = textColor)
 
             Icon(
                 painter = painterResource(R.drawable.up),
@@ -248,7 +277,7 @@ fun PlaylistAccordionRow(
                         }
                     }
                     .fillMaxWidth(),
-                //tint = color
+                tint = textColor
             )
 
             Icon(
@@ -261,7 +290,7 @@ fun PlaylistAccordionRow(
                         mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
                     }
                     .fillMaxWidth(),
-                //tint = color
+                tint = textColor
             )
 
             Icon(
@@ -274,7 +303,7 @@ fun PlaylistAccordionRow(
                         mainViewModel.updateCurrentPlaylistToUi(uiState.playerController)
                     }
                     .fillMaxWidth(),
-                //tint = color
+                tint = textColor
             )
         }
 
@@ -289,6 +318,7 @@ fun PlaylistAccordionRow(
                     fontSize = 10.sp,
                     maxLines = 1,
                     modifier = Modifier.width(150.dp)
+                        .background(backgroundColor)
                 )
             }
         }

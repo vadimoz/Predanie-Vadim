@@ -2,6 +2,7 @@ package fund.predanie.medialib.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -38,10 +39,21 @@ import fund.predanie.medialib.presentation.MainViewModel
 fun CatalogScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     val uiState by mainViewModel.uiState.collectAsState()
 
+    var textColor: Color? = null
+    var backgroundColor: Color? = null
+
+    if (isSystemInDarkTheme()){
+        textColor = Color.White
+        backgroundColor = Color.Black
+    } else {
+        textColor = Color(android.graphics.Color.parseColor("#2F2F2F"))
+        backgroundColor = Color.White
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(id = R.color.white))
+            .background(backgroundColor)
             .wrapContentSize(Alignment.Center)
     ) {
         LazyColumn() {
@@ -99,7 +111,8 @@ fun CatalogScreen(mainViewModel: MainViewModel, navController: NavHostController
                                                 }
                                             }
                                         },
-                                    fontSize = 20.sp
+                                    fontSize = 20.sp,
+                                    color = textColor
                                 )
                             }
 
@@ -110,7 +123,9 @@ fun CatalogScreen(mainViewModel: MainViewModel, navController: NavHostController
 
                             subCats.forEach() { sub ->
                                 sub.categories.forEach(){
-                                    Row(modifier = Modifier.padding(top = 0.dp, start = 20.dp).fillMaxWidth()) {
+                                    Row(modifier = Modifier
+                                        .padding(top = 0.dp, start = 20.dp)
+                                        .fillMaxWidth()) {
                                         var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
 
                                         Text(
@@ -143,11 +158,18 @@ fun CatalogScreen(mainViewModel: MainViewModel, navController: NavHostController
                                                                         it.getLineBottom(i) - spacingExtra + offsetY
                                                                     )
                                                                 },
-                                                                Color(android.graphics.Color.parseColor("#FFD600")),
+                                                                Color(
+                                                                    android.graphics.Color.parseColor(
+                                                                        "#FFD600"
+                                                                    )
+                                                                ),
                                                                 style = Stroke(
                                                                     width = thickness,
                                                                     pathEffect = PathEffect.dashPathEffect(
-                                                                        floatArrayOf(dashPath, dashPath),
+                                                                        floatArrayOf(
+                                                                            dashPath,
+                                                                            dashPath
+                                                                        ),
                                                                         0f
                                                                     )
                                                                 )
@@ -155,7 +177,8 @@ fun CatalogScreen(mainViewModel: MainViewModel, navController: NavHostController
                                                         }
                                                     }
                                                 },
-                                            fontSize = 15.sp
+                                            fontSize = 15.sp,
+                                            color = textColor
                                         )
                                     }
                                 }
