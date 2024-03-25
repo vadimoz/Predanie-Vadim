@@ -26,3 +26,4 @@ data class Banner (
     var height : Int?    = null,
     var type   : String? = null
 )
+

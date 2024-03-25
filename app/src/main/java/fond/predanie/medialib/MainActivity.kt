@@ -119,7 +119,7 @@ class MainActivity : ComponentActivity() {
         val currentPlaylistFromDB = mainViewModel.getPlaylistFromDB("Main", this)
 
         playerController.addMediaItems(currentPlaylistFromDB.playlistJson)
-        playerController.seekTo(currentPlaylistFromDB.playlistFile, C.INDEX_UNSET.toLong())
+        playerController.seekTo(currentPlaylistFromDB.playlistFile, currentPlaylistFromDB.playlistTime)
         mainViewModel.updateCurrentPlaylistToUi(playerController)
         playerController.prepare()
         playerController.pause()

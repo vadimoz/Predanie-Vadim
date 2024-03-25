@@ -550,16 +550,18 @@ class MainViewModel(
                 "firsttime", Context.MODE_PRIVATE
             )
 
+            settingsPrefs.edit().putBoolean("goToNext", false).commit()
+
             if (!prefs.getBoolean("firstTime", false)) {
                 // <---- run one time code here
                 _uiState.update { currentState ->
                     currentState.copy(
-                        goToNext = true,
+                        goToNext = false,
                         percentToFileReady = settingsPrefs.getInt("percentToFileReady", 95)
                     )
                 }
 
-                settingsPrefs.edit().putBoolean("goToNext", true).commit()
+                //settingsPrefs.edit().putBoolean("goToNext", false).commit()
 
                 // mark first time has ran.
                 val editor = prefs.edit()
@@ -570,7 +572,8 @@ class MainViewModel(
                 _uiState.update { currentState ->
                     currentState.copy(
                         //Беру значения, если нет, то ставлю дефолтные
-                        goToNext = settingsPrefs.getBoolean("goToNext", true),
+                        goToNext = false,
+                        //settingsPrefs.getBoolean("goToNext", false),
                         percentToFileReady = settingsPrefs.getInt("percentToFileReady", 95)
                     )
                 }
