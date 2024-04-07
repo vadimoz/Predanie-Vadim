@@ -19,6 +19,12 @@ interface FilePositionDao {
     @Query("SELECT * from FilePosition WHERE fileid= :fileid")
     fun getPositionByFileId(fileid: String?): FilePosition?
 
+    @Query("SELECT * from FilePosition WHERE compositionid= :compositionid")
+    fun getCheckCompositionPlayed(compositionid: String?): FilePosition?
+
+    @Query("SELECT * from FilePosition WHERE compositionid= :compositionid AND lastPlayTimestamp = (SELECT max(lastPlayTimestamp) FROM FilePosition WHERE compositionid= :compositionid )")
+    fun getLastCompositionPlayedFileId(compositionid: String?): FilePosition?
+
     fun insertOrUpdate(filePosition: FilePosition) {
         val itemsFromDB = getPositionByFileIdAndCompositionId(filePosition.fileid, filePosition.compositionid)
         if (itemsFromDB == null) {

@@ -3,6 +3,8 @@ package fund.predanie.medialib.presentation.screens
 import android.content.Context
 import android.content.Intent
 import android.text.Html.fromHtml
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -67,6 +69,7 @@ import fund.predanie.medialib.domain.models.api.items.Tracks
 import fund.predanie.medialib.presentation.MainViewModel
 import fund.predanie.medialib.presentation.screens.accordion.AccordionGroup
 import fund.predanie.medialib.presentation.screens.accordion.AccordionModel
+import io.appmetrica.analytics.impl.id
 
 @Composable
 fun ItemScreen(
@@ -259,8 +262,48 @@ fun ItemScreen(
                                                     mainViewModel.prepareCompositionForPlayer(
                                                         uiState.itemInto?.data!!
                                                     )
+                                                //Задаем вопрос пользователю - продолжить ли прослушивание
+                                                //с последнего файла воспроизведенного в данном произведении
+                                                //если с последнего - смотрим для композиции последний файл
+                                                //по таймстампу ищем его в очереди playerList и идем на него
+                                                //по порядковому номеру
+
+                                                //Если произведение не проигрывалось (в табрице файлов нет записей)
+                                                //запускаем просто play
+
+                                                /*Log.d("COMPOSITION: ",
+                                                    uiState.itemInto?.data!!.id.toString()
+                                                )*/
+
+
                                                 uiState.playerController?.setMediaItems(playerList)
-                                                uiState.playerController?.play()
+                                                if(mainViewModel.checkCompositionPlayed(uiState.itemInto?.data!!.id.toString(), context) != null){
+                                                    //Здесь композиция в которой что-то уже слушалось
+                                                    //Выдаем запрос на проигрывание с начала или с файла на котором в последний раз остановились
+                                                    //для начала просто проигрываем на файле где в последний раз остановились
+
+                                                    val lastFilePlayer = mainViewModel.setPlayerToLastCompositionFile(uiState.itemInto?.data!!.id.toString(), context)
+
+                                                    var countPlayerIndex = 0
+
+                                                    for (item in playerList) {
+                                                        if (lastFilePlayer != null) {
+                                                            if(item.mediaId == lastFilePlayer.fileid){
+                                                                uiState.playerController?.seekTo(countPlayerIndex, mainViewModel.getPlaylistFromDB("Main", context).playlistTime)
+                                                                uiState.playerController?.play()
+                                                                Toast.makeText(
+                                                                    context, "Воспроизведение продолжено с файла на котором Вы остановились",
+                                                                    Toast.LENGTH_LONG
+                                                                ).show()
+                                                            }
+                                                        }
+
+                                                        countPlayerIndex +=1
+                                                    }
+
+                                                } else {
+                                                    uiState.playerController?.play()
+                                                }
                                                 navController.navigate("PlayerScreen")
 
                                                 mainViewModel.playerVisible()

@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.preference.PreferenceManager
+import android.provider.SyncStateContract.Helpers.insert
 import android.text.TextUtils
 import android.util.Log
 import android.widget.Toast
@@ -27,6 +28,7 @@ import fund.predanie.medialib.data.room.AppDatabase
 import fund.predanie.medialib.data.room.FavoriteAuthors
 import fund.predanie.medialib.data.room.FavoriteCompositions
 import fund.predanie.medialib.data.room.FavoriteTracks
+import fund.predanie.medialib.data.room.FilePosition
 import fund.predanie.medialib.data.room.HistoryCompositions
 import fund.predanie.medialib.data.room.MainPlaylist
 import fund.predanie.medialib.data.room.UserPlaylist
@@ -637,7 +639,7 @@ class MainViewModel(
                 playlistArray.add(player.getMediaItemAt(it))
             }
 
-            if(playlistArray.isEmpty() == true){
+            if (playlistArray.isEmpty() == true) {
                 _uiState.update { currentState ->
                     currentState.copy(
                         isPlayerVisible = false,
@@ -806,6 +808,17 @@ class MainViewModel(
                 currentSongTitle = uiState.value.playerController?.mediaMetadata?.title.toString(),
             )
         }
+    }
+
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun checkCompositionPlayed(compositionid: String, context: Context): FilePosition? {
+        return AppDatabase.getInstance(context).filePositionDao().getCheckCompositionPlayed(compositionid)
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    fun setPlayerToLastCompositionFile(compositionid: String, context: Context): FilePosition? {
+        return AppDatabase.getInstance(context).filePositionDao().getLastCompositionPlayedFileId(compositionid)
     }
 
     val handler = Handler(Looper.getMainLooper())
